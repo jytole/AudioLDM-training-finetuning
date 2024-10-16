@@ -227,7 +227,8 @@ def parallel_data_prefetch(
 
 def get_available_checkpoint_keys(model, ckpt):
     print("==> Attemp to reload from %s" % ckpt)
-    state_dict = torch.load(ckpt)["state_dict"]
+    # state_dict = torch.load(ckpt)["state_dict"]
+    state_dict = torch.load(ckpt, map_location=torch.device('cpu'))["state_dict"]
     current_state_dict = model.state_dict()
     new_state_dict = {}
     for k in state_dict.keys():
@@ -279,7 +280,8 @@ def get_vocoder(config, device, mel_bins):
         config = hifigan.AttrDict(config)
         vocoder = hifigan.Generator_HiFiRes(config)
 
-    ckpt = torch.load(model_path + ".ckpt")
+    # ckpt = torch.load(model_path + ".ckpt")
+    ckpt = torch.load(model_path + ".ckpt", map_location=torch.device('cpu'))
     ckpt = torch_version_orig_mod_remove(ckpt)
     vocoder.load_state_dict(ckpt["generator"])
     vocoder.eval()

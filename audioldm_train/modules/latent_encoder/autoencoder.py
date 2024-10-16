@@ -90,7 +90,8 @@ class AutoencoderKL(pl.LightningModule):
 
         if not self.reloaded and self.reload_from_ckpt is not None:
             print("--> Reload weight of autoencoder from %s" % self.reload_from_ckpt)
-            checkpoint = torch.load(self.reload_from_ckpt)
+            # checkpoint = torch.load(self.reload_from_ckpt)
+            checkpoint = torch.load(self.reload_from_ckpt, map_location=torch.device('cpu'))
 
             load_todo_keys = {}
             pretrained_state_dict = checkpoint["state_dict"]

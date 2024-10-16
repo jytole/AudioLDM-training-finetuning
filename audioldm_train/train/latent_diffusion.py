@@ -62,8 +62,9 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
     loader = DataLoader(
         dataset,
         batch_size=batch_size,
-        num_workers=16,
-        pin_memory=True,
+        # num_workers=16,
+        num_workers=12,
+        # pin_memory=True,
         shuffle=True,
     )
 
@@ -135,7 +136,8 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
         print("Train from scratch")
         resume_from_checkpoint = None
 
-    devices = torch.cuda.device_count()
+    # devices = torch.cuda.device_count()
+    devices = 1
 
     latent_diffusion = instantiate_from_config(configs["model"])
     latent_diffusion.set_log_dir(log_path, exp_group_name, exp_name)
@@ -153,7 +155,8 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
     print("==> Perform validation every %s epochs" % validation_every_n_epochs)
 
     trainer = Trainer(
-        accelerator="gpu",
+        # accelerator="gpu",
+        accelerator="cpu",
         devices=devices,
         logger=wandb_logger,
         max_steps=max_steps,
@@ -166,7 +169,8 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
 
     if is_external_checkpoints:
         if resume_from_checkpoint is not None:
-            ckpt = torch.load(resume_from_checkpoint)["state_dict"]
+            # ckpt = torch.load(resume_from_checkpoint)["state_dict"]
+            ckpt = torch.load(resume_from_checkpoint, map_location=torch.device('cpu'))["state_dict"]
 
             key_not_in_model_state_dict = []
             size_mismatch_keys = []
@@ -228,7 +232,8 @@ if __name__ == "__main__":
 
     perform_validation = args.val
 
-    assert torch.cuda.is_available(), "CUDA is not available"
+    #CHANGED: Commented out, because this is what we want to get around
+    # assert torch.cuda.is_available(), "CUDA is not available"
 
     config_yaml = args.config_yaml
 

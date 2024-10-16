@@ -1,0 +1,1685 @@
+Last login: Wed Oct  9 19:58:11 on ttys000
+(base) kyler@Kylers-MacBook-Pro AudioLDM-training-finetuning % conda activate audioldm_train
+(audioldm_train) kyler@Kylers-MacBook-Pro AudioLDM-training-finetuning % python3 tests/validate_dataset_checkpoint.py
+All files and directories are present
+Checking the validity of the audio datasets
+100%|█████████████████████████████████| 49502/49502 [00:00<00:00, 362567.47it/s]
+100%|█████████████████████████████████████| 964/964 [00:00<00:00, 367941.49it/s]
+All audio files are present. You are good to go!
+(audioldm_train) kyler@Kylers-MacBook-Pro AudioLDM-training-finetuning % # Train the AudioLDM (latent diffusion part)
+python3 audioldm_train/train/latent_diffusion.py -c audioldm_train/config/2023_08_23_reproduce_audioldm/audioldm_original.yaml
+
+# Train the VAE (Optional)
+# python3 audioldm_train/train/autoencoder.py -c audioldm_train/config/2023_11_13_vae_autoencoder/16k_64.yaml
+zsh: number expected
+Traceback (most recent call last):
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/train/latent_diffusion.py", line 231, in <module>
+    assert torch.cuda.is_available(), "CUDA is not available"
+AssertionError: CUDA is not available
+zsh: unknown sort specifier
+zsh: command not found: #
+(audioldm_train) kyler@Kylers-MacBook-Pro AudioLDM-training-finetuning % # Train the AudioLDM (latent diffusion part)
+python3 audioldm_train/train/latent_diffusion.py -c audioldm_train/config/2023_08_23_reproduce_audioldm/audioldm_original.yaml
+
+# Train the VAE (Optional)
+# python3 audioldm_train/train/autoencoder.py -c audioldm_train/config/2023_11_13_vae_autoencoder/16k_64.yaml
+zsh: number expected
+SEED EVERYTHING TO 0
+Seed set to 0
+Add-ons: []
+Build dataset split train from ['audiocaps']
+Data size: 49502
+/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/audio/stft.py:42: FutureWarning: Pass size=1024 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  fft_window = pad_center(fft_window, filter_length)
+/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/audio/stft.py:145: FutureWarning: Pass sr=16000, n_fft=1024, n_mels=64, fmin=0, fmax=8000 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  mel_basis = librosa_mel_fn(
+Dataset initialize finished
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/utils/data/dataloader.py:554: UserWarning: This DataLoader will create 16 worker processes in total. Our suggested max number of worker in current system is 12 (`cpuset` is not taken into account), which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(_create_warning_msg(
+The length of the dataset is 49502, the length of the dataloader is 24751, the batchsize is 2
+Add-ons: []
+Build dataset split test from audiocaps
+Data size: 964
+Dataset initialize finished
+Copying test subset data to ./log/testset_data/audiocaps
+100%|████████████████████████████████████████| 964/964 [00:03<00:00, 297.71it/s]
+Train from scratch
+Downloading vocab.json: 100%|████████████████| 899k/899k [00:00<00:00, 14.5MB/s]
+Downloading merges.txt: 100%|████████████████| 456k/456k [00:00<00:00, 15.9MB/s]
+Downloading tokenizer_config.json: 100%|█████| 25.0/25.0 [00:00<00:00, 73.3kB/s]
+Downloading config.json: 100%|█████████████████| 481/481 [00:00<00:00, 1.26MB/s]
+LatentDiffusion: Running in eps-prediction mode
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchlibrosa/stft.py:193: FutureWarning: Pass size=1024 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  fft_window = librosa.util.pad_center(fft_window, n_fft)
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/functional.py:504: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /Users/runner/work/pytorch/pytorch/pytorch/aten/src/ATen/native/TensorShape.cpp:3191.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+Downloading model.safetensors: 100%|█████████| 499M/499M [00:14<00:00, 35.5MB/s]
+Some weights of the model checkpoint at roberta-base were not used when initializing RobertaModel: ['lm_head.dense.weight', 'lm_head.dense.bias', 'lm_head.layer_norm.weight', 'lm_head.bias', 'lm_head.layer_norm.bias']
+- This IS expected if you are initializing RobertaModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing RobertaModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of RobertaModel were not initialized from the model checkpoint at roberta-base and are newly initialized: ['roberta.pooler.dense.bias', 'roberta.pooler.dense.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
++ Use extra condition on UNet channel using Film. Extra condition dimension is 512. 
+DiffusionWrapper has 185.04 M params.
+Keeping EMAs of 692.
+making attention of type 'vanilla' with 512 in_channels
+making attention of type 'vanilla' with 512 in_channels
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/taming/modules/losses/lpips.py:34: SyntaxWarning: "is not" with a literal. Did you mean "!="?
+  if name is not "vgg_lpips":
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+  warnings.warn(
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=VGG16_Weights.IMAGENET1K_V1`. You can also use `weights=VGG16_Weights.DEFAULT` to get the most up-to-date weights.
+  warnings.warn(msg)
+Downloading: "https://download.pytorch.org/models/vgg16-397923af.pth" to /Users/kyler/.cache/torch/hub/checkpoints/vgg16-397923af.pth
+100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 528M/528M [00:15<00:00, 35.5MB/s]
+Downloading vgg_lpips model from https://heibox.uni-heidelberg.de/f/607503859c864bc1b30b/?dl=1 to taming/modules/autoencoder/lpips/vgg.pth
+8.19kB [00:00, 527kB/s]                                                                                                                                                                                               
+loaded pretrained LPIPS loss from taming/modules/autoencoder/lpips/vgg.pth
+Traceback (most recent call last):
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/train/latent_diffusion.py", line 250, in <module>
+    main(config_yaml, config_yaml_path, exp_group_name, exp_name, perform_validation)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/train/latent_diffusion.py", line 140, in main
+    latent_diffusion = instantiate_from_config(configs["model"])
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/model_util.py", line 102, in instantiate_from_config
+    return get_obj_from_str(config["target"])(**config.get("params", dict()))
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_diffusion/ddpm.py", line 1033, in __init__
+    self.instantiate_first_stage(first_stage_config)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_diffusion/ddpm.py", line 1130, in instantiate_first_stage
+    model = instantiate_from_config(config)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/model_util.py", line 102, in instantiate_from_config
+    return get_obj_from_str(config["target"])(**config.get("params", dict()))
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_encoder/autoencoder.py", line 66, in __init__
+    self.vocoder = get_vocoder(None, "cpu", num_mel)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/model_util.py", line 282, in get_vocoder
+    ckpt = torch.load(model_path + ".ckpt")
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/serialization.py", line 789, in load
+    return _load(opened_zipfile, map_location, pickle_module, **pickle_load_args)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/serialization.py", line 1131, in _load
+    result = unpickler.load()
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/serialization.py", line 1101, in persistent_load
+    load_tensor(dtype, nbytes, key, _maybe_decode_ascii(location))
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/serialization.py", line 1083, in load_tensor
+    wrap_storage=restore_location(storage, location),
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/serialization.py", line 215, in default_restore_location
+    result = fn(storage, location)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/serialization.py", line 182, in _cuda_deserialize
+    device = validate_cuda_device(location)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/serialization.py", line 166, in validate_cuda_device
+    raise RuntimeError('Attempting to deserialize object on a CUDA '
+RuntimeError: Attempting to deserialize object on a CUDA device but torch.cuda.is_available() is False. If you are running on a CPU-only machine, please use torch.load with map_location=torch.device('cpu') to map your storages to the CPU.
+zsh: unknown sort specifier
+zsh: command not found: #
+(audioldm_train) kyler@Kylers-MacBook-Pro AudioLDM-training-finetuning % # Train the AudioLDM (latent diffusion part)
+python3 audioldm_train/train/latent_diffusion.py -c audioldm_train/config/2023_08_23_reproduce_audioldm/audioldm_original.yaml
+
+# Train the VAE (Optional)
+# python3 audioldm_train/train/autoencoder.py -c audioldm_train/config/2023_11_13_vae_autoencoder/16k_64.yaml
+zsh: number expected
+SEED EVERYTHING TO 0
+Seed set to 0
+Add-ons: []
+Build dataset split train from ['audiocaps']
+Data size: 49502
+/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/audio/stft.py:42: FutureWarning: Pass size=1024 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  fft_window = pad_center(fft_window, filter_length)
+/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/audio/stft.py:145: FutureWarning: Pass sr=16000, n_fft=1024, n_mels=64, fmin=0, fmax=8000 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  mel_basis = librosa_mel_fn(
+Dataset initialize finished
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/utils/data/dataloader.py:554: UserWarning: This DataLoader will create 16 worker processes in total. Our suggested max number of worker in current system is 12 (`cpuset` is not taken into account), which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(_create_warning_msg(
+The length of the dataset is 49502, the length of the dataloader is 24751, the batchsize is 2
+Add-ons: []
+Build dataset split test from audiocaps
+Data size: 964
+Dataset initialize finished
+Train from scratch
+LatentDiffusion: Running in eps-prediction mode
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchlibrosa/stft.py:193: FutureWarning: Pass size=1024 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  fft_window = librosa.util.pad_center(fft_window, n_fft)
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/functional.py:504: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /Users/runner/work/pytorch/pytorch/pytorch/aten/src/ATen/native/TensorShape.cpp:3191.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+Some weights of the model checkpoint at roberta-base were not used when initializing RobertaModel: ['lm_head.dense.weight', 'lm_head.bias', 'lm_head.layer_norm.weight', 'lm_head.dense.bias', 'lm_head.layer_norm.bias']
+- This IS expected if you are initializing RobertaModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing RobertaModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of RobertaModel were not initialized from the model checkpoint at roberta-base and are newly initialized: ['roberta.pooler.dense.bias', 'roberta.pooler.dense.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
++ Use extra condition on UNet channel using Film. Extra condition dimension is 512. 
+DiffusionWrapper has 185.04 M params.
+Keeping EMAs of 692.
+making attention of type 'vanilla' with 512 in_channels
+making attention of type 'vanilla' with 512 in_channels
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+  warnings.warn(
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=VGG16_Weights.IMAGENET1K_V1`. You can also use `weights=VGG16_Weights.DEFAULT` to get the most up-to-date weights.
+  warnings.warn(msg)
+loaded pretrained LPIPS loss from taming/modules/autoencoder/lpips/vgg.pth
+Traceback (most recent call last):
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/train/latent_diffusion.py", line 250, in <module>
+    main(config_yaml, config_yaml_path, exp_group_name, exp_name, perform_validation)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/train/latent_diffusion.py", line 140, in main
+    latent_diffusion = instantiate_from_config(configs["model"])
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/model_util.py", line 102, in instantiate_from_config
+    return get_obj_from_str(config["target"])(**config.get("params", dict()))
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_diffusion/ddpm.py", line 1033, in __init__
+    self.instantiate_first_stage(first_stage_config)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_diffusion/ddpm.py", line 1130, in instantiate_first_stage
+    model = instantiate_from_config(config)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/model_util.py", line 102, in instantiate_from_config
+    return get_obj_from_str(config["target"])(**config.get("params", dict()))
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_encoder/autoencoder.py", line 66, in __init__
+    self.vocoder = get_vocoder(None, "cpu", num_mel)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/model_util.py", line 282, in get_vocoder
+    ckpt = torch.load(model_path + ".ckpt")
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/serialization.py", line 789, in load
+    return _load(opened_zipfile, map_location, pickle_module, **pickle_load_args)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/serialization.py", line 1131, in _load
+    result = unpickler.load()
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/serialization.py", line 1101, in persistent_load
+    load_tensor(dtype, nbytes, key, _maybe_decode_ascii(location))
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/serialization.py", line 1083, in load_tensor
+    wrap_storage=restore_location(storage, location),
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/serialization.py", line 215, in default_restore_location
+    result = fn(storage, location)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/serialization.py", line 182, in _cuda_deserialize
+    device = validate_cuda_device(location)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/serialization.py", line 166, in validate_cuda_device
+    raise RuntimeError('Attempting to deserialize object on a CUDA '
+RuntimeError: Attempting to deserialize object on a CUDA device but torch.cuda.is_available() is False. If you are running on a CPU-only machine, please use torch.load with map_location=torch.device('cpu') to map your storages to the CPU.
+zsh: unknown sort specifier
+zsh: command not found: #
+(audioldm_train) kyler@Kylers-MacBook-Pro AudioLDM-training-finetuning % # Train the AudioLDM (latent diffusion part)
+python3 audioldm_train/train/latent_diffusion.py -c audioldm_train/config/2023_08_23_reproduce_audioldm/audioldm_original.yaml
+
+# Train the VAE (Optional)
+# python3 audioldm_train/train/autoencoder.py -c audioldm_train/config/2023_11_13_vae_autoencoder/16k_64.yaml
+zsh: number expected
+SEED EVERYTHING TO 0
+Seed set to 0
+Add-ons: []
+Build dataset split train from ['audiocaps']
+Data size: 49502
+/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/audio/stft.py:42: FutureWarning: Pass size=1024 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  fft_window = pad_center(fft_window, filter_length)
+/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/audio/stft.py:145: FutureWarning: Pass sr=16000, n_fft=1024, n_mels=64, fmin=0, fmax=8000 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  mel_basis = librosa_mel_fn(
+Dataset initialize finished
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/utils/data/dataloader.py:554: UserWarning: This DataLoader will create 16 worker processes in total. Our suggested max number of worker in current system is 12 (`cpuset` is not taken into account), which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(_create_warning_msg(
+The length of the dataset is 49502, the length of the dataloader is 24751, the batchsize is 2
+Add-ons: []
+Build dataset split test from audiocaps
+Data size: 964
+Dataset initialize finished
+Train from scratch
+LatentDiffusion: Running in eps-prediction mode
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchlibrosa/stft.py:193: FutureWarning: Pass size=1024 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  fft_window = librosa.util.pad_center(fft_window, n_fft)
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/functional.py:504: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /Users/runner/work/pytorch/pytorch/pytorch/aten/src/ATen/native/TensorShape.cpp:3191.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+Some weights of the model checkpoint at roberta-base were not used when initializing RobertaModel: ['lm_head.layer_norm.bias', 'lm_head.bias', 'lm_head.layer_norm.weight', 'lm_head.dense.bias', 'lm_head.dense.weight']
+- This IS expected if you are initializing RobertaModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing RobertaModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of RobertaModel were not initialized from the model checkpoint at roberta-base and are newly initialized: ['roberta.pooler.dense.bias', 'roberta.pooler.dense.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
++ Use extra condition on UNet channel using Film. Extra condition dimension is 512. 
+DiffusionWrapper has 185.04 M params.
+Keeping EMAs of 692.
+making attention of type 'vanilla' with 512 in_channels
+making attention of type 'vanilla' with 512 in_channels
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+  warnings.warn(
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=VGG16_Weights.IMAGENET1K_V1`. You can also use `weights=VGG16_Weights.DEFAULT` to get the most up-to-date weights.
+  warnings.warn(msg)
+loaded pretrained LPIPS loss from taming/modules/autoencoder/lpips/vgg.pth
+Removing weight norm...
+Initial learning rate 1e-05
+--> Reload weight of autoencoder from data/checkpoints/vae_mel_16k_64bins.ckpt
+Traceback (most recent call last):
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/train/latent_diffusion.py", line 250, in <module>
+    main(config_yaml, config_yaml_path, exp_group_name, exp_name, perform_validation)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/train/latent_diffusion.py", line 140, in main
+    latent_diffusion = instantiate_from_config(configs["model"])
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/model_util.py", line 102, in instantiate_from_config
+    return get_obj_from_str(config["target"])(**config.get("params", dict()))
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_diffusion/ddpm.py", line 1033, in __init__
+    self.instantiate_first_stage(first_stage_config)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_diffusion/ddpm.py", line 1130, in instantiate_first_stage
+    model = instantiate_from_config(config)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/model_util.py", line 102, in instantiate_from_config
+    return get_obj_from_str(config["target"])(**config.get("params", dict()))
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_encoder/autoencoder.py", line 93, in __init__
+    checkpoint = torch.load(self.reload_from_ckpt)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/serialization.py", line 789, in load
+    return _load(opened_zipfile, map_location, pickle_module, **pickle_load_args)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/serialization.py", line 1131, in _load
+    result = unpickler.load()
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/serialization.py", line 1101, in persistent_load
+    load_tensor(dtype, nbytes, key, _maybe_decode_ascii(location))
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/serialization.py", line 1083, in load_tensor
+    wrap_storage=restore_location(storage, location),
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/serialization.py", line 215, in default_restore_location
+    result = fn(storage, location)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/serialization.py", line 182, in _cuda_deserialize
+    device = validate_cuda_device(location)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/serialization.py", line 166, in validate_cuda_device
+    raise RuntimeError('Attempting to deserialize object on a CUDA '
+RuntimeError: Attempting to deserialize object on a CUDA device but torch.cuda.is_available() is False. If you are running on a CPU-only machine, please use torch.load with map_location=torch.device('cpu') to map your storages to the CPU.
+zsh: unknown sort specifier
+zsh: command not found: #
+(audioldm_train) kyler@Kylers-MacBook-Pro AudioLDM-training-finetuning % # Train the AudioLDM (latent diffusion part)
+python3 audioldm_train/train/latent_diffusion.py -c audioldm_train/config/2023_08_23_reproduce_audioldm/audioldm_original.yaml
+
+# Train the VAE (Optional)
+# python3 audioldm_train/train/autoencoder.py -c audioldm_train/config/2023_11_13_vae_autoencoder/16k_64.yaml
+zsh: number expected
+SEED EVERYTHING TO 0
+Seed set to 0
+Add-ons: []
+Build dataset split train from ['audiocaps']
+Data size: 49502
+/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/audio/stft.py:42: FutureWarning: Pass size=1024 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  fft_window = pad_center(fft_window, filter_length)
+/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/audio/stft.py:145: FutureWarning: Pass sr=16000, n_fft=1024, n_mels=64, fmin=0, fmax=8000 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  mel_basis = librosa_mel_fn(
+Dataset initialize finished
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/utils/data/dataloader.py:554: UserWarning: This DataLoader will create 16 worker processes in total. Our suggested max number of worker in current system is 12 (`cpuset` is not taken into account), which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(_create_warning_msg(
+The length of the dataset is 49502, the length of the dataloader is 24751, the batchsize is 2
+Add-ons: []
+Build dataset split test from audiocaps
+Data size: 964
+Dataset initialize finished
+Train from scratch
+LatentDiffusion: Running in eps-prediction mode
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchlibrosa/stft.py:193: FutureWarning: Pass size=1024 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  fft_window = librosa.util.pad_center(fft_window, n_fft)
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/functional.py:504: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /Users/runner/work/pytorch/pytorch/pytorch/aten/src/ATen/native/TensorShape.cpp:3191.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+Some weights of the model checkpoint at roberta-base were not used when initializing RobertaModel: ['lm_head.dense.weight', 'lm_head.layer_norm.weight', 'lm_head.layer_norm.bias', 'lm_head.bias', 'lm_head.dense.bias']
+- This IS expected if you are initializing RobertaModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing RobertaModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of RobertaModel were not initialized from the model checkpoint at roberta-base and are newly initialized: ['roberta.pooler.dense.bias', 'roberta.pooler.dense.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
++ Use extra condition on UNet channel using Film. Extra condition dimension is 512. 
+DiffusionWrapper has 185.04 M params.
+Keeping EMAs of 692.
+making attention of type 'vanilla' with 512 in_channels
+making attention of type 'vanilla' with 512 in_channels
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+  warnings.warn(
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=VGG16_Weights.IMAGENET1K_V1`. You can also use `weights=VGG16_Weights.DEFAULT` to get the most up-to-date weights.
+  warnings.warn(msg)
+loaded pretrained LPIPS loss from taming/modules/autoencoder/lpips/vgg.pth
+Removing weight norm...
+Initial learning rate 1e-05
+--> Reload weight of autoencoder from data/checkpoints/vae_mel_16k_64bins.ckpt
+Some weights of the model checkpoint at roberta-base were not used when initializing RobertaModel: ['lm_head.dense.weight', 'lm_head.layer_norm.weight', 'lm_head.layer_norm.bias', 'lm_head.bias', 'lm_head.dense.bias']
+- This IS expected if you are initializing RobertaModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing RobertaModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of RobertaModel were not initialized from the model checkpoint at roberta-base and are newly initialized: ['roberta.pooler.dense.bias', 'roberta.pooler.dense.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+==> Save checkpoint every 5000 steps
+==> Perform validation every 5 epochs
+Traceback (most recent call last):
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/train/latent_diffusion.py", line 250, in <module>
+    main(config_yaml, config_yaml_path, exp_group_name, exp_name, perform_validation)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/train/latent_diffusion.py", line 155, in main
+    trainer = Trainer(
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/utilities/argparse.py", line 70, in insert_env_defaults
+    return fn(self, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 401, in __init__
+    self._accelerator_connector = _AcceleratorConnector(
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/connectors/accelerator_connector.py", line 139, in __init__
+    self._check_config_and_set_final_flags(
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/connectors/accelerator_connector.py", line 233, in _check_config_and_set_final_flags
+    raise ValueError(
+ValueError: You set `strategy=<pytorch_lightning.strategies.ddp.DDPStrategy object at 0x3083251e0>` but strategies from the DDP family are not supported on the MPS accelerator. Either explicitly set `accelerator='cpu'` or change the strategy.
+zsh: unknown sort specifier
+zsh: command not found: #
+(audioldm_train) kyler@Kylers-MacBook-Pro AudioLDM-training-finetuning % # Train the AudioLDM (latent diffusion part)
+python3 audioldm_train/train/latent_diffusion.py -c audioldm_train/config/2023_08_23_reproduce_audioldm/audioldm_original.yaml
+
+# Train the VAE (Optional)
+# python3 audioldm_train/train/autoencoder.py -c audioldm_train/config/2023_11_13_vae_autoencoder/16k_64.yaml
+zsh: number expected
+SEED EVERYTHING TO 0
+Seed set to 0
+Add-ons: []
+Build dataset split train from ['audiocaps']
+Data size: 49502
+/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/audio/stft.py:42: FutureWarning: Pass size=1024 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  fft_window = pad_center(fft_window, filter_length)
+/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/audio/stft.py:145: FutureWarning: Pass sr=16000, n_fft=1024, n_mels=64, fmin=0, fmax=8000 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  mel_basis = librosa_mel_fn(
+Dataset initialize finished
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/utils/data/dataloader.py:554: UserWarning: This DataLoader will create 16 worker processes in total. Our suggested max number of worker in current system is 12 (`cpuset` is not taken into account), which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(_create_warning_msg(
+The length of the dataset is 49502, the length of the dataloader is 24751, the batchsize is 2
+Add-ons: []
+Build dataset split test from audiocaps
+Data size: 964
+Dataset initialize finished
+Train from scratch
+LatentDiffusion: Running in eps-prediction mode
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchlibrosa/stft.py:193: FutureWarning: Pass size=1024 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  fft_window = librosa.util.pad_center(fft_window, n_fft)
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/functional.py:504: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /Users/runner/work/pytorch/pytorch/pytorch/aten/src/ATen/native/TensorShape.cpp:3191.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+Some weights of the model checkpoint at roberta-base were not used when initializing RobertaModel: ['lm_head.bias', 'lm_head.layer_norm.bias', 'lm_head.dense.weight', 'lm_head.layer_norm.weight', 'lm_head.dense.bias']
+- This IS expected if you are initializing RobertaModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing RobertaModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of RobertaModel were not initialized from the model checkpoint at roberta-base and are newly initialized: ['roberta.pooler.dense.weight', 'roberta.pooler.dense.bias']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
++ Use extra condition on UNet channel using Film. Extra condition dimension is 512. 
+DiffusionWrapper has 185.04 M params.
+Keeping EMAs of 692.
+making attention of type 'vanilla' with 512 in_channels
+making attention of type 'vanilla' with 512 in_channels
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+  warnings.warn(
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=VGG16_Weights.IMAGENET1K_V1`. You can also use `weights=VGG16_Weights.DEFAULT` to get the most up-to-date weights.
+  warnings.warn(msg)
+loaded pretrained LPIPS loss from taming/modules/autoencoder/lpips/vgg.pth
+Removing weight norm...
+Initial learning rate 1e-05
+--> Reload weight of autoencoder from data/checkpoints/vae_mel_16k_64bins.ckpt
+Some weights of the model checkpoint at roberta-base were not used when initializing RobertaModel: ['lm_head.bias', 'lm_head.layer_norm.bias', 'lm_head.dense.weight', 'lm_head.layer_norm.weight', 'lm_head.dense.bias']
+- This IS expected if you are initializing RobertaModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing RobertaModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of RobertaModel were not initialized from the model checkpoint at roberta-base and are newly initialized: ['roberta.pooler.dense.weight', 'roberta.pooler.dense.bias']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+==> Save checkpoint every 5000 steps
+==> Perform validation every 5 epochs
+Traceback (most recent call last):
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/train/latent_diffusion.py", line 250, in <module>
+    main(config_yaml, config_yaml_path, exp_group_name, exp_name, perform_validation)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/train/latent_diffusion.py", line 155, in main
+    trainer = Trainer(
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/utilities/argparse.py", line 70, in insert_env_defaults
+    return fn(self, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 401, in __init__
+    self._accelerator_connector = _AcceleratorConnector(
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/connectors/accelerator_connector.py", line 154, in __init__
+    self._check_device_config_and_set_final_flags(devices=devices, num_nodes=num_nodes)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/connectors/accelerator_connector.py", line 341, in _check_device_config_and_set_final_flags
+    raise MisconfigurationException(
+lightning_fabric.utilities.exceptions.MisconfigurationException: `Trainer(devices=0)` value is not a valid input using cpu accelerator.
+zsh: unknown sort specifier
+zsh: command not found: #
+(audioldm_train) kyler@Kylers-MacBook-Pro AudioLDM-training-finetuning % # Train the AudioLDM (latent diffusion part)
+python3 audioldm_train/train/latent_diffusion.py -c audioldm_train/config/2023_08_23_reproduce_audioldm/audioldm_original.yaml
+
+# Train the VAE (Optional)
+# python3 audioldm_train/train/autoencoder.py -c audioldm_train/config/2023_11_13_vae_autoencoder/16k_64.yaml
+zsh: number expected
+SEED EVERYTHING TO 0
+Seed set to 0
+Add-ons: []
+Build dataset split train from ['audiocaps']
+Data size: 49502
+/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/audio/stft.py:42: FutureWarning: Pass size=1024 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  fft_window = pad_center(fft_window, filter_length)
+/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/audio/stft.py:145: FutureWarning: Pass sr=16000, n_fft=1024, n_mels=64, fmin=0, fmax=8000 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  mel_basis = librosa_mel_fn(
+Dataset initialize finished
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/utils/data/dataloader.py:554: UserWarning: This DataLoader will create 16 worker processes in total. Our suggested max number of worker in current system is 12 (`cpuset` is not taken into account), which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(_create_warning_msg(
+The length of the dataset is 49502, the length of the dataloader is 24751, the batchsize is 2
+Add-ons: []
+Build dataset split test from audiocaps
+Data size: 964
+Dataset initialize finished
+Train from scratch
+LatentDiffusion: Running in eps-prediction mode
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchlibrosa/stft.py:193: FutureWarning: Pass size=1024 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  fft_window = librosa.util.pad_center(fft_window, n_fft)
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/functional.py:504: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /Users/runner/work/pytorch/pytorch/pytorch/aten/src/ATen/native/TensorShape.cpp:3191.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+Some weights of the model checkpoint at roberta-base were not used when initializing RobertaModel: ['lm_head.bias', 'lm_head.dense.bias', 'lm_head.layer_norm.bias', 'lm_head.layer_norm.weight', 'lm_head.dense.weight']
+- This IS expected if you are initializing RobertaModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing RobertaModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of RobertaModel were not initialized from the model checkpoint at roberta-base and are newly initialized: ['roberta.pooler.dense.bias', 'roberta.pooler.dense.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
++ Use extra condition on UNet channel using Film. Extra condition dimension is 512. 
+DiffusionWrapper has 185.04 M params.
+Keeping EMAs of 692.
+making attention of type 'vanilla' with 512 in_channels
+making attention of type 'vanilla' with 512 in_channels
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+  warnings.warn(
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=VGG16_Weights.IMAGENET1K_V1`. You can also use `weights=VGG16_Weights.DEFAULT` to get the most up-to-date weights.
+  warnings.warn(msg)
+loaded pretrained LPIPS loss from taming/modules/autoencoder/lpips/vgg.pth
+Removing weight norm...
+Initial learning rate 1e-05
+--> Reload weight of autoencoder from data/checkpoints/vae_mel_16k_64bins.ckpt
+Some weights of the model checkpoint at roberta-base were not used when initializing RobertaModel: ['lm_head.bias', 'lm_head.dense.bias', 'lm_head.layer_norm.bias', 'lm_head.layer_norm.weight', 'lm_head.dense.weight']
+- This IS expected if you are initializing RobertaModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing RobertaModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of RobertaModel were not initialized from the model checkpoint at roberta-base and are newly initialized: ['roberta.pooler.dense.bias', 'roberta.pooler.dense.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+==> Save checkpoint every 5000 steps
+==> Perform validation every 5 epochs
+GPU available: True (mps), used: False
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/setup.py:187: GPU available but not used. You can set it by doing `Trainer(accelerator='gpu')`.
+[rank: 0] Seed set to 0
+Initializing distributed: GLOBAL_RANK: 0, MEMBER: 1/1
+----------------------------------------------------------------------------------------------------
+distributed_backend=gloo
+All distributed processes registered. Starting with 1 processes
+----------------------------------------------------------------------------------------------------
+
+wandb: (1) Create a W&B account
+wandb: (2) Use an existing W&B account
+wandb: (3) Don't visualize my results
+wandb: Enter your choice: 2
+wandb: You chose 'Use an existing W&B account'
+wandb: Logging into wandb.ai. (Learn how to deploy a W&B server locally: https://wandb.me/wandb-server)
+wandb: You can find your API key in your browser here: https://wandb.ai/authorize
+wandb: Paste an API key from your profile and hit enter, or press ctrl+c to quit: 
+wandb: Appending key for api.wandb.ai to your netrc file: /Users/kyler/.netrc
+wandb: wandb version 0.18.3 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Tracking run with wandb version 0.16.0
+wandb: Run data is saved locally in ./log/latent_diffusion/2023_08_23_reproduce_audioldm/audioldm_original/wandb/run-20241014_212025-3ejecubo
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run 2023_08_23_reproduce_audioldm/audioldm_original
+wandb: ⭐️ View project at https://wandb.ai/kss445team/audioldm
+wandb: 🚀 View run at https://wandb.ai/kss445team/audioldm/runs/3ejecubo
+
+  | Name              | Type                               | Params
+-------------------------------------------------------------------------
+0 | clap              | CLAPAudioEmbeddingClassifierFreev2 | 199 M 
+1 | model             | DiffusionWrapper                   | 185 M 
+2 | model_ema         | LitEma                             | 0     
+3 | first_stage_model | AutoencoderKL                      | 128 M 
+4 | cond_stage_models | ModuleList                         | 158 M 
+  | other params      | n/a                                | 1.0 K 
+-------------------------------------------------------------------------
+185 M     Trainable params
+486 M     Non-trainable params
+671 M     Total params
+2,684.231 Total estimated model params size (MB)
+Sanity Checking: |                                                                                                                                                                              | 0/? [00:00<?, ?it/s]/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/connectors/data_connector.py:441: The 'val_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=11` in the `DataLoader` to improve performance.
+Change the model original cond_keyand embed_mode text, text to text during evaluation
+/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/data/dataset.py:455: FutureWarning: Pass sr=16000, n_fft=1024, n_mels=64, fmin=0, fmax=8000 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  mel = librosa_mel_fn(
+Sanity Checking DataLoader 0:   0%|                                                                                                                                                             | 0/1 [00:00<?, ?it/s]Waveform inference save path:  ./log/latent_diffusion/2023_08_23_reproduce_audioldm/audioldm_original/infer_10-14-21:20_cfg_scale_3.5_ddim_200_n_cand_3
+Plotting: Switched to EMA weights
+Warning: CLAP model normally should use text for evaluation
+Use ddim sampler
+Plotting: Restored training weights
+Traceback (most recent call last):
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/train/latent_diffusion.py", line 251, in <module>
+    main(config_yaml, config_yaml_path, exp_group_name, exp_name, perform_validation)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/train/latent_diffusion.py", line 203, in main
+    trainer.fit(
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 544, in fit
+    call._call_and_handle_interrupt(
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/call.py", line 43, in _call_and_handle_interrupt
+    return trainer.strategy.launcher.launch(trainer_fn, *args, trainer=trainer, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/strategies/launchers/subprocess_script.py", line 102, in launch
+    return function(*args, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 580, in _fit_impl
+    self._run(model, ckpt_path=ckpt_path)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 989, in _run
+    results = self._run_stage()
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 1033, in _run_stage
+    self._run_sanity_check()
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 1062, in _run_sanity_check
+    val_loop.run()
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/loops/utilities.py", line 182, in _decorator
+    return loop_run(self, *args, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/loops/evaluation_loop.py", line 134, in run
+    self._evaluation_step(batch, batch_idx, dataloader_idx, dataloader_iter)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/loops/evaluation_loop.py", line 391, in _evaluation_step
+    output = call._call_strategy_hook(trainer, hook_name, *step_args)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/call.py", line 309, in _call_strategy_hook
+    output = fn(*args, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/strategies/strategy.py", line 402, in validation_step
+    return self._forward_redirection(self.model, self.lightning_module, "validation_step", *args, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/strategies/strategy.py", line 628, in __call__
+    wrapper_output = wrapper_module(*args, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1194, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/nn/parallel/distributed.py", line 1040, in forward
+    output = self._run_ddp_forward(*inputs, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/nn/parallel/distributed.py", line 1003, in _run_ddp_forward
+    return module_to_run(*inputs, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1194, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/strategies/strategy.py", line 621, in wrapped_forward
+    out = method(*_args, **_kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/autograd/grad_mode.py", line 27, in decorate_context
+    return func(*args, **kwargs)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_diffusion/ddpm.py", line 732, in validation_step
+    self.generate_sample(
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/autograd/grad_mode.py", line 27, in decorate_context
+    return func(*args, **kwargs)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_diffusion/ddpm.py", line 1919, in generate_sample
+    samples, _ = self.sample_log(
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/autograd/grad_mode.py", line 27, in decorate_context
+    return func(*args, **kwargs)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_diffusion/ddpm.py", line 1801, in sample_log
+    samples, intermediates = ddim_sampler.sample(
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/autograd/grad_mode.py", line 27, in decorate_context
+    return func(*args, **kwargs)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_diffusion/ddim.py", line 135, in sample
+    self.make_schedule(ddim_num_steps=S, ddim_eta=eta, verbose=verbose)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_diffusion/ddim.py", line 45, in make_schedule
+    self.register_buffer("betas", to_torch(self.model.betas))
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_diffusion/ddim.py", line 27, in register_buffer
+    attr = attr.to(self.device)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/cuda/__init__.py", line 221, in _lazy_init
+    raise AssertionError("Torch not compiled with CUDA enabled")
+AssertionError: Torch not compiled with CUDA enabled
+wandb: 🚀 View run 2023_08_23_reproduce_audioldm/audioldm_original at: https://wandb.ai/kss445team/audioldm/runs/3ejecubo
+wandb: ️⚡ View job at https://wandb.ai/kss445team/audioldm/jobs/QXJ0aWZhY3RDb2xsZWN0aW9uOjQ3NzUwOTA0Ng==/version_details/v0
+wandb: Synced 6 W&B file(s), 0 media file(s), 2 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./log/latent_diffusion/2023_08_23_reproduce_audioldm/audioldm_original/wandb/run-20241014_212025-3ejecubo/logs
+zsh: unknown sort specifier
+zsh: command not found: #
+(audioldm_train) kyler@Kylers-MacBook-Pro AudioLDM-training-finetuning % # Train the AudioLDM (latent diffusion part)
+python3 audioldm_train/train/latent_diffusion.py -c audioldm_train/config/2023_08_23_reproduce_audioldm/audioldm_original.yaml
+
+# Train the VAE (Optional)
+# python3 audioldm_train/train/autoencoder.py -c audioldm_train/config/2023_11_13_vae_autoencoder/16k_64.yaml
+zsh: number expected
+SEED EVERYTHING TO 0
+Seed set to 0
+Add-ons: []
+Build dataset split train from ['audiocaps']
+Data size: 49502
+/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/audio/stft.py:42: FutureWarning: Pass size=1024 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  fft_window = pad_center(fft_window, filter_length)
+/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/audio/stft.py:145: FutureWarning: Pass sr=16000, n_fft=1024, n_mels=64, fmin=0, fmax=8000 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  mel_basis = librosa_mel_fn(
+Dataset initialize finished
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/utils/data/dataloader.py:554: UserWarning: This DataLoader will create 16 worker processes in total. Our suggested max number of worker in current system is 12 (`cpuset` is not taken into account), which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(_create_warning_msg(
+The length of the dataset is 49502, the length of the dataloader is 24751, the batchsize is 2
+Add-ons: []
+Build dataset split test from audiocaps
+Data size: 964
+Dataset initialize finished
+Train from scratch
+LatentDiffusion: Running in eps-prediction mode
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchlibrosa/stft.py:193: FutureWarning: Pass size=1024 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  fft_window = librosa.util.pad_center(fft_window, n_fft)
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/functional.py:504: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /Users/runner/work/pytorch/pytorch/pytorch/aten/src/ATen/native/TensorShape.cpp:3191.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+Some weights of the model checkpoint at roberta-base were not used when initializing RobertaModel: ['lm_head.layer_norm.weight', 'lm_head.dense.weight', 'lm_head.dense.bias', 'lm_head.bias', 'lm_head.layer_norm.bias']
+- This IS expected if you are initializing RobertaModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing RobertaModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of RobertaModel were not initialized from the model checkpoint at roberta-base and are newly initialized: ['roberta.pooler.dense.bias', 'roberta.pooler.dense.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
++ Use extra condition on UNet channel using Film. Extra condition dimension is 512. 
+DiffusionWrapper has 185.04 M params.
+Keeping EMAs of 692.
+making attention of type 'vanilla' with 512 in_channels
+making attention of type 'vanilla' with 512 in_channels
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+  warnings.warn(
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=VGG16_Weights.IMAGENET1K_V1`. You can also use `weights=VGG16_Weights.DEFAULT` to get the most up-to-date weights.
+  warnings.warn(msg)
+loaded pretrained LPIPS loss from taming/modules/autoencoder/lpips/vgg.pth
+Removing weight norm...
+Initial learning rate 1e-05
+--> Reload weight of autoencoder from data/checkpoints/vae_mel_16k_64bins.ckpt
+Some weights of the model checkpoint at roberta-base were not used when initializing RobertaModel: ['lm_head.layer_norm.weight', 'lm_head.dense.weight', 'lm_head.dense.bias', 'lm_head.bias', 'lm_head.layer_norm.bias']
+- This IS expected if you are initializing RobertaModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing RobertaModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of RobertaModel were not initialized from the model checkpoint at roberta-base and are newly initialized: ['roberta.pooler.dense.bias', 'roberta.pooler.dense.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+==> Save checkpoint every 5000 steps
+==> Perform validation every 5 epochs
+GPU available: True (mps), used: False
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/setup.py:187: GPU available but not used. You can set it by doing `Trainer(accelerator='gpu')`.
+[rank: 0] Seed set to 0
+Initializing distributed: GLOBAL_RANK: 0, MEMBER: 1/1
+----------------------------------------------------------------------------------------------------
+distributed_backend=gloo
+All distributed processes registered. Starting with 1 processes
+----------------------------------------------------------------------------------------------------
+
+wandb: Currently logged in as: kss445 (kss445team). Use `wandb login --relogin` to force relogin
+wandb: wandb version 0.18.3 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Tracking run with wandb version 0.16.0
+wandb: Run data is saved locally in ./log/latent_diffusion/2023_08_23_reproduce_audioldm/audioldm_original/wandb/run-20241014_212608-tiyh6jhu
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run 2023_08_23_reproduce_audioldm/audioldm_original
+wandb: ⭐️ View project at https://wandb.ai/kss445team/audioldm
+wandb: 🚀 View run at https://wandb.ai/kss445team/audioldm/runs/tiyh6jhu
+
+  | Name              | Type                               | Params
+-------------------------------------------------------------------------
+0 | clap              | CLAPAudioEmbeddingClassifierFreev2 | 199 M 
+1 | model             | DiffusionWrapper                   | 185 M 
+2 | model_ema         | LitEma                             | 0     
+3 | first_stage_model | AutoencoderKL                      | 128 M 
+4 | cond_stage_models | ModuleList                         | 158 M 
+  | other params      | n/a                                | 1.0 K 
+-------------------------------------------------------------------------
+185 M     Trainable params
+486 M     Non-trainable params
+671 M     Total params
+2,684.231 Total estimated model params size (MB)
+Sanity Checking: |                                                                                                                                                                              | 0/? [00:00<?, ?it/s]/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/connectors/data_connector.py:441: The 'val_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=11` in the `DataLoader` to improve performance.
+Change the model original cond_keyand embed_mode text, text to text during evaluation
+/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/data/dataset.py:455: FutureWarning: Pass sr=16000, n_fft=1024, n_mels=64, fmin=0, fmax=8000 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  mel = librosa_mel_fn(
+Sanity Checking DataLoader 0:   0%|                                                                                                                                                             | 0/1 [00:00<?, ?it/s]Waveform inference save path:  ./log/latent_diffusion/2023_08_23_reproduce_audioldm/audioldm_original/infer_10-14-21:26_cfg_scale_3.5_ddim_200_n_cand_3
+Plotting: Switched to EMA weights
+Warning: CLAP model normally should use text for evaluation
+Use ddim sampler
+Plotting: Restored training weights
+Traceback (most recent call last):
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/train/latent_diffusion.py", line 251, in <module>
+    main(config_yaml, config_yaml_path, exp_group_name, exp_name, perform_validation)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/train/latent_diffusion.py", line 203, in main
+    trainer.fit(
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 544, in fit
+    call._call_and_handle_interrupt(
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/call.py", line 43, in _call_and_handle_interrupt
+    return trainer.strategy.launcher.launch(trainer_fn, *args, trainer=trainer, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/strategies/launchers/subprocess_script.py", line 102, in launch
+    return function(*args, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 580, in _fit_impl
+    self._run(model, ckpt_path=ckpt_path)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 989, in _run
+    results = self._run_stage()
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 1033, in _run_stage
+    self._run_sanity_check()
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 1062, in _run_sanity_check
+    val_loop.run()
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/loops/utilities.py", line 182, in _decorator
+    return loop_run(self, *args, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/loops/evaluation_loop.py", line 134, in run
+    self._evaluation_step(batch, batch_idx, dataloader_idx, dataloader_iter)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/loops/evaluation_loop.py", line 391, in _evaluation_step
+    output = call._call_strategy_hook(trainer, hook_name, *step_args)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/call.py", line 309, in _call_strategy_hook
+    output = fn(*args, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/strategies/strategy.py", line 402, in validation_step
+    return self._forward_redirection(self.model, self.lightning_module, "validation_step", *args, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/strategies/strategy.py", line 628, in __call__
+    wrapper_output = wrapper_module(*args, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1194, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/nn/parallel/distributed.py", line 1040, in forward
+    output = self._run_ddp_forward(*inputs, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/nn/parallel/distributed.py", line 1003, in _run_ddp_forward
+    return module_to_run(*inputs, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1194, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/strategies/strategy.py", line 621, in wrapped_forward
+    out = method(*_args, **_kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/autograd/grad_mode.py", line 27, in decorate_context
+    return func(*args, **kwargs)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_diffusion/ddpm.py", line 732, in validation_step
+    self.generate_sample(
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/autograd/grad_mode.py", line 27, in decorate_context
+    return func(*args, **kwargs)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_diffusion/ddpm.py", line 1919, in generate_sample
+    samples, _ = self.sample_log(
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/autograd/grad_mode.py", line 27, in decorate_context
+    return func(*args, **kwargs)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_diffusion/ddpm.py", line 1801, in sample_log
+    samples, intermediates = ddim_sampler.sample(
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/autograd/grad_mode.py", line 27, in decorate_context
+    return func(*args, **kwargs)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_diffusion/ddim.py", line 135, in sample
+    self.make_schedule(ddim_num_steps=S, ddim_eta=eta, verbose=verbose)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_diffusion/ddim.py", line 45, in make_schedule
+    self.register_buffer("betas", to_torch(self.model.betas))
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_diffusion/ddim.py", line 27, in register_buffer
+    attr = attr.to(self.device)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/cuda/__init__.py", line 221, in _lazy_init
+    raise AssertionError("Torch not compiled with CUDA enabled")
+AssertionError: Torch not compiled with CUDA enabled
+wandb: 🚀 View run 2023_08_23_reproduce_audioldm/audioldm_original at: https://wandb.ai/kss445team/audioldm/runs/tiyh6jhu
+wandb: ️⚡ View job at https://wandb.ai/kss445team/audioldm/jobs/QXJ0aWZhY3RDb2xsZWN0aW9uOjQ3NzUwOTA0Ng==/version_details/v0
+wandb: Synced 6 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./log/latent_diffusion/2023_08_23_reproduce_audioldm/audioldm_original/wandb/run-20241014_212608-tiyh6jhu/logs
+zsh: unknown sort specifier
+zsh: command not found: #
+(audioldm_train) kyler@Kylers-MacBook-Pro AudioLDM-training-finetuning % pip3 install torch torchvision
+Requirement already satisfied: torch in /opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages (1.13.1)
+Requirement already satisfied: torchvision in /opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages (0.14.1)
+Requirement already satisfied: typing-extensions in /opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages (from torch) (4.8.0)
+Requirement already satisfied: numpy in /opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages (from torchvision) (1.23.5)
+Requirement already satisfied: requests in /opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages (from torchvision) (2.31.0)
+Requirement already satisfied: pillow!=8.3.*,>=5.3.0 in /opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages (from torchvision) (10.1.0)
+Requirement already satisfied: charset-normalizer<4,>=2 in /opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages (from requests->torchvision) (3.3.2)
+Requirement already satisfied: idna<4,>=2.5 in /opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages (from requests->torchvision) (3.4)
+Requirement already satisfied: urllib3<3,>=1.21.1 in /opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages (from requests->torchvision) (2.1.0)
+Requirement already satisfied: certifi>=2017.4.17 in /opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages (from requests->torchvision) (2023.7.22)
+(audioldm_train) kyler@Kylers-MacBook-Pro AudioLDM-training-finetuning % # Train the AudioLDM (latent diffusion part)
+python3 audioldm_train/train/latent_diffusion.py -c audioldm_train/config/2023_08_23_reproduce_audioldm/audioldm_original.yaml
+
+# Train the VAE (Optional)
+# python3 audioldm_train/train/autoencoder.py -c audioldm_train/config/2023_11_13_vae_autoencoder/16k_64.yaml
+zsh: number expected
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/_tensor_str.py:115: UserWarning: The operator 'aten::nonzero' is not currently supported on the MPS backend and will fall back to run on the CPU. This may have performance implications. (Triggered internally at /Users/runner/work/pytorch/pytorch/pytorch/aten/src/ATen/mps/MPSFallback.mm:11.)
+  nonzero_finite_vals = torch.masked_select(
+tensor([1.], device='mps:0')
+SEED EVERYTHING TO 0
+Seed set to 0
+Add-ons: []
+Build dataset split train from ['audiocaps']
+Data size: 49502
+/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/audio/stft.py:42: FutureWarning: Pass size=1024 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  fft_window = pad_center(fft_window, filter_length)
+/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/audio/stft.py:145: FutureWarning: Pass sr=16000, n_fft=1024, n_mels=64, fmin=0, fmax=8000 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  mel_basis = librosa_mel_fn(
+Dataset initialize finished
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/utils/data/dataloader.py:554: UserWarning: This DataLoader will create 16 worker processes in total. Our suggested max number of worker in current system is 12 (`cpuset` is not taken into account), which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(_create_warning_msg(
+The length of the dataset is 49502, the length of the dataloader is 24751, the batchsize is 2
+Add-ons: []
+Build dataset split test from audiocaps
+Data size: 964
+Dataset initialize finished
+Train from scratch
+LatentDiffusion: Running in eps-prediction mode
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchlibrosa/stft.py:193: FutureWarning: Pass size=1024 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  fft_window = librosa.util.pad_center(fft_window, n_fft)
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/functional.py:504: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /Users/runner/work/pytorch/pytorch/pytorch/aten/src/ATen/native/TensorShape.cpp:3191.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+Some weights of the model checkpoint at roberta-base were not used when initializing RobertaModel: ['lm_head.layer_norm.bias', 'lm_head.dense.weight', 'lm_head.dense.bias', 'lm_head.bias', 'lm_head.layer_norm.weight']
+- This IS expected if you are initializing RobertaModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing RobertaModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of RobertaModel were not initialized from the model checkpoint at roberta-base and are newly initialized: ['roberta.pooler.dense.bias', 'roberta.pooler.dense.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
++ Use extra condition on UNet channel using Film. Extra condition dimension is 512. 
+DiffusionWrapper has 185.04 M params.
+Keeping EMAs of 692.
+making attention of type 'vanilla' with 512 in_channels
+making attention of type 'vanilla' with 512 in_channels
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+  warnings.warn(
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=VGG16_Weights.IMAGENET1K_V1`. You can also use `weights=VGG16_Weights.DEFAULT` to get the most up-to-date weights.
+  warnings.warn(msg)
+loaded pretrained LPIPS loss from taming/modules/autoencoder/lpips/vgg.pth
+Removing weight norm...
+Initial learning rate 1e-05
+--> Reload weight of autoencoder from data/checkpoints/vae_mel_16k_64bins.ckpt
+Some weights of the model checkpoint at roberta-base were not used when initializing RobertaModel: ['lm_head.layer_norm.bias', 'lm_head.dense.weight', 'lm_head.dense.bias', 'lm_head.bias', 'lm_head.layer_norm.weight']
+- This IS expected if you are initializing RobertaModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing RobertaModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of RobertaModel were not initialized from the model checkpoint at roberta-base and are newly initialized: ['roberta.pooler.dense.bias', 'roberta.pooler.dense.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+==> Save checkpoint every 5000 steps
+==> Perform validation every 5 epochs
+GPU available: True (mps), used: False
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/setup.py:187: GPU available but not used. You can set it by doing `Trainer(accelerator='gpu')`.
+[rank: 0] Seed set to 0
+Initializing distributed: GLOBAL_RANK: 0, MEMBER: 1/1
+----------------------------------------------------------------------------------------------------
+distributed_backend=gloo
+All distributed processes registered. Starting with 1 processes
+----------------------------------------------------------------------------------------------------
+
+wandb: Currently logged in as: kss445 (kss445team). Use `wandb login --relogin` to force relogin
+wandb: wandb version 0.18.3 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Tracking run with wandb version 0.16.0
+wandb: Run data is saved locally in ./log/latent_diffusion/2023_08_23_reproduce_audioldm/audioldm_original/wandb/run-20241014_213151-3f208c8l
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run 2023_08_23_reproduce_audioldm/audioldm_original
+wandb: ⭐️ View project at https://wandb.ai/kss445team/audioldm
+wandb: 🚀 View run at https://wandb.ai/kss445team/audioldm/runs/3f208c8l
+
+  | Name              | Type                               | Params
+-------------------------------------------------------------------------
+0 | clap              | CLAPAudioEmbeddingClassifierFreev2 | 199 M 
+1 | model             | DiffusionWrapper                   | 185 M 
+2 | model_ema         | LitEma                             | 0     
+3 | first_stage_model | AutoencoderKL                      | 128 M 
+4 | cond_stage_models | ModuleList                         | 158 M 
+  | other params      | n/a                                | 1.0 K 
+-------------------------------------------------------------------------
+185 M     Trainable params
+486 M     Non-trainable params
+671 M     Total params
+2,684.231 Total estimated model params size (MB)
+Sanity Checking: |                                                                                                                                                                              | 0/? [00:00<?, ?it/s]/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/connectors/data_connector.py:441: The 'val_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=11` in the `DataLoader` to improve performance.
+Change the model original cond_keyand embed_mode text, text to text during evaluation
+/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/data/dataset.py:455: FutureWarning: Pass sr=16000, n_fft=1024, n_mels=64, fmin=0, fmax=8000 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  mel = librosa_mel_fn(
+Sanity Checking DataLoader 0:   0%|                                                                                                                                                             | 0/1 [00:00<?, ?it/s]Waveform inference save path:  ./log/latent_diffusion/2023_08_23_reproduce_audioldm/audioldm_original/infer_10-14-21:31_cfg_scale_3.5_ddim_200_n_cand_3
+Plotting: Switched to EMA weights
+Warning: CLAP model normally should use text for evaluation
+Use ddim sampler
+Plotting: Restored training weights
+Traceback (most recent call last):
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/train/latent_diffusion.py", line 262, in <module>
+    main(config_yaml, config_yaml_path, exp_group_name, exp_name, perform_validation)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/train/latent_diffusion.py", line 214, in main
+    trainer.fit(
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 544, in fit
+    call._call_and_handle_interrupt(
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/call.py", line 43, in _call_and_handle_interrupt
+    return trainer.strategy.launcher.launch(trainer_fn, *args, trainer=trainer, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/strategies/launchers/subprocess_script.py", line 102, in launch
+    return function(*args, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 580, in _fit_impl
+    self._run(model, ckpt_path=ckpt_path)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 989, in _run
+    results = self._run_stage()
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 1033, in _run_stage
+    self._run_sanity_check()
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 1062, in _run_sanity_check
+    val_loop.run()
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/loops/utilities.py", line 182, in _decorator
+    return loop_run(self, *args, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/loops/evaluation_loop.py", line 134, in run
+    self._evaluation_step(batch, batch_idx, dataloader_idx, dataloader_iter)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/loops/evaluation_loop.py", line 391, in _evaluation_step
+    output = call._call_strategy_hook(trainer, hook_name, *step_args)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/call.py", line 309, in _call_strategy_hook
+    output = fn(*args, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/strategies/strategy.py", line 402, in validation_step
+    return self._forward_redirection(self.model, self.lightning_module, "validation_step", *args, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/strategies/strategy.py", line 628, in __call__
+    wrapper_output = wrapper_module(*args, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1194, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/nn/parallel/distributed.py", line 1040, in forward
+    output = self._run_ddp_forward(*inputs, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/nn/parallel/distributed.py", line 1003, in _run_ddp_forward
+    return module_to_run(*inputs, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1194, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/strategies/strategy.py", line 621, in wrapped_forward
+    out = method(*_args, **_kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/autograd/grad_mode.py", line 27, in decorate_context
+    return func(*args, **kwargs)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_diffusion/ddpm.py", line 732, in validation_step
+    self.generate_sample(
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/autograd/grad_mode.py", line 27, in decorate_context
+    return func(*args, **kwargs)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_diffusion/ddpm.py", line 1919, in generate_sample
+    samples, _ = self.sample_log(
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/autograd/grad_mode.py", line 27, in decorate_context
+    return func(*args, **kwargs)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_diffusion/ddpm.py", line 1801, in sample_log
+    samples, intermediates = ddim_sampler.sample(
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/autograd/grad_mode.py", line 27, in decorate_context
+    return func(*args, **kwargs)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_diffusion/ddim.py", line 135, in sample
+    self.make_schedule(ddim_num_steps=S, ddim_eta=eta, verbose=verbose)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_diffusion/ddim.py", line 45, in make_schedule
+    self.register_buffer("betas", to_torch(self.model.betas))
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_diffusion/ddim.py", line 27, in register_buffer
+    attr = attr.to(self.device)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/cuda/__init__.py", line 221, in _lazy_init
+    raise AssertionError("Torch not compiled with CUDA enabled")
+AssertionError: Torch not compiled with CUDA enabled
+wandb: 🚀 View run 2023_08_23_reproduce_audioldm/audioldm_original at: https://wandb.ai/kss445team/audioldm/runs/3f208c8l
+wandb: ️⚡ View job at https://wandb.ai/kss445team/audioldm/jobs/QXJ0aWZhY3RDb2xsZWN0aW9uOjQ3NzUwOTA0Ng==/version_details/v0
+wandb: Synced 6 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./log/latent_diffusion/2023_08_23_reproduce_audioldm/audioldm_original/wandb/run-20241014_213151-3f208c8l/logs
+zsh: unknown sort specifier
+zsh: command not found: #
+(audioldm_train) kyler@Kylers-MacBook-Pro AudioLDM-training-finetuning % # Train the AudioLDM (latent diffusion part)
+python3 audioldm_train/train/latent_diffusion.py -c audioldm_train/config/2023_08_23_reproduce_audioldm/audioldm_original.yaml
+
+# Train the VAE (Optional)
+# python3 audioldm_train/train/autoencoder.py -c audioldm_train/config/2023_11_13_vae_autoencoder/16k_64.yaml
+zsh: number expected
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/_tensor_str.py:115: UserWarning: The operator 'aten::nonzero' is not currently supported on the MPS backend and will fall back to run on the CPU. This may have performance implications. (Triggered internally at /Users/runner/work/pytorch/pytorch/pytorch/aten/src/ATen/mps/MPSFallback.mm:11.)
+  nonzero_finite_vals = torch.masked_select(
+tensor([1.], device='mps:0')
+SEED EVERYTHING TO 0
+Seed set to 0
+Add-ons: []
+Build dataset split train from ['audiocaps']
+Data size: 49502
+/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/audio/stft.py:42: FutureWarning: Pass size=1024 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  fft_window = pad_center(fft_window, filter_length)
+/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/audio/stft.py:145: FutureWarning: Pass sr=16000, n_fft=1024, n_mels=64, fmin=0, fmax=8000 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  mel_basis = librosa_mel_fn(
+Dataset initialize finished
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/utils/data/dataloader.py:554: UserWarning: This DataLoader will create 16 worker processes in total. Our suggested max number of worker in current system is 12 (`cpuset` is not taken into account), which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(_create_warning_msg(
+The length of the dataset is 49502, the length of the dataloader is 24751, the batchsize is 2
+Add-ons: []
+Build dataset split test from audiocaps
+Data size: 964
+Dataset initialize finished
+Train from scratch
+LatentDiffusion: Running in eps-prediction mode
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchlibrosa/stft.py:193: FutureWarning: Pass size=1024 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  fft_window = librosa.util.pad_center(fft_window, n_fft)
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/functional.py:504: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /Users/runner/work/pytorch/pytorch/pytorch/aten/src/ATen/native/TensorShape.cpp:3191.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+Some weights of the model checkpoint at roberta-base were not used when initializing RobertaModel: ['lm_head.bias', 'lm_head.layer_norm.bias', 'lm_head.dense.bias', 'lm_head.dense.weight', 'lm_head.layer_norm.weight']
+- This IS expected if you are initializing RobertaModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing RobertaModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of RobertaModel were not initialized from the model checkpoint at roberta-base and are newly initialized: ['roberta.pooler.dense.weight', 'roberta.pooler.dense.bias']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
++ Use extra condition on UNet channel using Film. Extra condition dimension is 512. 
+DiffusionWrapper has 185.04 M params.
+Keeping EMAs of 692.
+making attention of type 'vanilla' with 512 in_channels
+making attention of type 'vanilla' with 512 in_channels
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+  warnings.warn(
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=VGG16_Weights.IMAGENET1K_V1`. You can also use `weights=VGG16_Weights.DEFAULT` to get the most up-to-date weights.
+  warnings.warn(msg)
+loaded pretrained LPIPS loss from taming/modules/autoencoder/lpips/vgg.pth
+Removing weight norm...
+Initial learning rate 1e-05
+--> Reload weight of autoencoder from data/checkpoints/vae_mel_16k_64bins.ckpt
+Some weights of the model checkpoint at roberta-base were not used when initializing RobertaModel: ['lm_head.bias', 'lm_head.layer_norm.bias', 'lm_head.dense.bias', 'lm_head.dense.weight', 'lm_head.layer_norm.weight']
+- This IS expected if you are initializing RobertaModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing RobertaModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of RobertaModel were not initialized from the model checkpoint at roberta-base and are newly initialized: ['roberta.pooler.dense.weight', 'roberta.pooler.dense.bias']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+==> Save checkpoint every 5000 steps
+==> Perform validation every 5 epochs
+Traceback (most recent call last):
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/train/latent_diffusion.py", line 263, in <module>
+    main(config_yaml, config_yaml_path, exp_group_name, exp_name, perform_validation)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/train/latent_diffusion.py", line 167, in main
+    trainer = Trainer(
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/utilities/argparse.py", line 70, in insert_env_defaults
+    return fn(self, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 401, in __init__
+    self._accelerator_connector = _AcceleratorConnector(
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/connectors/accelerator_connector.py", line 139, in __init__
+    self._check_config_and_set_final_flags(
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/connectors/accelerator_connector.py", line 233, in _check_config_and_set_final_flags
+    raise ValueError(
+ValueError: You set `strategy=ddp_spawn` but strategies from the DDP family are not supported on the MPS accelerator. Either explicitly set `accelerator='cpu'` or change the strategy.
+zsh: unknown sort specifier
+zsh: command not found: #
+(audioldm_train) kyler@Kylers-MacBook-Pro AudioLDM-training-finetuning % # Train the AudioLDM (latent diffusion part)
+python3 audioldm_train/train/latent_diffusion.py -c audioldm_train/config/2023_08_23_reproduce_audioldm/audioldm_original.yaml
+
+# Train the VAE (Optional)
+# python3 audioldm_train/train/autoencoder.py -c audioldm_train/config/2023_11_13_vae_autoencoder/16k_64.yaml
+zsh: number expected
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/_tensor_str.py:115: UserWarning: The operator 'aten::nonzero' is not currently supported on the MPS backend and will fall back to run on the CPU. This may have performance implications. (Triggered internally at /Users/runner/work/pytorch/pytorch/pytorch/aten/src/ATen/mps/MPSFallback.mm:11.)
+  nonzero_finite_vals = torch.masked_select(
+tensor([1.], device='mps:0')
+SEED EVERYTHING TO 0
+Seed set to 0
+Add-ons: []
+Build dataset split train from ['audiocaps']
+Data size: 49502
+/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/audio/stft.py:42: FutureWarning: Pass size=1024 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  fft_window = pad_center(fft_window, filter_length)
+/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/audio/stft.py:145: FutureWarning: Pass sr=16000, n_fft=1024, n_mels=64, fmin=0, fmax=8000 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  mel_basis = librosa_mel_fn(
+Dataset initialize finished
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/utils/data/dataloader.py:554: UserWarning: This DataLoader will create 16 worker processes in total. Our suggested max number of worker in current system is 12 (`cpuset` is not taken into account), which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(_create_warning_msg(
+The length of the dataset is 49502, the length of the dataloader is 24751, the batchsize is 2
+Add-ons: []
+Build dataset split test from audiocaps
+Data size: 964
+Dataset initialize finished
+Train from scratch
+LatentDiffusion: Running in eps-prediction mode
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchlibrosa/stft.py:193: FutureWarning: Pass size=1024 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  fft_window = librosa.util.pad_center(fft_window, n_fft)
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/functional.py:504: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /Users/runner/work/pytorch/pytorch/pytorch/aten/src/ATen/native/TensorShape.cpp:3191.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+Some weights of the model checkpoint at roberta-base were not used when initializing RobertaModel: ['lm_head.bias', 'lm_head.layer_norm.weight', 'lm_head.dense.bias', 'lm_head.dense.weight', 'lm_head.layer_norm.bias']
+- This IS expected if you are initializing RobertaModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing RobertaModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of RobertaModel were not initialized from the model checkpoint at roberta-base and are newly initialized: ['roberta.pooler.dense.bias', 'roberta.pooler.dense.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
++ Use extra condition on UNet channel using Film. Extra condition dimension is 512. 
+DiffusionWrapper has 185.04 M params.
+Keeping EMAs of 692.
+making attention of type 'vanilla' with 512 in_channels
+making attention of type 'vanilla' with 512 in_channels
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+  warnings.warn(
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=VGG16_Weights.IMAGENET1K_V1`. You can also use `weights=VGG16_Weights.DEFAULT` to get the most up-to-date weights.
+  warnings.warn(msg)
+loaded pretrained LPIPS loss from taming/modules/autoencoder/lpips/vgg.pth
+Removing weight norm...
+Initial learning rate 1e-05
+--> Reload weight of autoencoder from data/checkpoints/vae_mel_16k_64bins.ckpt
+Some weights of the model checkpoint at roberta-base were not used when initializing RobertaModel: ['lm_head.bias', 'lm_head.layer_norm.weight', 'lm_head.dense.bias', 'lm_head.dense.weight', 'lm_head.layer_norm.bias']
+- This IS expected if you are initializing RobertaModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing RobertaModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of RobertaModel were not initialized from the model checkpoint at roberta-base and are newly initialized: ['roberta.pooler.dense.bias', 'roberta.pooler.dense.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+==> Save checkpoint every 5000 steps
+==> Perform validation every 5 epochs
+GPU available: True (mps), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+wandb: Currently logged in as: kss445 (kss445team). Use `wandb login --relogin` to force relogin
+wandb: wandb version 0.18.3 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Tracking run with wandb version 0.16.0
+wandb: Run data is saved locally in ./log/latent_diffusion/2023_08_23_reproduce_audioldm/audioldm_original/wandb/run-20241014_214410-8xeon5jt
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run 2023_08_23_reproduce_audioldm/audioldm_original
+wandb: ⭐️ View project at https://wandb.ai/kss445team/audioldm
+wandb: 🚀 View run at https://wandb.ai/kss445team/audioldm/runs/8xeon5jt
+
+  | Name              | Type                               | Params
+-------------------------------------------------------------------------
+0 | clap              | CLAPAudioEmbeddingClassifierFreev2 | 199 M 
+1 | model             | DiffusionWrapper                   | 185 M 
+2 | model_ema         | LitEma                             | 0     
+3 | first_stage_model | AutoencoderKL                      | 128 M 
+4 | cond_stage_models | ModuleList                         | 158 M 
+  | other params      | n/a                                | 1.0 K 
+-------------------------------------------------------------------------
+185 M     Trainable params
+486 M     Non-trainable params
+671 M     Total params
+2,684.231 Total estimated model params size (MB)
+Sanity Checking: |                                                                                                                                                                              | 0/? [00:00<?, ?it/s]/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/connectors/data_connector.py:441: The 'val_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=11` in the `DataLoader` to improve performance.
+Change the model original cond_keyand embed_mode text, text to text during evaluation
+/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/data/dataset.py:455: FutureWarning: Pass sr=16000, n_fft=1024, n_mels=64, fmin=0, fmax=8000 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  mel = librosa_mel_fn(
+Traceback (most recent call last):
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/train/latent_diffusion.py", line 263, in <module>
+    main(config_yaml, config_yaml_path, exp_group_name, exp_name, perform_validation)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/train/latent_diffusion.py", line 215, in main
+    trainer.fit(
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 544, in fit
+    call._call_and_handle_interrupt(
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/call.py", line 44, in _call_and_handle_interrupt
+    return trainer_fn(*args, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 580, in _fit_impl
+    self._run(model, ckpt_path=ckpt_path)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 989, in _run
+    results = self._run_stage()
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 1033, in _run_stage
+    self._run_sanity_check()
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 1062, in _run_sanity_check
+    val_loop.run()
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/loops/utilities.py", line 182, in _decorator
+    return loop_run(self, *args, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/loops/evaluation_loop.py", line 134, in run
+    self._evaluation_step(batch, batch_idx, dataloader_idx, dataloader_iter)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/loops/evaluation_loop.py", line 365, in _evaluation_step
+    batch = call._call_strategy_hook(trainer, "batch_to_device", batch, dataloader_idx=dataloader_idx)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/call.py", line 309, in _call_strategy_hook
+    output = fn(*args, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/strategies/strategy.py", line 269, in batch_to_device
+    return model._apply_batch_transfer_handler(batch, device=device, dataloader_idx=dataloader_idx)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/core/module.py", line 333, in _apply_batch_transfer_handler
+    batch = self._call_batch_hook("transfer_batch_to_device", batch, device, dataloader_idx)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/core/module.py", line 322, in _call_batch_hook
+    return trainer_method(trainer, hook_name, *args)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/call.py", line 157, in _call_lightning_module_hook
+    output = fn(*args, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/core/hooks.py", line 583, in transfer_batch_to_device
+    return move_data_to_device(batch, device)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/lightning_fabric/utilities/apply_func.py", line 102, in move_data_to_device
+    return apply_to_collection(batch, dtype=_TransferableDataType, function=batch_to)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/lightning_utilities/core/apply_func.py", line 59, in apply_to_collection
+    v = apply_to_collection(
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/lightning_utilities/core/apply_func.py", line 51, in apply_to_collection
+    return function(data, *args, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/lightning_fabric/utilities/apply_func.py", line 96, in batch_to
+    data_output = data.to(device, **kwargs)
+TypeError: Cannot convert a MPS Tensor to float64 dtype as the MPS framework doesn't support float64. Please use float32 instead.
+wandb: 🚀 View run 2023_08_23_reproduce_audioldm/audioldm_original at: https://wandb.ai/kss445team/audioldm/runs/8xeon5jt
+wandb: ️⚡ View job at https://wandb.ai/kss445team/audioldm/jobs/QXJ0aWZhY3RDb2xsZWN0aW9uOjQ3NzUwOTA0Ng==/version_details/v0
+wandb: Synced 6 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./log/latent_diffusion/2023_08_23_reproduce_audioldm/audioldm_original/wandb/run-20241014_214410-8xeon5jt/logs
+zsh: unknown sort specifier
+zsh: command not found: #
+(audioldm_train) kyler@Kylers-MacBook-Pro AudioLDM-training-finetuning % # Train the AudioLDM (latent diffusion part)
+python3 audioldm_train/train/latent_diffusion.py -c audioldm_train/config/2023_08_23_reproduce_audioldm/audioldm_original.yaml
+
+# Train the VAE (Optional)
+# python3 audioldm_train/train/autoencoder.py -c audioldm_train/config/2023_11_13_vae_autoencoder/16k_64.yaml
+zsh: number expected
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/_tensor_str.py:115: UserWarning: The operator 'aten::nonzero' is not currently supported on the MPS backend and will fall back to run on the CPU. This may have performance implications. (Triggered internally at /Users/runner/work/pytorch/pytorch/pytorch/aten/src/ATen/mps/MPSFallback.mm:11.)
+  nonzero_finite_vals = torch.masked_select(
+tensor([1.], device='mps:0')
+SEED EVERYTHING TO 0
+Seed set to 0
+Add-ons: []
+Build dataset split train from ['audiocaps']
+Data size: 49502
+/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/audio/stft.py:42: FutureWarning: Pass size=1024 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  fft_window = pad_center(fft_window, filter_length)
+/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/audio/stft.py:145: FutureWarning: Pass sr=16000, n_fft=1024, n_mels=64, fmin=0, fmax=8000 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  mel_basis = librosa_mel_fn(
+Dataset initialize finished
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/utils/data/dataloader.py:554: UserWarning: This DataLoader will create 16 worker processes in total. Our suggested max number of worker in current system is 12 (`cpuset` is not taken into account), which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(_create_warning_msg(
+The length of the dataset is 49502, the length of the dataloader is 24751, the batchsize is 2
+Add-ons: []
+Build dataset split test from audiocaps
+Data size: 964
+Dataset initialize finished
+Train from scratch
+LatentDiffusion: Running in eps-prediction mode
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchlibrosa/stft.py:193: FutureWarning: Pass size=1024 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  fft_window = librosa.util.pad_center(fft_window, n_fft)
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/functional.py:504: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /Users/runner/work/pytorch/pytorch/pytorch/aten/src/ATen/native/TensorShape.cpp:3191.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+Some weights of the model checkpoint at roberta-base were not used when initializing RobertaModel: ['lm_head.dense.weight', 'lm_head.layer_norm.bias', 'lm_head.dense.bias', 'lm_head.layer_norm.weight', 'lm_head.bias']
+- This IS expected if you are initializing RobertaModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing RobertaModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of RobertaModel were not initialized from the model checkpoint at roberta-base and are newly initialized: ['roberta.pooler.dense.bias', 'roberta.pooler.dense.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
++ Use extra condition on UNet channel using Film. Extra condition dimension is 512. 
+DiffusionWrapper has 185.04 M params.
+Keeping EMAs of 692.
+making attention of type 'vanilla' with 512 in_channels
+making attention of type 'vanilla' with 512 in_channels
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+  warnings.warn(
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=VGG16_Weights.IMAGENET1K_V1`. You can also use `weights=VGG16_Weights.DEFAULT` to get the most up-to-date weights.
+  warnings.warn(msg)
+loaded pretrained LPIPS loss from taming/modules/autoencoder/lpips/vgg.pth
+Removing weight norm...
+Initial learning rate 1e-05
+--> Reload weight of autoencoder from data/checkpoints/vae_mel_16k_64bins.ckpt
+Some weights of the model checkpoint at roberta-base were not used when initializing RobertaModel: ['lm_head.dense.weight', 'lm_head.layer_norm.bias', 'lm_head.dense.bias', 'lm_head.layer_norm.weight', 'lm_head.bias']
+- This IS expected if you are initializing RobertaModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing RobertaModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of RobertaModel were not initialized from the model checkpoint at roberta-base and are newly initialized: ['roberta.pooler.dense.bias', 'roberta.pooler.dense.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+==> Save checkpoint every 5000 steps
+==> Perform validation every 5 epochs
+GPU available: True (mps), used: False
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/setup.py:187: GPU available but not used. You can set it by doing `Trainer(accelerator='gpu')`.
+wandb: Currently logged in as: kss445 (kss445team). Use `wandb login --relogin` to force relogin
+wandb: wandb version 0.18.3 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Tracking run with wandb version 0.16.0
+wandb: Run data is saved locally in ./log/latent_diffusion/2023_08_23_reproduce_audioldm/audioldm_original/wandb/run-20241014_214513-418xm39c
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run 2023_08_23_reproduce_audioldm/audioldm_original
+wandb: ⭐️ View project at https://wandb.ai/kss445team/audioldm
+wandb: 🚀 View run at https://wandb.ai/kss445team/audioldm/runs/418xm39c
+
+  | Name              | Type                               | Params
+-------------------------------------------------------------------------
+0 | clap              | CLAPAudioEmbeddingClassifierFreev2 | 199 M 
+1 | model             | DiffusionWrapper                   | 185 M 
+2 | model_ema         | LitEma                             | 0     
+3 | first_stage_model | AutoencoderKL                      | 128 M 
+4 | cond_stage_models | ModuleList                         | 158 M 
+  | other params      | n/a                                | 1.0 K 
+-------------------------------------------------------------------------
+185 M     Trainable params
+486 M     Non-trainable params
+671 M     Total params
+2,684.231 Total estimated model params size (MB)
+Sanity Checking: |                                                                                                                                                                              | 0/? [00:00<?, ?it/s]/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/connectors/data_connector.py:441: The 'val_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=11` in the `DataLoader` to improve performance.
+Change the model original cond_keyand embed_mode text, text to text during evaluation
+/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/data/dataset.py:455: FutureWarning: Pass sr=16000, n_fft=1024, n_mels=64, fmin=0, fmax=8000 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  mel = librosa_mel_fn(
+Sanity Checking DataLoader 0:   0%|                                                                                                                                                             | 0/1 [00:00<?, ?it/s]Waveform inference save path:  ./log/latent_diffusion/2023_08_23_reproduce_audioldm/audioldm_original/infer_10-14-21:45_cfg_scale_3.5_ddim_200_n_cand_3
+Plotting: Switched to EMA weights
+Warning: CLAP model normally should use text for evaluation
+Use ddim sampler
+Plotting: Restored training weights
+Traceback (most recent call last):
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/train/latent_diffusion.py", line 263, in <module>
+    main(config_yaml, config_yaml_path, exp_group_name, exp_name, perform_validation)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/train/latent_diffusion.py", line 215, in main
+    trainer.fit(
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 544, in fit
+    call._call_and_handle_interrupt(
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/call.py", line 44, in _call_and_handle_interrupt
+    return trainer_fn(*args, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 580, in _fit_impl
+    self._run(model, ckpt_path=ckpt_path)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 989, in _run
+    results = self._run_stage()
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 1033, in _run_stage
+    self._run_sanity_check()
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 1062, in _run_sanity_check
+    val_loop.run()
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/loops/utilities.py", line 182, in _decorator
+    return loop_run(self, *args, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/loops/evaluation_loop.py", line 134, in run
+    self._evaluation_step(batch, batch_idx, dataloader_idx, dataloader_iter)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/loops/evaluation_loop.py", line 391, in _evaluation_step
+    output = call._call_strategy_hook(trainer, hook_name, *step_args)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/call.py", line 309, in _call_strategy_hook
+    output = fn(*args, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/strategies/strategy.py", line 403, in validation_step
+    return self.lightning_module.validation_step(*args, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/autograd/grad_mode.py", line 27, in decorate_context
+    return func(*args, **kwargs)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_diffusion/ddpm.py", line 732, in validation_step
+    self.generate_sample(
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/autograd/grad_mode.py", line 27, in decorate_context
+    return func(*args, **kwargs)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_diffusion/ddpm.py", line 1919, in generate_sample
+    samples, _ = self.sample_log(
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/autograd/grad_mode.py", line 27, in decorate_context
+    return func(*args, **kwargs)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_diffusion/ddpm.py", line 1801, in sample_log
+    samples, intermediates = ddim_sampler.sample(
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/autograd/grad_mode.py", line 27, in decorate_context
+    return func(*args, **kwargs)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_diffusion/ddim.py", line 135, in sample
+    self.make_schedule(ddim_num_steps=S, ddim_eta=eta, verbose=verbose)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_diffusion/ddim.py", line 45, in make_schedule
+    self.register_buffer("betas", to_torch(self.model.betas))
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_diffusion/ddim.py", line 27, in register_buffer
+    attr = attr.to(self.device)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/cuda/__init__.py", line 221, in _lazy_init
+    raise AssertionError("Torch not compiled with CUDA enabled")
+AssertionError: Torch not compiled with CUDA enabled
+wandb: 🚀 View run 2023_08_23_reproduce_audioldm/audioldm_original at: https://wandb.ai/kss445team/audioldm/runs/418xm39c
+wandb: ️⚡ View job at https://wandb.ai/kss445team/audioldm/jobs/QXJ0aWZhY3RDb2xsZWN0aW9uOjQ3NzUwOTA0Ng==/version_details/v0
+wandb: Synced 6 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./log/latent_diffusion/2023_08_23_reproduce_audioldm/audioldm_original/wandb/run-20241014_214513-418xm39c/logs
+Exception in thread Exception in thread NetStatThrChkStopThr:
+:
+Traceback (most recent call last):
+Traceback (most recent call last):
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/threading.py", line 1016, in _bootstrap_inner
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/threading.py", line 1016, in _bootstrap_inner
+    self.run()
+    self.run()
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/threading.py", line 953, in run
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/threading.py", line 953, in run
+    self._target(*self._args, **self._kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/wandb/sdk/wandb_run.py", line 286, in check_stop_status
+    self._target(*self._args, **self._kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/wandb/sdk/wandb_run.py", line 268, in check_network_status
+    self._loop_check_status(
+    self._loop_check_status(  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/wandb/sdk/wandb_run.py", line 224, in _loop_check_status
+
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/wandb/sdk/wandb_run.py", line 224, in _loop_check_status
+    local_handle = request()
+    local_handle = request()  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/wandb/sdk/interface/interface.py", line 750, in deliver_stop_status
+
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/wandb/sdk/interface/interface.py", line 758, in deliver_network_status
+        return self._deliver_stop_status(status)return self._deliver_network_status(status)
+
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/wandb/sdk/interface/interface_shared.py", line 468, in _deliver_stop_status
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/wandb/sdk/interface/interface_shared.py", line 484, in _deliver_network_status
+    return self._deliver_record(record)
+      File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/wandb/sdk/interface/interface_shared.py", line 437, in _deliver_record
+return self._deliver_record(record)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/wandb/sdk/interface/interface_shared.py", line 437, in _deliver_record
+        handle = mailbox._deliver_record(record, interface=self)handle = mailbox._deliver_record(record, interface=self)
+
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/wandb/sdk/lib/mailbox.py", line 455, in _deliver_record
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/wandb/sdk/lib/mailbox.py", line 455, in _deliver_record
+    interface._publish(record)
+    interface._publish(record)  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/wandb/sdk/interface/interface_sock.py", line 51, in _publish
+
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/wandb/sdk/interface/interface_sock.py", line 51, in _publish
+    self._sock_client.send_record_publish(record)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/wandb/sdk/lib/sock_client.py", line 221, in send_record_publish
+    self._sock_client.send_record_publish(record)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/wandb/sdk/lib/sock_client.py", line 221, in send_record_publish
+    self.send_server_request(server_req)    
+self.send_server_request(server_req)  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/wandb/sdk/lib/sock_client.py", line 155, in send_server_request
+
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/wandb/sdk/lib/sock_client.py", line 155, in send_server_request
+    self._send_message(msg)
+      File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/wandb/sdk/lib/sock_client.py", line 152, in _send_message
+self._send_message(msg)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/wandb/sdk/lib/sock_client.py", line 152, in _send_message
+    self._sendall_with_error_handle(header + data)    
+self._sendall_with_error_handle(header + data)  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/wandb/sdk/lib/sock_client.py", line 130, in _sendall_with_error_handle
+
+      File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/wandb/sdk/lib/sock_client.py", line 130, in _sendall_with_error_handle
+sent = self._sock.send(data)
+BrokenPipeError: [Errno 32] Broken pipe
+    sent = self._sock.send(data)
+BrokenPipeError: [Errno 32] Broken pipe
+zsh: unknown sort specifier
+zsh: command not found: #
+(audioldm_train) kyler@Kylers-MacBook-Pro AudioLDM-training-finetuning % # Train the AudioLDM (latent diffusion part)
+python3 audioldm_train/train/latent_diffusion.py -c audioldm_train/config/2023_08_23_reproduce_audioldm/audioldm_original.yaml
+
+# Train the VAE (Optional)
+# python3 audioldm_train/train/autoencoder.py -c audioldm_train/config/2023_11_13_vae_autoencoder/16k_64.yaml
+zsh: number expected
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/_tensor_str.py:115: UserWarning: The operator 'aten::nonzero' is not currently supported on the MPS backend and will fall back to run on the CPU. This may have performance implications. (Triggered internally at /Users/runner/work/pytorch/pytorch/pytorch/aten/src/ATen/mps/MPSFallback.mm:11.)
+  nonzero_finite_vals = torch.masked_select(
+tensor([1.], device='mps:0')
+SEED EVERYTHING TO 0
+Seed set to 0
+Add-ons: []
+Build dataset split train from ['audiocaps']
+Data size: 49502
+/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/audio/stft.py:42: FutureWarning: Pass size=1024 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  fft_window = pad_center(fft_window, filter_length)
+/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/audio/stft.py:145: FutureWarning: Pass sr=16000, n_fft=1024, n_mels=64, fmin=0, fmax=8000 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  mel_basis = librosa_mel_fn(
+Dataset initialize finished
+The length of the dataset is 49502, the length of the dataloader is 24751, the batchsize is 2
+Add-ons: []
+Build dataset split test from audiocaps
+Data size: 964
+Dataset initialize finished
+Train from scratch
+LatentDiffusion: Running in eps-prediction mode
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchlibrosa/stft.py:193: FutureWarning: Pass size=1024 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  fft_window = librosa.util.pad_center(fft_window, n_fft)
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/functional.py:504: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /Users/runner/work/pytorch/pytorch/pytorch/aten/src/ATen/native/TensorShape.cpp:3191.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+Some weights of the model checkpoint at roberta-base were not used when initializing RobertaModel: ['lm_head.dense.bias', 'lm_head.bias', 'lm_head.dense.weight', 'lm_head.layer_norm.bias', 'lm_head.layer_norm.weight']
+- This IS expected if you are initializing RobertaModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing RobertaModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of RobertaModel were not initialized from the model checkpoint at roberta-base and are newly initialized: ['roberta.pooler.dense.weight', 'roberta.pooler.dense.bias']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
++ Use extra condition on UNet channel using Film. Extra condition dimension is 512. 
+DiffusionWrapper has 185.04 M params.
+Keeping EMAs of 692.
+making attention of type 'vanilla' with 512 in_channels
+making attention of type 'vanilla' with 512 in_channels
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+  warnings.warn(
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=VGG16_Weights.IMAGENET1K_V1`. You can also use `weights=VGG16_Weights.DEFAULT` to get the most up-to-date weights.
+  warnings.warn(msg)
+loaded pretrained LPIPS loss from taming/modules/autoencoder/lpips/vgg.pth
+Removing weight norm...
+Initial learning rate 1e-05
+--> Reload weight of autoencoder from data/checkpoints/vae_mel_16k_64bins.ckpt
+Some weights of the model checkpoint at roberta-base were not used when initializing RobertaModel: ['lm_head.dense.bias', 'lm_head.bias', 'lm_head.dense.weight', 'lm_head.layer_norm.bias', 'lm_head.layer_norm.weight']
+- This IS expected if you are initializing RobertaModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing RobertaModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of RobertaModel were not initialized from the model checkpoint at roberta-base and are newly initialized: ['roberta.pooler.dense.weight', 'roberta.pooler.dense.bias']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+==> Save checkpoint every 5000 steps
+==> Perform validation every 5 epochs
+GPU available: True (mps), used: False
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/setup.py:187: GPU available but not used. You can set it by doing `Trainer(accelerator='gpu')`.
+[rank: 0] Seed set to 0
+Initializing distributed: GLOBAL_RANK: 0, MEMBER: 1/1
+----------------------------------------------------------------------------------------------------
+distributed_backend=gloo
+All distributed processes registered. Starting with 1 processes
+----------------------------------------------------------------------------------------------------
+
+wandb: Currently logged in as: kss445 (kss445team). Use `wandb login --relogin` to force relogin
+wandb: wandb version 0.18.3 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Tracking run with wandb version 0.16.0
+wandb: Run data is saved locally in ./log/latent_diffusion/2023_08_23_reproduce_audioldm/audioldm_original/wandb/run-20241014_215047-8sk9sczf
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run 2023_08_23_reproduce_audioldm/audioldm_original
+wandb: ⭐️ View project at https://wandb.ai/kss445team/audioldm
+wandb: 🚀 View run at https://wandb.ai/kss445team/audioldm/runs/8sk9sczf
+
+  | Name              | Type                               | Params
+-------------------------------------------------------------------------
+0 | clap              | CLAPAudioEmbeddingClassifierFreev2 | 199 M 
+1 | model             | DiffusionWrapper                   | 185 M 
+2 | model_ema         | LitEma                             | 0     
+3 | first_stage_model | AutoencoderKL                      | 128 M 
+4 | cond_stage_models | ModuleList                         | 158 M 
+  | other params      | n/a                                | 1.0 K 
+-------------------------------------------------------------------------
+185 M     Trainable params
+486 M     Non-trainable params
+671 M     Total params
+2,684.231 Total estimated model params size (MB)
+Sanity Checking: |                                                                                                                                                                              | 0/? [00:00<?, ?it/s]/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/connectors/data_connector.py:441: The 'val_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=11` in the `DataLoader` to improve performance.
+Change the model original cond_keyand embed_mode text, text to text during evaluation
+/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/data/dataset.py:455: FutureWarning: Pass sr=16000, n_fft=1024, n_mels=64, fmin=0, fmax=8000 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  mel = librosa_mel_fn(
+Sanity Checking DataLoader 0:   0%|                                                                                                                                                             | 0/1 [00:00<?, ?it/s]Waveform inference save path:  ./log/latent_diffusion/2023_08_23_reproduce_audioldm/audioldm_original/infer_10-14-21:50_cfg_scale_3.5_ddim_200_n_cand_3
+Plotting: Switched to EMA weights
+Warning: CLAP model normally should use text for evaluation
+Use ddim sampler
+Plotting: Restored training weights
+Traceback (most recent call last):
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/train/latent_diffusion.py", line 262, in <module>
+    main(config_yaml, config_yaml_path, exp_group_name, exp_name, perform_validation)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/train/latent_diffusion.py", line 214, in main
+    trainer.fit(
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 544, in fit
+    call._call_and_handle_interrupt(
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/call.py", line 43, in _call_and_handle_interrupt
+    return trainer.strategy.launcher.launch(trainer_fn, *args, trainer=trainer, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/strategies/launchers/subprocess_script.py", line 102, in launch
+    return function(*args, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 580, in _fit_impl
+    self._run(model, ckpt_path=ckpt_path)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 989, in _run
+    results = self._run_stage()
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 1033, in _run_stage
+    self._run_sanity_check()
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 1062, in _run_sanity_check
+    val_loop.run()
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/loops/utilities.py", line 182, in _decorator
+    return loop_run(self, *args, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/loops/evaluation_loop.py", line 134, in run
+    self._evaluation_step(batch, batch_idx, dataloader_idx, dataloader_iter)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/loops/evaluation_loop.py", line 391, in _evaluation_step
+    output = call._call_strategy_hook(trainer, hook_name, *step_args)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/call.py", line 309, in _call_strategy_hook
+    output = fn(*args, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/strategies/strategy.py", line 402, in validation_step
+    return self._forward_redirection(self.model, self.lightning_module, "validation_step", *args, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/strategies/strategy.py", line 628, in __call__
+    wrapper_output = wrapper_module(*args, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1194, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/nn/parallel/distributed.py", line 1040, in forward
+    output = self._run_ddp_forward(*inputs, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/nn/parallel/distributed.py", line 1003, in _run_ddp_forward
+    return module_to_run(*inputs, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1194, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/strategies/strategy.py", line 621, in wrapped_forward
+    out = method(*_args, **_kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/autograd/grad_mode.py", line 27, in decorate_context
+    return func(*args, **kwargs)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_diffusion/ddpm.py", line 732, in validation_step
+    self.generate_sample(
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/autograd/grad_mode.py", line 27, in decorate_context
+    return func(*args, **kwargs)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_diffusion/ddpm.py", line 1919, in generate_sample
+    samples, _ = self.sample_log(
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/autograd/grad_mode.py", line 27, in decorate_context
+    return func(*args, **kwargs)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_diffusion/ddpm.py", line 1801, in sample_log
+    samples, intermediates = ddim_sampler.sample(
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/autograd/grad_mode.py", line 27, in decorate_context
+    return func(*args, **kwargs)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_diffusion/ddim.py", line 135, in sample
+    self.make_schedule(ddim_num_steps=S, ddim_eta=eta, verbose=verbose)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_diffusion/ddim.py", line 45, in make_schedule
+    self.register_buffer("betas", to_torch(self.model.betas))
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_diffusion/ddim.py", line 27, in register_buffer
+    attr = attr.to(self.device)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/cuda/__init__.py", line 221, in _lazy_init
+    raise AssertionError("Torch not compiled with CUDA enabled")
+AssertionError: Torch not compiled with CUDA enabled
+wandb: 🚀 View run 2023_08_23_reproduce_audioldm/audioldm_original at: https://wandb.ai/kss445team/audioldm/runs/8sk9sczf
+wandb: ️⚡ View job at https://wandb.ai/kss445team/audioldm/jobs/QXJ0aWZhY3RDb2xsZWN0aW9uOjQ3NzUwOTA0Ng==/version_details/v0
+wandb: Synced 6 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./log/latent_diffusion/2023_08_23_reproduce_audioldm/audioldm_original/wandb/run-20241014_215047-8sk9sczf/logs
+zsh: unknown sort specifier
+zsh: command not found: #
+(audioldm_train) kyler@Kylers-MacBook-Pro AudioLDM-training-finetuning % # Train the AudioLDM (latent diffusion part)
+python3 audioldm_train/train/latent_diffusion.py -c audioldm_train/config/2023_08_23_reproduce_audioldm/audioldm_original.yaml
+
+# Train the VAE (Optional)
+# python3 audioldm_train/train/autoencoder.py -c audioldm_train/config/2023_11_13_vae_autoencoder/16k_64.yaml
+zsh: number expected
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/_tensor_str.py:115: UserWarning: The operator 'aten::nonzero' is not currently supported on the MPS backend and will fall back to run on the CPU. This may have performance implications. (Triggered internally at /Users/runner/work/pytorch/pytorch/pytorch/aten/src/ATen/mps/MPSFallback.mm:11.)
+  nonzero_finite_vals = torch.masked_select(
+tensor([1.], device='mps:0')
+SEED EVERYTHING TO 0
+Seed set to 0
+Add-ons: []
+Build dataset split train from ['audiocaps']
+Data size: 49502
+/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/audio/stft.py:42: FutureWarning: Pass size=1024 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  fft_window = pad_center(fft_window, filter_length)
+/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/audio/stft.py:145: FutureWarning: Pass sr=16000, n_fft=1024, n_mels=64, fmin=0, fmax=8000 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  mel_basis = librosa_mel_fn(
+Dataset initialize finished
+The length of the dataset is 49502, the length of the dataloader is 24751, the batchsize is 2
+Add-ons: []
+Build dataset split test from audiocaps
+Data size: 964
+Dataset initialize finished
+Train from scratch
+LatentDiffusion: Running in eps-prediction mode
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchlibrosa/stft.py:193: FutureWarning: Pass size=1024 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  fft_window = librosa.util.pad_center(fft_window, n_fft)
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/functional.py:504: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /Users/runner/work/pytorch/pytorch/pytorch/aten/src/ATen/native/TensorShape.cpp:3191.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+Some weights of the model checkpoint at roberta-base were not used when initializing RobertaModel: ['lm_head.layer_norm.weight', 'lm_head.dense.bias', 'lm_head.bias', 'lm_head.layer_norm.bias', 'lm_head.dense.weight']
+- This IS expected if you are initializing RobertaModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing RobertaModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of RobertaModel were not initialized from the model checkpoint at roberta-base and are newly initialized: ['roberta.pooler.dense.bias', 'roberta.pooler.dense.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
++ Use extra condition on UNet channel using Film. Extra condition dimension is 512. 
+DiffusionWrapper has 185.04 M params.
+Keeping EMAs of 692.
+making attention of type 'vanilla' with 512 in_channels
+making attention of type 'vanilla' with 512 in_channels
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+  warnings.warn(
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=VGG16_Weights.IMAGENET1K_V1`. You can also use `weights=VGG16_Weights.DEFAULT` to get the most up-to-date weights.
+  warnings.warn(msg)
+loaded pretrained LPIPS loss from taming/modules/autoencoder/lpips/vgg.pth
+Removing weight norm...
+Initial learning rate 1e-05
+--> Reload weight of autoencoder from data/checkpoints/vae_mel_16k_64bins.ckpt
+Some weights of the model checkpoint at roberta-base were not used when initializing RobertaModel: ['lm_head.layer_norm.weight', 'lm_head.dense.bias', 'lm_head.bias', 'lm_head.layer_norm.bias', 'lm_head.dense.weight']
+- This IS expected if you are initializing RobertaModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing RobertaModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of RobertaModel were not initialized from the model checkpoint at roberta-base and are newly initialized: ['roberta.pooler.dense.bias', 'roberta.pooler.dense.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+==> Save checkpoint every 5000 steps
+==> Perform validation every 5 epochs
+GPU available: True (mps), used: False
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/setup.py:187: GPU available but not used. You can set it by doing `Trainer(accelerator='gpu')`.
+[rank: 0] Seed set to 0
+Initializing distributed: GLOBAL_RANK: 0, MEMBER: 1/1
+----------------------------------------------------------------------------------------------------
+distributed_backend=gloo
+All distributed processes registered. Starting with 1 processes
+----------------------------------------------------------------------------------------------------
+
+wandb: Currently logged in as: kss445 (kss445team). Use `wandb login --relogin` to force relogin
+wandb: wandb version 0.18.3 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Tracking run with wandb version 0.16.0
+wandb: Run data is saved locally in ./log/latent_diffusion/2023_08_23_reproduce_audioldm/audioldm_original/wandb/run-20241014_215349-c1oq8pgo
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run 2023_08_23_reproduce_audioldm/audioldm_original
+wandb: ⭐️ View project at https://wandb.ai/kss445team/audioldm
+wandb: 🚀 View run at https://wandb.ai/kss445team/audioldm/runs/c1oq8pgo
+
+  | Name              | Type                               | Params
+-------------------------------------------------------------------------
+0 | clap              | CLAPAudioEmbeddingClassifierFreev2 | 199 M 
+1 | model             | DiffusionWrapper                   | 185 M 
+2 | model_ema         | LitEma                             | 0     
+3 | first_stage_model | AutoencoderKL                      | 128 M 
+4 | cond_stage_models | ModuleList                         | 158 M 
+  | other params      | n/a                                | 1.0 K 
+-------------------------------------------------------------------------
+185 M     Trainable params
+486 M     Non-trainable params
+671 M     Total params
+2,684.231 Total estimated model params size (MB)
+Sanity Checking: |                                                                                                                                                                              | 0/? [00:00<?, ?it/s]/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/connectors/data_connector.py:441: The 'val_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=11` in the `DataLoader` to improve performance.
+Change the model original cond_keyand embed_mode text, text to text during evaluation
+/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/utilities/data/dataset.py:455: FutureWarning: Pass sr=16000, n_fft=1024, n_mels=64, fmin=0, fmax=8000 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  mel = librosa_mel_fn(
+Sanity Checking DataLoader 0:   0%|                                                                                                                                                             | 0/1 [00:00<?, ?it/s]Waveform inference save path:  ./log/latent_diffusion/2023_08_23_reproduce_audioldm/audioldm_original/infer_10-14-21:53_cfg_scale_3.5_ddim_200_n_cand_3
+Plotting: Switched to EMA weights
+Warning: CLAP model normally should use text for evaluation
+Use ddim sampler
+Data shape for DDIM sampling is (24, 8, 256, 16), eta 1.0
+Running DDIM Sampling with 200 timesteps
+                                                                                                                                                                                                                     The shape of UNet input is torch.Size([24, 8, 256, 16])                                                                                                                                        | 0/200 [00:00<?, ?it/s]
+DDIM Sampler: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 200/200 [1:27:02<00:00, 26.11s/it]
+Warning: while calculating CLAP score (not fatal),  Torch not compiled with CUDA enabled██████████████████████████████████████████████████████████████████████████████████████████| 200/200 [1:27:02<00:00, 25.72s/it]
+Plotting: Restored training weights
+Traceback (most recent call last):
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/train/latent_diffusion.py", line 262, in <module>
+    main(config_yaml, config_yaml_path, exp_group_name, exp_name, perform_validation)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/train/latent_diffusion.py", line 214, in main
+    trainer.fit(
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 544, in fit
+    call._call_and_handle_interrupt(
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/call.py", line 43, in _call_and_handle_interrupt
+    return trainer.strategy.launcher.launch(trainer_fn, *args, trainer=trainer, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/strategies/launchers/subprocess_script.py", line 102, in launch
+    return function(*args, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 580, in _fit_impl
+    self._run(model, ckpt_path=ckpt_path)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 989, in _run
+    results = self._run_stage()
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 1033, in _run_stage
+    self._run_sanity_check()
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/trainer.py", line 1062, in _run_sanity_check
+    val_loop.run()
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/loops/utilities.py", line 182, in _decorator
+    return loop_run(self, *args, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/loops/evaluation_loop.py", line 134, in run
+    self._evaluation_step(batch, batch_idx, dataloader_idx, dataloader_iter)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/loops/evaluation_loop.py", line 391, in _evaluation_step
+    output = call._call_strategy_hook(trainer, hook_name, *step_args)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/trainer/call.py", line 309, in _call_strategy_hook
+    output = fn(*args, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/strategies/strategy.py", line 402, in validation_step
+    return self._forward_redirection(self.model, self.lightning_module, "validation_step", *args, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/strategies/strategy.py", line 628, in __call__
+    wrapper_output = wrapper_module(*args, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1194, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/nn/parallel/distributed.py", line 1040, in forward
+    output = self._run_ddp_forward(*inputs, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/nn/parallel/distributed.py", line 1003, in _run_ddp_forward
+    return module_to_run(*inputs, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1194, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/pytorch_lightning/strategies/strategy.py", line 621, in wrapped_forward
+    out = method(*_args, **_kwargs)
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/autograd/grad_mode.py", line 27, in decorate_context
+    return func(*args, **kwargs)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_diffusion/ddpm.py", line 732, in validation_step
+    self.generate_sample(
+  File "/opt/miniconda3/envs/audioldm_train/lib/python3.10/site-packages/torch/autograd/grad_mode.py", line 27, in decorate_context
+    return func(*args, **kwargs)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_diffusion/ddpm.py", line 1955, in generate_sample
+    self.save_waveform(waveform, waveform_save_path, name=fnames)
+  File "/Users/kyler/Documents/Git Repos/grad-thesis/AudioLDM-training-finetuning/audioldm_train/modules/latent_diffusion/ddpm.py", line 1766, in save_waveform
+    if (not ".wav" in name[i])
+IndexError: list index out of range
+wandb: 🚀 View run 2023_08_23_reproduce_audioldm/audioldm_original at: https://wandb.ai/kss445team/audioldm/runs/c1oq8pgo
+wandb: ️⚡ View job at https://wandb.ai/kss445team/audioldm/jobs/QXJ0aWZhY3RDb2xsZWN0aW9uOjQ3NzUwOTA0Ng==/version_details/v0
+wandb: Synced 6 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./log/latent_diffusion/2023_08_23_reproduce_audioldm/audioldm_original/wandb/run-20241014_215349-c1oq8pgo/logs
+zsh: unknown sort specifier
+zsh: command not found: #
+(audioldm_train) kyler@Kylers-MacBook-Pro AudioLDM-training-finetuning % 
