@@ -1758,15 +1758,19 @@ class LatentDiffusion(DDPM):
                     savepath, "%s_%s_%s.wav" % (self.global_step, i, name)
                 )
             elif type(name) is list:
-                path = os.path.join(
-                    savepath,
-                    "%s.wav"
-                    % (
-                        os.path.basename(name[i])
-                        if (not ".wav" in name[i])
-                        else os.path.basename(name[i]).split(".")[0]
-                    ),
-                )
+                if 0 <= i and i < len(name):
+                    path = os.path.join(
+                        savepath,
+                        "%s.wav"
+                        % (
+                            os.path.basename(name[i])
+                            if (not ".wav" in name[i])
+                            else os.path.basename(name[i]).split(".")[0]
+                        ),
+                    )
+                else:
+                    print("failed to save: index", i, "does not exist in length", len(name), "- Not saving.")
+                    print("name:", name)
             else:
                 raise NotImplementedError
             todo_waveform = waveform[i, 0]
