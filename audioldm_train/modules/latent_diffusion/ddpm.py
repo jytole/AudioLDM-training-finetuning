@@ -781,7 +781,8 @@ class DDPM(pl.LightningModule):
                 print("Error encountered during evaluation: ", e)
 
         # Very important or the program may fail
-        torch.cuda.synchronize()
+        # torch.cuda.synchronize()
+        # but I'm not using cuda, so I am commenting it out (-kyler)
 
         for key in self.cond_stage_model_metadata.keys():
             metadata = self.cond_stage_model_metadata[key]
@@ -1758,15 +1759,19 @@ class LatentDiffusion(DDPM):
                     savepath, "%s_%s_%s.wav" % (self.global_step, i, name)
                 )
             elif type(name) is list:
-                path = os.path.join(
-                    savepath,
-                    "%s.wav"
-                    % (
-                        os.path.basename(name[i])
-                        if (not ".wav" in name[i])
-                        else os.path.basename(name[i]).split(".")[0]
-                    ),
-                )
+                if 0 <= i and i < len(name):
+                    path = os.path.join(
+                        savepath,
+                        "%s.wav"
+                        % (
+                            os.path.basename(name[i])
+                            if (not ".wav" in name[i])
+                            else os.path.basename(name[i]).split(".")[0]
+                        ),
+                    )
+                else:
+                    print("failed to save: index", i, "does not exist in length", len(name), "- Not saving.")
+                    print("name:", name)
             else:
                 raise NotImplementedError
             todo_waveform = waveform[i, 0]
