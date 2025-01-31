@@ -2,15 +2,17 @@
 
 # 🔊 AudioLDM training, finetuning, inference and evaluation
 
+- [🔊 AudioLDM training, finetuning, inference and evaluation](#-audioldm-training-finetuning-inference-and-evaluation)
 - [Prepare Python running environment](#prepare-python-running-environment)
-  * [Download checkpoints and dataset](#download-checkpoints-and-dataset)
+  - [Download checkpoints and dataset](#download-checkpoints-and-dataset)
 - [Play around with the code](#play-around-with-the-code)
-  * [Train the AudioLDM model](#train-the-audioldm-model)
-  * [Finetuning of the pretrained model](#finetuning-of-the-pretrained-model)
-  * [Evaluate the model output](#evaluate-the-model-output)
-  * [Inference with the pretrained model](#inference-with-the-pretrained-model)
-  * [Train the model using your own dataset](#train-the-model-using-your-own-dataset)
+  - [Train the AudioLDM model](#train-the-audioldm-model)
+  - [Finetuning of the pretrained model](#finetuning-of-the-pretrained-model)
+  - [Evaluate the model output](#evaluate-the-model-output)
+  - [Inference with the pretrained model](#inference-with-the-pretrained-model)
+  - [Train the model using your own dataset](#train-the-model-using-your-own-dataset)
 - [Cite this work](#cite-this-work)
+- [Acknowledgement](#acknowledgement)
 
 # Prepare Python running environment
 
@@ -93,7 +95,7 @@ For example:
 ```shell
 # Please make sure you have train the model using audioldm_crossattn_flant5.yaml
 # The generated audio will be saved at the same log folder if the pretrained model.
-python3 audioldm_train/infer.py --config_yaml audioldm_train/config/2023_08_23_reproduce_audioldm/audioldm_crossattn_flant5.yaml --list_inference tests/captionlist/inference_test.lst
+python3 audioldm_train/infer.py --config_yaml audioldm_train/config/2023_08_23_reproduce_audioldm/audioldm_original_medium.yaml --list_inference tests/animalSound/inference_test.lst
 ```
 
 The generated audio will be named with the caption by default. If you like to specify the filename to use, please checkout the format of *tests/captionlist/inference_test_with_filename.lst*.

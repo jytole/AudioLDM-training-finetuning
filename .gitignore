@@ -19,6 +19,5 @@ wandb
 data/
 .DS_Store
 
-tests/
 data-saveme/
 data-test/
