@@ -1,7 +1,7 @@
 metadata_root: "./data/dataset/metadata/dataset_root.json"
-log_directory: "./log/latent_diffusion"
-project: "audioldm"
-precision: "high"
+log_directory: "./log/latent_diffusion" # sets location for all logs in audioldm
+project: "audioldm" # sets project name (within wandb)
+precision: "high" # sets precision of 32-bit matrix multiplication (highest, high, medium)
 
 variables:
   sampling_rate: &sampling_rate 16000 

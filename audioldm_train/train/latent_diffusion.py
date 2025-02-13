@@ -8,7 +8,7 @@ sys.path.append("src")
 import shutil
 import os
 
-os.environ["TOKENIZERS_PARALLELISM"] = "true"
+os.environ["TOKENIZERS_PARALLELISM"] = "true" ## TODO
 
 import argparse
 import yaml
@@ -29,28 +29,32 @@ from audioldm_train.utilities.tools import (
 from audioldm_train.utilities.model_util import instantiate_from_config
 import logging
 
+# Only allows "WARNING" and higher level logged messages (print is unaffected, I don't see logging used elsewhere in this file)
 logging.basicConfig(level=logging.WARNING)
 
-
+# Presumably this is called by other files
 def print_on_rank0(msg):
-    if torch.distributed.get_rank() == 0:
+    ## https://pytorch.org/docs/stable/distributed.html#torch.distributed.get_rank
+    if torch.distributed.get_rank() == 0: # this seems like it would return true once per "group" of distributed processes, i.e. for the first "thread"
         print(msg)
 
-
+# gets "configs" from the yaml file that is passed in and loaded, default 
 def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation):
+    # If there is a seed in the yaml, run "seed_everything"
     if "seed" in configs.keys():
         seed_everything(configs["seed"])
     else:
         print("SEED EVERYTHING TO 0")
         seed_everything(0)
 
+    # If there is "precision" in the yaml, set precision of 32-bit matrix multiplication
     if "precision" in configs.keys():
         torch.set_float32_matmul_precision(
             configs["precision"]
         )  # highest, high, medium
 
-    log_path = configs["log_directory"]
-    batch_size = configs["model"]["params"]["batchsize"]
+    log_path = configs["log_directory"] # pull log_path from the yaml
+    batch_size = configs["model"]["params"]["batchsize"] # set batchsize
 
     if "dataloader_add_ons" in configs["data"].keys():
         dataloader_add_ons = configs["data"]["dataloader_add_ons"]
