@@ -7,7 +7,7 @@ variables:
   sampling_rate: &sampling_rate 16000 
   mel_bins: &mel_bins 64
   latent_embed_dim: &latent_embed_dim 8
-  latent_t_size: &latent_t_size 256 # TODO might need to change
+  latent_t_size: &latent_t_size 256 # TODO-OG might need to change
   latent_f_size: &latent_f_size 16
   in_channels: &unet_in_channels 8
   optimize_ddpm_parameter: &optimize_ddpm_parameter true
@@ -22,11 +22,11 @@ data:
   dataloader_add_ons: [] 
 
 step:
-  validation_every_n_epochs: 5
-  save_checkpoint_every_n_steps: 25
+  validation_every_n_epochs: 5 # Trainer init call
+  save_checkpoint_every_n_steps: 25 # default 5000 # ModelCheckpoint init call
   # limit_val_batches: 2
-  max_steps: 50
-  save_top_k: 1
+  max_steps: 50 # default 800000 # Trainer init call
+  save_top_k: 1 # ModelCheckpoint init call
 
 preprocessing:
   audio:
@@ -49,7 +49,7 @@ model:
   target: audioldm_train.modules.latent_diffusion.ddpm.LatentDiffusion
   params: 
     # Autoencoder
-    first_stage_config:
+    first_stage_config: # LatentDiffusion
       base_learning_rate: 8.0e-06
       target: audioldm_train.modules.latent_encoder.autoencoder.AutoencoderKL
       params: 
@@ -86,25 +86,25 @@ model:
           dropout: 0.0
     
     # Other parameters
-    base_learning_rate: 1.0e-4
-    warmup_steps: *warmup_steps
-    optimize_ddpm_parameter: *optimize_ddpm_parameter
-    sampling_rate: *sampling_rate
-    batchsize: 2
-    linear_start: 0.0015
-    linear_end: 0.0195
-    num_timesteps_cond: 1
-    log_every_t: 200
-    timesteps: 1000
-    unconditional_prob_cfg: 0.1
-    parameterization: eps # [eps, x0, v]
-    first_stage_key: fbank
-    latent_t_size: *latent_t_size # TODO might need to change
-    latent_f_size: *latent_f_size
-    channels: *latent_embed_dim # TODO might need to change
-    monitor: val/loss_simple_ema
-    scale_by_std: true
-    unet_config:
+    base_learning_rate: 1.0e-4 # LatentDiffusion
+    warmup_steps: *warmup_steps # LatentDiffusion
+    optimize_ddpm_parameter: *optimize_ddpm_parameter # LatentDiffusion
+    sampling_rate: *sampling_rate # DDPM
+    batchsize: 2 # LatentDiffusion
+    linear_start: 0.0015 # DDPM
+    linear_end: 0.0195 # DDPM
+    num_timesteps_cond: 1 # LatentDiffusion
+    log_every_t: 200 # DDPM
+    timesteps: 1000 # DDPM
+    unconditional_prob_cfg: 0.1 # LatentDiffusion
+    parameterization: eps # [eps, x0, v] # DDPM
+    first_stage_key: fbank # DDPM
+    latent_t_size: *latent_t_size # TODO-OG might need to change # DDPM
+    latent_f_size: *latent_f_size # DDPM
+    channels: *latent_embed_dim # TODO-OG might need to change # DDPM
+    monitor: val/loss_simple_ema # DDPM
+    scale_by_std: true # LatentDiffusion
+    unet_config: # DDPM
       target: audioldm_train.modules.diffusionmodules.openaimodel.UNetModel
       params:
         image_size: 64 
@@ -112,8 +112,8 @@ model:
         # context_dim: 
         # - 768
         in_channels: *unet_in_channels # The input channel of the UNet model
-        out_channels: *latent_embed_dim # TODO might need to change
-        model_channels: 192 # TODO might need to change
+        out_channels: *latent_embed_dim # TODO-OG might need to change
+        model_channels: 192 # TODO-OG might need to change
         attention_resolutions:
         - 8
         - 4
@@ -129,7 +129,7 @@ model:
         transformer_depth: 1
         extra_sa_layer: False
     
-    cond_stage_config:
+    cond_stage_config: # LatentDiffusion
       film_clap_cond1:
         cond_stage_key: text
         conditioning_key: film
@@ -139,8 +139,10 @@ model:
           sampling_rate: 16000
           embed_mode: text # or text
           amodel: HTSAT-base
+      #crossattn_audiomae_pooled: # TODO figure out how to add a new cond layer, or how cond_stage_config gets used 
+        #cond_stage_key: text
 
-    evaluation_params:
+    evaluation_params: # DDPM
       unconditional_guidance_scale: 3.5
       ddim_sampling_steps: 50
       n_candidates_per_samples: 3

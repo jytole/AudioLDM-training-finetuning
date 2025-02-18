@@ -961,6 +961,7 @@ class DDPM(pl.LightningModule):
 class LatentDiffusion(DDPM):
     """main class"""
 
+    # Takes arguments DIRECTLY from the yaml "params" field
     def __init__(
         self,
         first_stage_config,

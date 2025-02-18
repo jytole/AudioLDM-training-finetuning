@@ -40,14 +40,14 @@ def print_on_rank0(msg):
 
 # gets "configs" from the yaml file that is passed in and loaded, default 
 def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation):
-    # If there is a seed in the yaml, run "seed_everything"
+    # Seed Everything
     if "seed" in configs.keys():
         seed_everything(configs["seed"])
     else:
         print("SEED EVERYTHING TO 0")
         seed_everything(0)
 
-    # If there is "precision" in the yaml, set precision of 32-bit matrix multiplication
+    # Set Matrix Multiplication Precision
     if "precision" in configs.keys():
         torch.set_float32_matmul_precision(
             configs["precision"]
@@ -56,6 +56,8 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
     log_path = configs["log_directory"] # pull log_path from the yaml
     batch_size = configs["model"]["params"]["batchsize"] # set batchsize
 
+    # Create The Train-split of the dataset
+    # (create the loader)
     if "dataloader_add_ons" in configs["data"].keys():
         dataloader_add_ons = configs["data"]["dataloader_add_ons"]
     else:
@@ -76,6 +78,8 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
         % (len(dataset), len(loader), batch_size)
     )
 
+    # Create the test-split of the dataset
+    # (create the validation loader)
     val_dataset = AudioDataset(configs, split="test", add_ons=dataloader_add_ons)
 
     val_loader = DataLoader(
@@ -83,7 +87,7 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
         batch_size=8,
     )
 
-    # Copy test data
+    # Copy test data to a subfolder
     test_data_subset_folder = os.path.join(
         os.path.dirname(configs["log_directory"]),
         "testset_data",
@@ -111,6 +115,7 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
 
     wandb_path = os.path.join(log_path, exp_group_name, exp_name)
 
+    # Create a callback to save a model checkpoint
     checkpoint_callback = ModelCheckpoint(
         dirpath=checkpoint_path,
         monitor="global_step",

@@ -113,7 +113,7 @@ model:
         # - 768
         in_channels: *unet_in_channels # The input channel of the UNet model
         out_channels: *latent_embed_dim # TODO might need to change
-        model_channels: 192 # TODO might need to change
+        model_channels: 192 # TODO might need to change ### DIFFERENT FROM ORIGINAL
         attention_resolutions:
         - 8
         - 4
@@ -135,10 +135,10 @@ model:
         conditioning_key: film
         target: audioldm_train.conditional_models.CLAPAudioEmbeddingClassifierFreev2
         params:
-          pretrained_path: data/checkpoints/clap_music_speech_audioset_epoch_15_esc_89.98.pt
+          pretrained_path: data/checkpoints/clap_music_speech_audioset_epoch_15_esc_89.98.pt ## DIFFERENT FROM ORIGINAL
           sampling_rate: 16000
           embed_mode: text # or text
-          amodel: HTSAT-base
+          amodel: HTSAT-base ## DIFFERENT FROM ORIGINAL
 
     evaluation_params:
       unconditional_guidance_scale: 3.5
