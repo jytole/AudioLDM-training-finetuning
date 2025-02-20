@@ -105,7 +105,7 @@ def main(configs, exp_group_name, exp_name):
         print("Train from scratch")
         resume_from_checkpoint = None
 
-    devices = torch.cuda.device_count()
+    devices = torch.cuda.device_count() if torch.cuda.is_available() else 1 # Handle no-CUDA case
 
     wandb_logger = WandbLogger(
         save_dir=wandb_path,

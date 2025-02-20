@@ -14,7 +14,7 @@ from audioldm_train.utilities.diffusion_util import (
 
 
 class DDIMSampler(object):
-    def __init__(self, model, schedule="linear", device=torch.device("cuda"), **kwargs):
+    def __init__(self, model, schedule="linear", device=torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu"), **kwargs):
         super().__init__()
         self.model = model
         self.ddpm_num_timesteps = model.num_timesteps

@@ -61,6 +61,7 @@ class MaskedAutoencoderViT(nn.Module):
         mask_2d=False,
         epoch=0,
         no_shift=False,
+        cuda_avail=False,
     ):
         super().__init__()
 
@@ -198,6 +199,8 @@ class MaskedAutoencoderViT(nn.Module):
         self.mask_2d = mask_2d
 
         self.epoch = epoch
+        
+        self.cuda_avail = torch.cuda.is_available() # set CUDA availability to only check on init, not every forward pass
 
         self.initialize_weights()
 
@@ -544,7 +547,10 @@ class MaskedAutoencoderViT(nn.Module):
         loss_recon = self.forward_loss(
             imgs, pred, mask, norm_pix_loss=self.norm_pix_loss
         )
-        loss_contrastive = torch.FloatTensor([0.0]).cuda()
+        if(self.cuda_avail):
+            loss_contrastive = torch.FloatTensor([0.0]).cuda()
+        else:
+            loss_contrastive = torch.FloatTensor([0.0]).cpu()
         return loss_recon, pred, mask, loss_contrastive
 
 
