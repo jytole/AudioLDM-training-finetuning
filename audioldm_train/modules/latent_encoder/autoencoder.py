@@ -90,6 +90,7 @@ class AutoencoderKL(pl.LightningModule):
 
         if not self.reloaded and self.reload_from_ckpt is not None:
             print("--> Reload weight of autoencoder from %s" % self.reload_from_ckpt)
+            
             checkpoint = torch.load(self.reload_from_ckpt, map_location= None if torch.cuda.is_available() else "cpu") #  Handle lack of CUDA with ternary operator
 
             load_todo_keys = {}

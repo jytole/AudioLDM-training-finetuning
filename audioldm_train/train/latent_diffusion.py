@@ -62,8 +62,9 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
     loader = DataLoader(
         dataset,
         batch_size=batch_size,
-        num_workers=16,
-        pin_memory=True,
+        # num_workers=16,
+        num_workers=12,
+        # pin_memory=True,
         shuffle=True,
     )
 

@@ -81,7 +81,7 @@ def infer(dataset_json, configs, config_yaml_path, exp_group_name, exp_name):
     latent_diffusion.load_state_dict(checkpoint["state_dict"])
 
     latent_diffusion.eval()
-    latent_diffusion = latent_diffusion.cuda()
+    # latent_diffusion = latent_diffusion.cuda()
 
     latent_diffusion.generate_sample(
         val_loader,
@@ -119,7 +119,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    assert torch.cuda.is_available(), "CUDA is not available"
+    # assert torch.cuda.is_available(), "CUDA is not available"
 
     config_yaml = args.config_yaml
     dataset_json = build_dataset_json_from_list(args.list_inference)

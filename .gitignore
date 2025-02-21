@@ -16,3 +16,8 @@ checkpoints
 *.tar
 condor*
 wandb
+data/
+.DS_Store
+
+data-saveme/
+data-test/
