@@ -58,7 +58,7 @@ def train_one_epoch(
     extra_suffix="",
 ):
     device = torch.device(args.device)
-    autocast = (torch.cuda.amp.autocast if torch.cuda.is_available() else torch.cpu.amp.autocast) if args.precision == "amp" else suppress
+    autocast = torch.cuda.amp.autocast if args.precision == "amp" else suppress
     model.train()
     loss = LPLoss(args.lp_loss)
 
@@ -222,7 +222,7 @@ def evaluate(model, data, epoch, args, tb_writer=None, extra_suffix=""):
         metric_names = args.lp_metrics.split(",")
         eval_tool = LPMetrics(metric_names=metric_names)
 
-    autocast = (torch.cuda.amp.autocast if torch.cuda.is_available() else torch.cpu.amp.autocast) if args.precision == "amp" else suppress
+    autocast = torch.cuda.amp.autocast if args.precision == "amp" else suppress
     if "val" in data and (
         args.val_frequency
         and ((epoch % args.val_frequency) == 0 or epoch == args.epochs)

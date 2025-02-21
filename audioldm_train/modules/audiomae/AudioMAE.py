@@ -141,13 +141,8 @@ class Vanilla_AudioMAE(nn.Module):
 
 
 if __name__ == "__main__":
-    # no-cuda change
-    if torch.cuda.is_available():
-        model = Vanilla_AudioMAE().cuda()
-        input = torch.randn(4, 1, 1024, 128).cuda()
-    else:
-        model = Vanilla_AudioMAE().cpu()
-        input = torch.randn(4, 1, 1024, 128).cpu()
+    model = Vanilla_AudioMAE().cuda()
+    input = torch.randn(4, 1, 1024, 128).cuda()
     print("The first run")
     embed = model(input, mask_ratio=0.0, no_mask=True)
     print(embed)

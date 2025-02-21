@@ -1236,10 +1236,7 @@ class CLAPAudioEmbeddingClassifierFreev2(nn.Module):
         original_embed_mode = self.embed_mode
         with torch.no_grad():
             self.embed_mode = "audio"
-            if torch.cuda.is_available():
-                audio_emb = self(waveform.cuda())
-            else:
-                audio_emb = self(waveform.cpu())
+            audio_emb = self(waveform.cuda())
             self.embed_mode = "text"
             text_emb = self(text)
             similarity = F.cosine_similarity(audio_emb, text_emb, dim=2)
@@ -1263,7 +1260,7 @@ class CLAPAudioEmbeddingClassifierFreev2(nn.Module):
                 self.tmodel,
                 self.pretrained,
                 precision=self.precision,
-                device="cuda" if torch.cuda.is_available() else "cpu",
+                device="cuda",
                 enable_fusion=self.enable_fusion,
                 fusion_type=self.fusion_type,
             )

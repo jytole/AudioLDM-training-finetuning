@@ -327,7 +327,7 @@ def main():
 
     random.seed(args.seed)
     torch.manual_seed(args.seed)
-    torch.cuda.manual_seed(args.seed) # These CUDA calls get silently ignored if CUDA is not available
+    torch.cuda.manual_seed(args.seed)
     torch.cuda.manual_seed_all(args.seed)
     np.random.seed(args.seed)
     args.class_index_dict = load_class_label(args.class_label_path)
@@ -502,7 +502,7 @@ def main():
         model, data, args
     )
 
-    scaler = GradScaler() if (args.precision == "amp" and torch.cuda.is_available()) else None
+    scaler = GradScaler() if args.precision == "amp" else None
 
     # optionally resume from a checkpoint
     start_epoch = 0

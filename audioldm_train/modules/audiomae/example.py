@@ -10,7 +10,7 @@ from tqdm import tqdm
 from AudioMAE import AudioMAE
 
 if __name__ == "__main__":
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    device = "cuda"
     dataset = AudioVisualDataset(
         datafiles=[
             "/mnt/bn/data-xubo/dataset/audioset_videos/datafiles/audioset_eval.json"
