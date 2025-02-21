@@ -135,7 +135,7 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
         print("Train from scratch")
         resume_from_checkpoint = None
 
-    devices = torch.cuda.device_count() if torch.cuda.is_available() else 1
+    devices = torch.cuda.device_count()
 
     latent_diffusion = instantiate_from_config(configs["model"])
     latent_diffusion.set_log_dir(log_path, exp_group_name, exp_name)
@@ -153,7 +153,7 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
     print("==> Perform validation every %s epochs" % validation_every_n_epochs)
 
     trainer = Trainer(
-        accelerator="gpu" if torch.cuda.is_available() else "cpu",
+        accelerator="gpu",
         devices=devices,
         logger=wandb_logger,
         max_steps=max_steps,
@@ -166,7 +166,7 @@ def main(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
 
     if is_external_checkpoints:
         if resume_from_checkpoint is not None:
-            ckpt = torch.load(resume_from_checkpoint, map_location= None if torch.cuda.is_available() else "cpu")["state_dict"] # Handle lack of CUDA with ternary operator
+            ckpt = torch.load(resume_from_checkpoint)["state_dict"]
 
             key_not_in_model_state_dict = []
             size_mismatch_keys = []
@@ -228,9 +228,7 @@ if __name__ == "__main__":
 
     perform_validation = args.val
 
-    # Check if CUDA is available
-    if(not torch.cuda.is_available()):
-        print("Note: CUDA is not available. Defaulting to CPU for torch.load calls and Accelerator")
+    assert torch.cuda.is_available(), "CUDA is not available"
 
     config_yaml = args.config_yaml
 

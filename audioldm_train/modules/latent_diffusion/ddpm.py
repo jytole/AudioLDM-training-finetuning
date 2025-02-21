@@ -781,7 +781,7 @@ class DDPM(pl.LightningModule):
                 print("Error encountered during evaluation: ", e)
 
         # Very important or the program may fail
-        torch.cuda.synchronize() if torch.cuda.is_available() else torch.cpu.synchronize() # CUDA vs CPU
+        torch.cuda.synchronize()
 
         for key in self.cond_stage_model_metadata.keys():
             metadata = self.cond_stage_model_metadata[key]
