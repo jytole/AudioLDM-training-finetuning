@@ -37,7 +37,7 @@ def accuracy(output, target, topk=(1,)):
 
 
 def run(model, classifier, dataloader, args):
-    autocast = torch.cuda.amp.autocast if args.precision == "amp" else suppress
+    autocast = (torch.cuda.amp.autocast if torch.cuda.is_available() else torch.cpu.amp.autocast) if args.precision == "amp" else suppress
     with torch.no_grad():
         top1, top5, n = 0.0, 0.0, 0.0
         for images, target in tqdm(dataloader, unit_scale=args.batch_size):

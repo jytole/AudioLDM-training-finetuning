@@ -45,7 +45,7 @@ class SmoothedValue(object):
         """
         if not is_dist_avail_and_initialized():
             return
-        t = torch.tensor([self.count, self.total], dtype=torch.float64, device="cuda")
+        t = torch.tensor([self.count, self.total], dtype=torch.float64, device="cuda" if torch.cuda.is_available() else "cpu")
         dist.barrier()
         dist.all_reduce(t)
         t = t.tolist()
@@ -247,7 +247,7 @@ def init_distributed_mode(args):
         args.gpu = int(os.environ["LOCAL_RANK"])
     elif "SLURM_PROCID" in os.environ:
         args.rank = int(os.environ["SLURM_PROCID"])
-        args.gpu = args.rank % torch.cuda.device_count()
+        args.gpu = (args.rank % torch.cuda.device_count()) if torch.cuda.is_available() else 0 # messy no-cuda alternative
     else:
         print("Not using distributed mode")
         setup_for_distributed(is_master=True)  # hack
@@ -256,7 +256,11 @@ def init_distributed_mode(args):
 
     args.distributed = True
 
-    torch.cuda.set_device(args.gpu)
+    # no-cuda option
+    if torch.cuda.is_available():
+        torch.cuda.set_device(args.gpu)
+    else:
+        torch.cpu.set_device(args.gpu)
     args.dist_backend = "nccl"
     print(
         "| distributed init (rank {}): {}, gpu {}".format(
@@ -278,7 +282,7 @@ class NativeScalerWithGradNormCount:
     state_dict_key = "amp_scaler"
 
     def __init__(self):
-        self._scaler = torch.cuda.amp.GradScaler()
+        self._scaler = torch.cuda.amp.GradScaler() #TODO analyze this file and find a no-CUDA alternative
 
     def __call__(
         self,
@@ -382,7 +386,7 @@ def load_model(args, model_without_ddp, optimizer, loss_scaler):
 def all_reduce_mean(x):
     world_size = get_world_size()
     if world_size > 1:
-        x_reduce = torch.tensor(x).cuda()
+        x_reduce = torch.tensor(x).cuda() if torch.cuda.is_available() else torch.tensor(x).cpu()
         dist.all_reduce(x_reduce)
         x_reduce /= world_size
         return x_reduce.item()

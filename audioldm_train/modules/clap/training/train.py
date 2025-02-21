@@ -49,7 +49,7 @@ def train_one_epoch(
     model, data, epoch, optimizer, scaler, scheduler, args, tb_writer=None
 ):
     device = torch.device(args.device)
-    autocast = torch.cuda.amp.autocast if args.precision == "amp" else suppress
+    autocast = (torch.cuda.amp.autocast if torch.cuda.is_available() else torch.cpu.amp.autocast) if args.precision == "amp" else suppress
     model.train()
     loss = ClipLoss(
         local_loss=args.local_loss,
@@ -277,7 +277,7 @@ def evaluate(model, data, epoch, args, tb_writer=None):
     # metrics.update(zero_shot_metrics)
     if is_master(args):
         print("Evaluating...")
-    autocast = torch.cuda.amp.autocast if args.precision == "amp" else suppress
+    autocast = (torch.cuda.amp.autocast if torch.cuda.is_available() else torch.cpu.amp.autocast) if args.precision == "amp" else suppress
     if args.val_dataset_names == ["Clotho", "audiocaps"]:
         # if only clotho and audiocaps are used, then we will use a different evaluation function.
         # This is because in the Clotho and audiocaps valid and test set, there are 5 text for 1 audio.

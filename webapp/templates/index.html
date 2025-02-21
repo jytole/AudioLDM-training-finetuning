@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <title>Basic Uploadable Web Interface</title>
+
+    <!--Get filesheet from webapp/static/css/style.css-->
+    <link rel="stylesheet" href="{{ url_for('static', filename= 'css/style.css') }}">
+</head>
+<body>
+    <h1>Upload a Zip File</h1>
+    <!--Form to accept .zip file uploads and send them to the /archiveUpload url-->
+    <!--For security, should possibly add an authorized key pair to this form-->
+    <form action="/archiveUpload" method="POST" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".zip" />
+        <input type="submit"/>
+    </form>
+</body>
+</html>
