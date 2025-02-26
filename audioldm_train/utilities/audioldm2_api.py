@@ -1,0 +1,276 @@
+## Adapted by: Kyler Smith
+
+# imports
+
+import sys
+
+sys.path.append("src")
+import shutil
+import os
+
+os.environ["TOKENIZERS_PARALLELISM"] = "true"
+
+import argparse
+import yaml
+import torch
+
+from tqdm import tqdm
+from pytorch_lightning.strategies.ddp import DDPStrategy
+from audioldm_train.utilities.data.dataset import AudioDataset
+
+from torch.utils.data import DataLoader
+from pytorch_lightning import Trainer, seed_everything
+from pytorch_lightning.callbacks import ModelCheckpoint
+from pytorch_lightning.loggers import WandbLogger
+from audioldm_train.utilities.tools import (
+    get_restore_step,
+    copy_test_subset_data,
+)
+from audioldm_train.utilities.model_util import instantiate_from_config
+import logging
+
+logging.basicConfig(level=logging.WARNING)
+
+## Data Processing imports
+import audioldm_train.utilities.processFromZip as processFromZip # local file, TODO look into possibly making it a part of the package
+
+## Create an API class that can hold an instance of all the settings we need
+class AudioLDM2APIObject:
+    def __init__(self, 
+                 configs=None, 
+                 config_yaml_path="audioldm_train/config/2025_02_25_api_default/default.yaml", 
+                 perform_validation=False):
+        
+        # assert torch.cuda.is_available(), "CUDA is not available. API failed to initialize."
+        
+        print("Initializing AudioLDM2 API...")
+        
+        self.perform_validation = perform_validation
+        
+        # Parse yaml path into experiment names and config path
+        self.exp_name = os.path.basename(config_yaml_path.split(".")[0])
+        self.exp_group_name = os.path.basename(os.path.dirname(config_yaml_path))
+        
+        self.config_yaml_path = os.path.join(config_yaml_path)
+        
+        if configs is not None:
+            self.configs = configs
+        else:
+            self.configs = yaml.load(open(self.config_yaml_path, "r"), Loader=yaml.FullLoader)
+        
+        if(perform_validation):
+            self.performValidation()
+        
+        ## Variables to be shared between functions
+        self.resume_from_checkpoint = None
+        self.test_data_subset_folder = None
+        
+        self.dataset = None
+        self.dataloader = None
+        self.val_dataset = None
+        self.val_dataloader = None
+        self.checkpoint_callback = None
+        self.latent_diffusion = None
+        self.wandb_logger = None
+        self.trainer = None
+        
+    def setReloadFromCheckpoint(self, flag):
+        self.configs["reload_from_ckpt"] = flag
+        
+    def performValidation(self):
+        self.configs["model"]["params"]["cond_stage_config"]["crossattn_audiomae_generated"]["params"]["use_gt_mae_output"] = False
+        self.configs["step"]["limit_val_batches"] = None
+        
+    def handleDataUpload(zipPath):
+        # TODO could set metadata_root depending on where processFromZip is configured to extract things
+        ## but for now processFromZip universally makes it match the audioset formatting
+        return processFromZip.process(zipPath)
+    
+    def initializeSystemSettings(self):
+        ## use self.configs to initialize system settings
+        if "seed" in self.configs.keys():
+            seed_everything(self.configs["seed"])
+        else:
+            print("SEED EVERYTHING TO 0")
+            seed_everything(0)
+        
+        if "precision" in self.configs.keys():
+            torch.set_float32_matmul_precision(
+                self.configs["precision"]
+            ) # precision can be highest, high, medium
+            
+    def initializeDatasetSplits(self):
+        # catch missing dataloader_add_ons
+        if "dataloader_add_ons" in self.configs["data"].keys():
+            dataloader_add_ons = self.configs["data"]["dataloader_add_ons"]
+        else:
+            dataloader_add_ons = []
+        
+        ## "train" split
+        self.dataset = AudioDataset(self.configs, split="train", add_ons=dataloader_add_ons)
+        
+        self.dataloader = DataLoader(
+            self.dataset,
+            batch_size=self.configs["model"]["params"]["batchsize"],
+            num_workers=16, #TODO investigate why / if this should be changed
+            pin_memory=True,
+            shuffle=True
+        )
+        
+        print(
+            "The length of the dataset is %s, the length of the dataloader is %s, the batchsize is %s"
+            % (len(self.dataset), len(self.dataloader), self.configs["model"]["params"]["batchsize"])
+        )
+        
+        self.val_dataset = AudioDataset(self.configs, split="test", add_ons=dataloader_add_ons)
+        
+        self.val_dataloader = DataLoader(
+            self.val_dataset,
+            batch_size=8, #TODO investigate changing this
+        )
+        
+    def copyTestData(self):
+        self.test_data_subset_folder = os.path.join(
+            os.path.dirname(self.configs["log_directory"]),
+            "testset_data",
+            self.val_dataset.dataset_name,
+        )
+        os.makedirs(self.test_data_subset_folder, exist_ok=True)
+        copy_test_subset_data(self.val_dataset.data, self.test_data_subset_folder)
+        
+    def initTrainer(self):
+        ## init local variables
+        try:
+            config_reload_from_ckpt = self.configs["reload_from_ckpt"]
+        except:
+            config_reload_from_ckpt = None
+            
+        try:
+            limit_val_batches = self.configs["step"]["limit_val_batches"]
+        except:
+            limit_val_batches = None
+            
+        validation_every_n_epochs = self.configs["step"]["validation_every_n_epochs"]
+        save_checkpoint_every_n_steps = self.configs["step"]["save_checkpoint_every_n_steps"]
+        max_steps = self.configs["step"]["max_steps"]
+        save_top_k = self.configs["step"]["save_top_k"]
+
+        checkpoint_path = os.path.join(self.configs["log_directory"], self.exp_group_name, self.exp_name, "checkpoints")
+
+        wandb_path = os.path.join(self.configs["log_directory"], self.exp_group_name, self.exp_name)
+        
+        self.checkpoint_callback = ModelCheckpoint(
+            dirpath=checkpoint_path,
+            monitor="global_step",
+            mode="max",
+            filename="checkpoint-fad-{val/frechet_inception_distance:.2f}-global_step={global_step:.0f}",
+            every_n_train_steps=save_checkpoint_every_n_steps,
+            save_top_k=save_top_k,
+            auto_insert_metric_name=False,
+            save_last=False,
+        )
+        
+        os.makedirs(checkpoint_path, exist_ok=True)
+        shutil.copy(self.config_yaml_path, wandb_path)
+        
+        # set self.resume_from_checkpoint
+        is_external_checkpoints = False
+        if len(os.listdir(checkpoint_path)) > 0:
+            print("Load checkpoints from path: %s" % checkpoint_path)
+            restore_step, n_step = get_restore_step(checkpoint_path)
+            resume_from_checkpoint = os.path.join(checkpoint_path, restore_step)
+            print("Resume from checkpoint", resume_from_checkpoint)
+        elif config_reload_from_ckpt is not None:
+            resume_from_checkpoint = config_reload_from_ckpt
+            is_external_checkpoints = True
+            print("Reload ckpt specified in the config file %s" % resume_from_checkpoint)
+        else:
+            print("Train from scratch")
+            resume_from_checkpoint = None
+            
+        devices = torch.cuda.device_count()
+        
+        self.latent_diffusion = instantiate_from_config(self.configs["model"])
+        self.latent_diffusion.set_log_dir(self.configs["log_directory"], self.exp_group_name, self.exp_name)
+        
+        self.wandb_logger = WandbLogger(
+            save_dir=wandb_path,
+            project=self.configs["project"],
+            config=self.configs,
+            name="%s/%s" % (self.exp_group_name, self.exp_name),
+        )
+        
+        self.latent_diffusion.test_data_subset_path = self.test_data_subset_folder
+        
+        print("==> Save checkpoint every %s steps" % save_checkpoint_every_n_steps)
+        print("==> Perform validation every %s epochs" % validation_every_n_epochs)
+        
+        self.trainer = Trainer(
+            accelerator="gpu",
+            devices=devices,
+            logger=self.wandb_logger,
+            max_steps=max_steps,
+            num_sanity_val_steps=1,
+            limit_val_batches=limit_val_batches,
+            check_val_every_n_epoch=validation_every_n_epochs,
+            strategy=DDPStrategy(find_unused_parameters=True),
+            callbacks=[self.checkpoint_callback]
+        )
+        
+        return is_external_checkpoints
+    
+    ## internal function for running the torch training process
+    def __train(self, is_external_checkpoints = False):
+        if is_external_checkpoints:
+            if self.resume_from_checkpoint is not None:
+                ckpt = torch.load(self.resume_from_checkpoint)["state_dict"]
+                
+                key_not_in_model_state_dict = []
+                size_mismatch_keys = []
+                state_dict = self.latent_diffusion.state_dict()
+                print("Filtering key for reloading:", self.resume_from_checkpoint)
+                print(
+                    "State dict key size:",
+                    len(list(state_dict.keys())),
+                    len(list(ckpt.keys())),
+                )
+                for key in tqdm(list(ckpt.keys())):
+                    if key not in state_dict.keys():
+                        key_not_in_model_state_dict.append(key)
+                        del ckpt[key]
+                        continue
+                    if state_dict[key].size() != ckpt[key].size():
+                        del ckpt[key]
+                        size_mismatch_keys.append(key)
+                        
+                if(len(key_not_in_model_state_dict) != 0):
+                    print("==> Warning: The following key in the checkpoint is not presented in the model:", key_not_in_model_state_dict)
+                if(len(size_mismatch_keys) != 0):
+                    print("==> Warning: These keys have different size between checkpoint and current model: ", size_mismatch_keys)
+                    
+                self.latent_diffusion.load_state_dict(ckpt, strict=False)
+            
+            self.trainer.fit(self.latent_diffusion, self.dataloader, self.val_dataloader)
+        else:
+            self.trainer.fit(
+                self.latent_diffusion, self.dataloader, self.val_dataloader, ckpt_path=self.resume_from_checkpoint
+            )
+    
+    # The full training function, called to both train from scratch and to finetune
+    # Modularized for better clarity
+    ## Reads self.configs["reload_from_ckpt"] to determine if it should reload from a checkpoint (thus finetuning)
+    def beginTrain(self):
+        self.initializeSystemSettings()
+        self.initializeDatasetSplits()
+        self.copyTestData()
+        is_external_checkpoints = self.initTrainer()
+        self.__train(is_external_checkpoints)
+        
+        
+    def finetune(self):
+        self.setReloadFromCheckpoint(True)
+        return self.beginTrain()
+        
+    def trainFromScratch(self):
+        self.setReloadFromCheckpoint(False)
+        return self.beginTrain()
