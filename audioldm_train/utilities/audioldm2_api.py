@@ -1,4 +1,8 @@
 ## Adapted by: Kyler Smith
+### This file establishes the API for AudioLDM2 training and finetuning.
+### It is a class that can be instantiated and used to manipulate config variables before training.
+
+## TODO implement inference code
 
 # imports
 
@@ -59,7 +63,7 @@ class AudioLDM2APIObject:
             self.configs = yaml.load(open(self.config_yaml_path, "r"), Loader=yaml.FullLoader)
         
         if(perform_validation):
-            self.performValidation()
+            self.__performValidation()
         
         ## Variables to be shared between functions
         self.resume_from_checkpoint = None
@@ -77,16 +81,16 @@ class AudioLDM2APIObject:
     def setReloadFromCheckpoint(self, flag):
         self.configs["reload_from_ckpt"] = flag
         
-    def performValidation(self):
+    def __performValidation(self):
         self.configs["model"]["params"]["cond_stage_config"]["crossattn_audiomae_generated"]["params"]["use_gt_mae_output"] = False
         self.configs["step"]["limit_val_batches"] = None
         
     def handleDataUpload(zipPath):
         # TODO could set metadata_root depending on where processFromZip is configured to extract things
-        ## but for now processFromZip universally makes it match the audioset formatting
+        ## but for now processFromZip universally makes it match the audioset formatting, so this is nonessential
         return processFromZip.process(zipPath)
     
-    def initializeSystemSettings(self):
+    def __initializeSystemSettings(self):
         ## use self.configs to initialize system settings
         if "seed" in self.configs.keys():
             seed_everything(self.configs["seed"])
@@ -99,7 +103,7 @@ class AudioLDM2APIObject:
                 self.configs["precision"]
             ) # precision can be highest, high, medium
             
-    def initializeDatasetSplits(self):
+    def __initializeDatasetSplits(self):
         # catch missing dataloader_add_ons
         if "dataloader_add_ons" in self.configs["data"].keys():
             dataloader_add_ons = self.configs["data"]["dataloader_add_ons"]
@@ -129,7 +133,7 @@ class AudioLDM2APIObject:
             batch_size=8, #TODO investigate changing this
         )
         
-    def copyTestData(self):
+    def __copyTestData(self):
         self.test_data_subset_folder = os.path.join(
             os.path.dirname(self.configs["log_directory"]),
             "testset_data",
@@ -138,7 +142,7 @@ class AudioLDM2APIObject:
         os.makedirs(self.test_data_subset_folder, exist_ok=True)
         copy_test_subset_data(self.val_dataset.data, self.test_data_subset_folder)
         
-    def initTrainer(self):
+    def __initTrainer(self):
         ## init local variables
         try:
             config_reload_from_ckpt = self.configs["reload_from_ckpt"]
@@ -259,18 +263,18 @@ class AudioLDM2APIObject:
     # The full training function, called to both train from scratch and to finetune
     # Modularized for better clarity
     ## Reads self.configs["reload_from_ckpt"] to determine if it should reload from a checkpoint (thus finetuning)
-    def beginTrain(self):
-        self.initializeSystemSettings()
-        self.initializeDatasetSplits()
-        self.copyTestData()
-        is_external_checkpoints = self.initTrainer()
+    def __beginTrain(self):
+        self.__initializeSystemSettings()
+        self.__initializeDatasetSplits()
+        self.__copyTestData()
+        is_external_checkpoints = self.__initTrainer()
         self.__train(is_external_checkpoints)
         
         
     def finetune(self):
         self.setReloadFromCheckpoint(True)
-        return self.beginTrain()
+        return self.__beginTrain()
         
     def trainFromScratch(self):
         self.setReloadFromCheckpoint(False)
-        return self.beginTrain()
+        return self.__beginTrain()
