@@ -82,7 +82,7 @@ def init(configs, config_yaml_path, exp_group_name, exp_name, perform_validation
 
     val_loader = DataLoader(
         val_dataset,
-        batch_size=8,
+        batch_size=batch_size,
     )
 
     # Copy test data
