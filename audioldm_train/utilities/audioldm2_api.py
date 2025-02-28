@@ -278,3 +278,26 @@ class AudioLDM2APIObject:
     def trainFromScratch(self):
         self.setReloadFromCheckpoint(False)
         return self.__beginTrain()
+    
+    ## Parameter setting functions
+    
+    def set_save_checkpoint_every_n_steps(self, val):
+        self.configs["step"]["save_checkpoint_every_n_steps"] = 5000
+        
+    # takes list of keys to drop-down and set targetParam
+    def set_parameter(self, targetParam, val):
+        
+        # Recursive loop to drill down into desired parameter
+        def set_nested_dict_value(d, keys, value):
+            for key in keys[:-1]:
+                d = d.setdefault(key, {})
+            d[keys[-1]] = value
+
+        # Catch to make sure there is an array targetParam
+        if len(targetParam) <= 0:
+            return False
+
+        # Run the recursion
+        set_nested_dict_value(self.configs, targetParam, val)
+
+        return True
