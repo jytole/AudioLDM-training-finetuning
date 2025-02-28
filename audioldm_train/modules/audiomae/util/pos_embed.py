@@ -25,7 +25,7 @@ def get_2d_sincos_pos_embed(embed_dim, grid_size, cls_token=False):
     """
     grid_h = np.arange(grid_size, dtype=np.float32)
     grid_w = np.arange(grid_size, dtype=np.float32)
-    grid = np.meshgrid(grid_w, grid_h)  # here w goes first
+    grid = np.meshgrid(grid_w, grid_h, indexing='xy')  # here w goes first
     grid = np.stack(grid, axis=0)
 
     grid = grid.reshape([2, 1, grid_size, grid_size])
@@ -43,7 +43,7 @@ def get_2d_sincos_pos_embed_flexible(embed_dim, grid_size, cls_token=False):
     """
     grid_h = np.arange(grid_size[0], dtype=np.float32)
     grid_w = np.arange(grid_size[1], dtype=np.float32)
-    grid = np.meshgrid(grid_w, grid_h)  # here w goes first
+    grid = np.meshgrid(grid_w, grid_h, indexing='xy')  # here w goes first
     grid = np.stack(grid, axis=0)
 
     grid = grid.reshape([2, 1, grid_size[0], grid_size[1]])
