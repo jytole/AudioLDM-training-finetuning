@@ -1,12 +1,20 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, Response, send_file
 from werkzeug.utils import secure_filename
 import zipfile
 import os
 
+projectRoot = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+from shelljob import proc
+
+from audioldm_train.utilities.audioldm2_api import AudioLDM2APIObject
+
 app = Flask(__name__)
 
+apiInstance = AudioLDM2APIObject()
+
 @app.route("/")
-def hello_world():
+def index():
     return render_template("index.html")
 
 ## Helper function for archiveUpload()
@@ -36,3 +44,24 @@ def archiveUpload():
         return testUnzip(savePath)
 
     return 'No file uploaded'
+
+@app.route("/setParameter", methods=['POST'])
+def setParameter():
+    text = request.form['save_checkpoint_every_n_steps']
+    
+    apiInstance.set_parameter(["step", "save_checkpoint_every_n_steps"], int(text))
+    
+    return "Successfully set parameter"
+
+@app.route("/startFineTuning", methods=['POST'])
+def startFineTuning():
+    apiInstance.finetune()
+    return "Fine tuning started. Please reference host console for progress."
+
+@app.route('/downloadCheckpoint/latest')
+def downloadCheckpointLatest():
+    checkpointPath = os.path.join(projectRoot,apiInstance.prepareCheckpointDownload())
+    return send_file(checkpointPath)
+
+if __name__ == "__main__":
+    app.run(debug=True)

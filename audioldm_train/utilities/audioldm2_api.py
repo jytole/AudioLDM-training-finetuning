@@ -17,6 +17,7 @@ os.environ["TOKENIZERS_PARALLELISM"] = "true"
 import argparse
 import yaml
 import torch
+import zipfile
 
 from tqdm import tqdm
 from pytorch_lightning.strategies.ddp import DDPStrategy
@@ -89,6 +90,23 @@ class AudioLDM2APIObject:
         # TODO could set metadata_root depending on where processFromZip is configured to extract things
         ## but for now processFromZip universally makes it match the audioset formatting, so this is nonessential
         return processFromZip.process(zipPath)
+    
+    # Function to return the path of a checkpoint which can be downloaded by the user
+    ## Helper function for a client-side implementation of a file download
+    def prepareCheckpointDownload(self):
+        # Search through the checkpoints directory for the most recent checkpoint
+        checkpointDir = os.path.join(self.configs["log_directory"], self.exp_group_name, self.exp_name, "checkpoints")
+        files = os.listdir(checkpointDir)
+        paths = []
+        for basename in files:
+            if(basename.endswith(".ckpt")):
+                paths.append(os.path.join(checkpointDir, basename))
+        checkpointPath = max(paths, key=os.path.getctime)
+        # Compress this checkpoint
+        compressedPath = os.path.splitext(checkpointPath)[0]
+        zipfile.ZipFile(compressedPath + ".zip", compression=zipfile.ZIP_DEFLATED, mode="w").write(checkpointPath, arcname=os.path.basename(checkpointPath))
+        # Return file path of compressed checkpoint
+        return compressedPath + ".zip"
     
     def __initializeSystemSettings(self):
         ## use self.configs to initialize system settings
