@@ -2,7 +2,7 @@
 ### This file establishes the API for AudioLDM2 training and finetuning.
 ### It is a class that can be instantiated and used to manipulate config variables before training.
 
-## TODO implement inference code
+## TODO implement manual inference code
 
 # imports
 
@@ -22,6 +22,7 @@ import zipfile
 from tqdm import tqdm
 from pytorch_lightning.strategies.ddp import DDPStrategy
 from audioldm_train.utilities.data.dataset import AudioDataset
+from audioldm_train.utilities.tools import build_dataset_json_from_list
 
 from torch.utils.data import DataLoader
 from pytorch_lightning import Trainer, seed_everything
@@ -86,7 +87,7 @@ class AudioLDM2APIObject:
         self.configs["model"]["params"]["cond_stage_config"]["crossattn_audiomae_generated"]["params"]["use_gt_mae_output"] = False
         self.configs["step"]["limit_val_batches"] = None
         
-    def handleDataUpload(zipPath):
+    def handleDataUpload(self, zipPath):
         # TODO could set metadata_root depending on where processFromZip is configured to extract things
         ## but for now processFromZip universally makes it match the audioset formatting, so this is nonessential
         return processFromZip.process(zipPath)
@@ -107,6 +108,101 @@ class AudioLDM2APIObject:
         zipfile.ZipFile(compressedPath + ".zip", compression=zipfile.ZIP_DEFLATED, mode="w").write(checkpointPath, arcname=os.path.basename(checkpointPath))
         # Return file path of compressed checkpoint
         return compressedPath + ".zip"
+    
+    # TODO implement this function
+    def prepareAllValidationsDownload(self):
+        logsDir = os.path.join(self.configs["log_directory"], self.exp_group_name, self.exp_name)
+        # compress all subdirectories except for checkpoints and wandb? Maybe?
+    
+    def __readInferencePromptsFile(self, promptsJsonPath):
+        # Read in file
+        promptsList = []
+        with open(promptsJsonPath, "r") as f:
+            for each in f.readlines():
+                each = each.strip("\n")
+                promptsList.append(each)
+        # Process allowed filename delimiters
+        data = []
+        for each in promptsList:
+            if "|" in each:
+                wav, caption = each.split("|")
+            else:
+                caption = each
+                wav = ""
+            data.append(
+                {
+                    "wav": wav,
+                    "caption": caption,
+                }
+            )
+        return {"data": data}
+    
+    def __infer(self, dataset_json):        
+        if "dataloader_add_ons" in self.configs["data"].keys():
+            dataloader_add_ons = self.configs["data"]["dataloader_add_ons"]
+        else:
+            dataloader_add_ons = []
+        
+        val_dataset = AudioDataset(
+            self.configs, split="test", add_ons=dataloader_add_ons, dataset_json=dataset_json
+        )
+
+        val_loader = DataLoader(
+            val_dataset,
+            batch_size=1,
+        )
+        
+        try:
+            config_reload_from_ckpt = self.configs["reload_from_ckpt"]
+        except:
+            config_reload_from_ckpt = None
+
+        checkpoint_path = os.path.join(self.configs["log_directory"], self.exp_group_name, self.exp_name, "checkpoints")
+
+        wandb_path = os.path.join(self.configs["log_directory"], self.exp_group_name, self.exp_name)
+
+        os.makedirs(checkpoint_path, exist_ok=True)
+        shutil.copy(self.config_yaml_path, wandb_path)
+
+        if len(os.listdir(checkpoint_path)) > 0:
+            print("Load checkpoint from path: %s" % checkpoint_path)
+            restore_step, n_step = get_restore_step(checkpoint_path)
+            resume_from_checkpoint = os.path.join(checkpoint_path, restore_step)
+            print("Resume from checkpoint", resume_from_checkpoint)
+        elif config_reload_from_ckpt is not None:
+            resume_from_checkpoint = config_reload_from_ckpt
+            print("Reload ckpt specified in the config file %s" % resume_from_checkpoint)
+        else:
+            print("Train from scratch")
+            resume_from_checkpoint = None
+
+        self.latent_diffusion = instantiate_from_config(self.configs["model"])
+        self.latent_diffusion.set_log_dir(self.configs["log_directory"], self.exp_group_name, self.exp_name)
+        
+        checkpoint = torch.load(resume_from_checkpoint)
+        self.latent_diffusion.load_state_dict(checkpoint["state_dict"])
+        
+        self.latent_diffusion.eval()
+        self.latent_diffusion = self.latent_diffusion.cuda()
+        
+        self.latent_diffusion.generate_sample(
+            val_loader,
+            unconditional_guidance_scale=self.configs["model"]["params"]["evaluation_params"]["unconditional_guidance_scale"],
+            ddim_steps=self.configs["model"]["params"]["evaluation_params"]["ddim_sampling_steps"],
+            n_gen=self.configs["model"]["params"]["evaluation_params"]["n_candidates_per_samples"],
+        )
+    
+    def inferSingle(self, prompt):
+        # Create json object
+        dataset_json = {"data":{
+                    "wav": "",
+                    "caption": prompt,
+                }}
+        return self.__infer(dataset_json)
+    
+    def inferFromFile(self, promptsJsonPath):
+        dataset_json = self.__readInferencePromptsFile(promptsJsonPath)
+        return self.__infer(dataset_json)
     
     def __initializeSystemSettings(self):
         ## use self.configs to initialize system settings

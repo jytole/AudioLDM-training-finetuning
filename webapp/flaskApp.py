@@ -58,6 +58,14 @@ def startFineTuning():
     apiInstance.finetune()
     return "Fine tuning started. Please reference host console for progress."
 
+@app.route("/inferSingle", methods=['POST'])
+def inferSingle():
+    prompt = request.form['prompt']
+    
+    apiInstance.inferSingle(prompt)
+    
+    return "Inference Complete."
+
 @app.route('/downloadCheckpoint/latest')
 def downloadCheckpointLatest():
     checkpointPath = os.path.join(projectRoot,apiInstance.prepareCheckpointDownload())

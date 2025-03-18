@@ -34,6 +34,15 @@
     </form>
 
     <hr>
+    
+    <h3>Generate Sound</h3>
+    <form action="/inferSingle" method="POST">
+        <label for="prompt">Prompt:</label>
+        <input type="text" name="prompt">
+        <input type="submit">
+    </form>
+
+    <hr>
 
     <h3>Download Latest Checkpoint</h3>
     <button onclick="window.location.href='/downloadCheckpoint/latest'">Download</button>
