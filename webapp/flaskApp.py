@@ -5,8 +5,6 @@ import os
 
 projectRoot = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-from shelljob import proc
-
 from audioldm_train.utilities.audioldm2_api import AudioLDM2APIObject
 
 app = Flask(__name__)
