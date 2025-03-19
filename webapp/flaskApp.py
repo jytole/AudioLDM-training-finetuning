@@ -17,7 +17,8 @@ app.wsgi_app = ProxyFix(
 )
 
 # Implement lock to only allow one instance of api
-def unlock_api():
+# https://flask.palletsprojects.com/en/stable/api/#flask.appcontext_tearing_down
+def unlock_api(sender, **extra):
     global apiInstance
     if os.path.exists("./webapp/audioldm_api.lock"):
         os.remove("./webapp/audioldm_api.lock")
