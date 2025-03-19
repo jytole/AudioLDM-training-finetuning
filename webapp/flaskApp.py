@@ -31,9 +31,9 @@ appcontext_tearing_down.connect(unlock_api, app)
 def start_api():
     apiInstance = None
     if not os.path.exists("./webapp/audioldm_api.lock"):
-        apiInstance = AudioLDM2APIObject()
         with open("./webapp/audioldm_api.lock", "w") as lockFile:
             lockFile.write("1")
+        apiInstance = AudioLDM2APIObject()
     return apiInstance
 
 apiInstance = start_api()
@@ -96,5 +96,5 @@ def downloadCheckpointLatest():
     checkpointPath = os.path.join(projectRoot,apiInstance.prepareCheckpointDownload())
     return send_file(checkpointPath)
 
-if __name__ == "__main__":
-    app.run(debug=True)
+# if __name__ == "__main__":
+#     app.run(debug=True)
