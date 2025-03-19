@@ -11,6 +11,13 @@ from audioldm_train.utilities.audioldm2_api import AudioLDM2APIObject
 
 app = Flask(__name__)
 
+# nginx prod deployment (tell the app it's behind a 1-layer proxy)
+from werkzeug.middleware.proxy_fix import ProxyFix
+
+app.wsgi_app = ProxyFix(
+    app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1
+)
+
 apiInstance = AudioLDM2APIObject()
 
 @app.route("/")
