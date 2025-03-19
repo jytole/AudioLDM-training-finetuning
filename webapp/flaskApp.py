@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, Response, send_file
 from werkzeug.utils import secure_filename
 import zipfile
 import os
+from multiprocessing import Process
 
 projectRoot = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -38,6 +39,34 @@ def start_api():
     return apiInstance
 
 apiInstance = start_api()
+
+def api_async(func, *args, **kwargs):
+    # Check lockfile for info about whether the API is running an action
+    # If it's not, run the specified api action "func"
+        # Write the pid of this func to the lockfile, so that future api_async calls know if it's being used or not
+        # When the process is finished, remove the pid from the lockfile
+    # If it is, return a message saying that the API is currently in use
+    if os.path.exists("./webapp/audioldm_api.lock"): # check if API instance exists
+        def wrapper(*args, **kwargs):
+            try:
+                func(*args, **kwargs)
+            finally:
+                if os.path.exists("./webapp/audioldm_api.lock"):
+                    with open("./webapp/audioldm_api.lock", "w") as lockFile:
+                        lockFile.write("")
+                    
+        process = Process(target=wrapper, args=args, kwargs=kwargs)
+        
+        with open("./webapp/audioldm_api.lock", "r+") as lockFile:
+            data = lockFile.read()
+            if "PID=" in data:
+                print("API is currently in use.")
+            else:
+                # spawn api function
+                process.start()
+                lockFile.seek(0)
+                lockFile.write("PID=" + str(101) + ";") #TODO write child PID to lockfile
+                lockFile.truncate()
 
 @app.route("/")
 def index():
