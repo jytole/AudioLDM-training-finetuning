@@ -1,7 +1,7 @@
 # Worker Settings
 workers = 1
-worker_class = 'eventlet'  # Use gevent async workers
-worker_connections = 5  # Maximum concurrent connections per worker
+# worker_class = 'eventlet'  # Use gevent async workers
+# worker_connections = 5  # Maximum concurrent connections per worker
 timeout = 0 # disable timeouts, to allow API (training, finetuning, inference) to run indefinitely
 
 # Server Settings
