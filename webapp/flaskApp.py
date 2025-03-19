@@ -46,7 +46,7 @@ def archiveUpload():
         savePath = './webapp/cache/' + fileName
         file.save(savePath)
         
-        return testUnzip(savePath)
+        return apiInstance.handleDataUpload(savePath)
 
     return 'No file uploaded'
 
