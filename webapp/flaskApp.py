@@ -28,10 +28,10 @@ def index():
 ### REQUIRES: os, zipfile
 def testUnzip(savePath):
     with zipfile.ZipFile(savePath,"r") as zip_ref:
-        extractPath = './cache/extract/'
+        extractPath = './webapp/cache/extract/'
         zip_ref.extractall(extractPath)
         
-        readFile = open("./cache/extract/" + os.listdir("./cache/extract/")[0], "r")
+        readFile = open("./webapp/cache/extract/" + os.listdir("./webapp/cache/extract/")[0], "r")
         return readFile.readline()
 
 ## Set up a function to handle the upload of an archive file
@@ -43,7 +43,7 @@ def archiveUpload():
     if 'file' in request.files:
         file = request.files['file']
         fileName = secure_filename(file.filename)
-        savePath = './cache/' + fileName
+        savePath = './webapp/cache/' + fileName
         file.save(savePath)
         
         return testUnzip(savePath)
