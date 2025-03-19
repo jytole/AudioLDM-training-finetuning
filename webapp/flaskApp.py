@@ -29,11 +29,12 @@ appcontext_tearing_down.connect(unlock_api, app)
 
 # Only allow one instance of the API to be running at a time
 def start_api():
-    apiInstance = None
     if not os.path.exists("./webapp/audioldm_api.lock"):
         with open("./webapp/audioldm_api.lock", "w") as lockFile:
             lockFile.write("1")
         apiInstance = AudioLDM2APIObject()
+    else:
+        apiInstance = None
     return apiInstance
 
 apiInstance = start_api()
