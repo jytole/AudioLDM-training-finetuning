@@ -49,7 +49,6 @@ apiInstance = AudioLDM2APIObject()
 context = zmq.Context()
 socket = context.socket(zmq.REP)
 socket.bind("tcp://*:5555")
-## TODO accept CLI to set port, so that flaskApp can spawn the server if it dies
 
 ## Message loop
 while True:

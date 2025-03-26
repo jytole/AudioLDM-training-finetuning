@@ -2,8 +2,6 @@
 ### This file establishes the API for AudioLDM2 training and finetuning.
 ### It is a class that can be instantiated and used to manipulate config variables before training.
 
-## TODO implement manual inference code
-
 # imports
 
 import sys
@@ -38,7 +36,7 @@ import logging
 logging.basicConfig(level=logging.WARNING)
 
 ## Data Processing imports
-import audioldm_train.utilities.processFromZip as processFromZip # local file, TODO look into possibly making it a part of the package
+import audioldm_train.utilities.processFromZip as processFromZip
 
 ## Create an API class that can hold an instance of all the settings we need
 class AudioLDM2APIObject:
@@ -88,7 +86,7 @@ class AudioLDM2APIObject:
         self.configs["step"]["limit_val_batches"] = None
         
     def handleDataUpload(self, zipPath):
-        # TODO could set metadata_root depending on where processFromZip is configured to extract things
+        # Note that this could be written to set metadata_root depending on where processFromZip is configured to extract things
         ## but for now processFromZip universally makes it match the audioset formatting, so this is nonessential
         return processFromZip.process(zipPath)
     
@@ -104,15 +102,23 @@ class AudioLDM2APIObject:
                 paths.append(os.path.join(checkpointDir, basename))
         checkpointPath = max(paths, key=os.path.getctime)
         # Compress this checkpoint
-        compressedPath = os.path.splitext(checkpointPath)[0]
-        zipfile.ZipFile(compressedPath + ".zip", compression=zipfile.ZIP_DEFLATED, mode="w").write(checkpointPath, arcname=os.path.basename(checkpointPath))
+        compressedPath = os.path.splitext(checkpointPath)[0] + ".zip"
+        zipfile.ZipFile(compressedPath, compression=zipfile.ZIP_DEFLATED, mode="w").write(checkpointPath, arcname=os.path.basename(checkpointPath))
         # Return file path of compressed checkpoint
-        return compressedPath + ".zip"
+        return compressedPath
     
-    # TODO implement this function
     def prepareAllValidationsDownload(self):
         logsDir = os.path.join(self.configs["log_directory"], self.exp_group_name, self.exp_name)
-        # compress all subdirectories except for checkpoints and wandb? Maybe?
+        subfolders = [ f.path for f in os.scandir(logsDir) if (f.is_dir() and ("val" in f.name))]
+        
+        compressedPath = os.path.join(logsDir, "allValidations.zip")
+
+        with zipfile.ZipFile(compressedPath, compression=zipfile.ZIP_DEFLATED, mode='w') as archive:
+            for folder_path in subfolders:
+                for root, dirs, files in os.walk(folder_path):
+                    for file in files:
+                        file_path = os.path.join(root, file)
+                        archive.write(file_path, os.path.relpath(file_path, logsDir))
     
     def __readInferencePromptsFile(self, promptsJsonPath):
         # Read in file
