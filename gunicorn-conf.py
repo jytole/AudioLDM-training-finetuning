@@ -1,3 +1,6 @@
+from datetime import datetime
+current_time = datetime.now().strftime("%Y-%m-%d_%H-%M")
+
 # Worker Settings
 workers = 1
 # worker_class = 'eventlet'  # Use gevent async workers
@@ -9,6 +12,6 @@ timeout = 90 # enable timeout to avoid cloudflare shutting down the endpoint
 bind = "0.0.0.0:8000"
 
 # Logging
-accesslog = "flaskAccessLogs.log"
-errorlog = "flaskErrorLogs.log"
+accesslog = "flaskAccessLogs" + current_time + ".log"
+errorlog = "flaskErrorLogs" + current_time + ".log"
 capture_output = True

@@ -26,6 +26,7 @@ taming-transformers-rom1504 = "^0.0.6"
 ipdb = "^0.13.13"
 flask = "^3.1.0"
 gunicorn = "^23.0.0"
+zmq = "^0.0.0"
 
 
 [build-system]
