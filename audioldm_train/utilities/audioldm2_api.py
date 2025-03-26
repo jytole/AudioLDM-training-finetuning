@@ -185,7 +185,7 @@ class AudioLDM2APIObject:
         self.latent_diffusion.eval()
         self.latent_diffusion = self.latent_diffusion.cuda()
         
-        self.latent_diffusion.generate_sample(
+        return self.latent_diffusion.generate_sample(
             val_loader,
             unconditional_guidance_scale=self.configs["model"]["params"]["evaluation_params"]["unconditional_guidance_scale"],
             ddim_steps=self.configs["model"]["params"]["evaluation_params"]["ddim_sampling_steps"],

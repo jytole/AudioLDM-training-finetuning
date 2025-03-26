@@ -74,7 +74,7 @@ while True:
         reply = "ack"
         post_loop_finetune = True
     elif(messageArr[0] == "inferSingle"):
-        apiInstance.inferSingle(messageArr[1])
+        reply = "ack;" + apiInstance.inferSingle(messageArr[1])
     elif(messageArr[0] == "prepareCheckpointDownload"):
         reply = "ack;" + apiInstance.prepareCheckpointDownload()
     elif(messageArr[0] == "ping"):

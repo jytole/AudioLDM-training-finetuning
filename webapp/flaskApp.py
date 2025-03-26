@@ -180,9 +180,12 @@ def startFineTuning():
 @app.route("/inferSingle", methods=['POST'])
 def inferSingle():
     prompt = request.form['prompt']
-    sendToServer("inferSingle;" + prompt)
+    waveformpath = getFromServer("inferSingle;" + prompt)
     
-    return "Inference Complete"
+    if not waveformpath:
+        return "Inference Failed. Corrupted Message."
+    
+    return send_file(waveformpath)
 
 @app.route('/downloadCheckpoint/latest')
 def downloadCheckpointLatest():
