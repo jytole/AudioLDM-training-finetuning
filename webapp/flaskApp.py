@@ -34,17 +34,17 @@ with app.app_context():
     logging.basicConfig(level=logging.INFO)
     logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
     
-    apiServerProcess = spawnAPIServer()
     logging.info("Connecting to AudioLDM2 process through zmq...")
     context = zmq.Context()
     socket = context.socket(zmq.REQ)
     socket.connect(SERVER_ENDPOINT)
     
-def sendToServer(message):
+def sendToServer(message, retries=REQUEST_RETRIES):
     global socket
     socket.send_string(message)
     
-    retries_left = REQUEST_RETRIES
+    retries_left = retries
+    
     while True:
         if (socket.poll(REQUEST_TIMEOUT) & zmq.POLLIN) != 0:
             reply = socket.recv_string()
@@ -192,15 +192,12 @@ def downloadCheckpointLatest():
 
 @app.route("/restartAPI")
 def restartAPIServer():
-    if(apiServerProcess == None):
+    if(sendToServer("ping", 5)):
         return "API still running"
     else:
-        if(sendToServer("ping")):
-            return "API still running"
-        else:
-        ## boot the API?
-            apiServerProcess = spawnAPIServer()
-            return "API booted again"
+    ## boot the API?
+        apiServerProcess = spawnAPIServer()
+        return "API not responding. New API instance booted"
 
 # if __name__ == "__main__":
 #     app.run(debug=True)
