@@ -235,8 +235,8 @@ class AudioLDM2APIObject:
         
         self.dataloader = DataLoader(
             self.dataset,
-            batch_size=self.configs["model"]["params"]["batchsize"],
-            num_workers=16, #TODO investigate why / if this should be changed
+            batch_size=self.configs["model"]["params"]["batchsize"], # Change this for potential changes in training quality -- smaller batches = more stable
+            num_workers=16, #change this for potential changes in speed -- quality shouldn't change
             pin_memory=True,
             shuffle=True
         )
@@ -250,7 +250,7 @@ class AudioLDM2APIObject:
         
         self.val_dataloader = DataLoader(
             self.val_dataset,
-            batch_size=8, #TODO investigate changing this
+            batch_size=8,
         )
         
     def __copyTestData(self):
