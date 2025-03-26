@@ -176,11 +176,10 @@ def startFineTuning():
 #         yield ''
 #     return Response(generate(), mimetype='text/plain')
 
-## Should not allow semicolons
 @app.route("/inferSingle", methods=['POST'])
 def inferSingle():
     prompt = request.form['prompt']
-    waveformpath = getFromServer("inferSingle;" + prompt)
+    waveformpath = getFromServer("inferSingle;PROMPT:" + prompt)
     
     if not waveformpath:
         return "Inference Failed. Corrupted Message."
