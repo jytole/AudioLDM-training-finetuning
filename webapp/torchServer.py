@@ -14,9 +14,10 @@ root = logging.getLogger()
 root.setLevel(logging.DEBUG)
 
 current_time = datetime.now().strftime("%Y-%m-%d_%H-%M")
+webappFolder = os.path.dirname(os.path.realpath(__file__))
 
 ## log messages to file with format
-handler = logging.FileHandler("torchServer" + current_time + ".log")
+handler = logging.FileHandler(os.path.join(webappFolder, "torchServer-" + current_time + ".log"))
 handler.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 handler.setFormatter(formatter)

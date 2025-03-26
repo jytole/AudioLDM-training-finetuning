@@ -1,5 +1,7 @@
+import os
 from datetime import datetime
 current_time = datetime.now().strftime("%Y-%m-%d_%H-%M")
+webappFolder = os.path.dirname(os.path.realpath(__file__))
 
 # Worker Settings
 workers = 1
@@ -12,6 +14,6 @@ timeout = 90 # enable timeout to avoid cloudflare shutting down the endpoint
 bind = "0.0.0.0:8000"
 
 # Logging
-accesslog = "flaskAccessLogs" + current_time + ".log"
-errorlog = "flaskErrorLogs" + current_time + ".log"
+accesslog = os.path.join(webappFolder, "flaskAccessLogs-" + current_time + ".log")
+errorlog = os.path.join(webappFolder, "flaskErrorLogs-" + current_time + ".log")
 capture_output = True
