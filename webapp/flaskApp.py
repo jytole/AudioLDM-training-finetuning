@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, Response, send_file
+from flask import Flask, render_template, request, Response, send_file, flash
 from werkzeug.utils import secure_filename
 import os
 # includes for zmq comms
@@ -13,6 +13,7 @@ logger.setLevel(logging.DEBUG)
 projectRoot = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 app = Flask(__name__)
+app.config.from_prefixed_env()
 
 # nginx prod deployment (tell the app it's behind a 1-layer proxy)
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -131,11 +132,14 @@ def archiveUpload():
             file.save(savePath)
             
             if(sendToServer("handleDataUpload;" + savePath)):
-                return "successful upload"
+                flash("successful upload")
+                return render_template("index.html")
             else:
-                return "failed upload"
+                flash("failed upload")
+                return render_template("index.html")
 
-    return 'No file uploaded'
+    flash("No file uploaded")
+    return render_template("index.html")
 
 @app.route("/setParameter", methods=['POST'])
 def setParameter():

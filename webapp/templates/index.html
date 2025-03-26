@@ -8,6 +8,16 @@
     <link rel="stylesheet" href="{{ url_for('static', filename= 'css/style.css') }}">
 </head>
 <body>
+    {% block content %}
+    <div class="container">
+        {% for message in get_flashed_messages() %}
+        <div class="alert alert-light">
+            <button type="button" class="close" data-dismiss="alert" onclick="this.parentElement.style.display='none'">&times;</button>
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endblock %}
     <h1>AudioLDM2 Fine-Tuning and Inference Pipeline</h1>
     <!--Form to accept .zip file uploads and send them to the /archiveUpload url-->
     <!--For security, should possibly add an authorized key pair to this form-->
