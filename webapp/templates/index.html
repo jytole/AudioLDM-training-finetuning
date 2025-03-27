@@ -23,45 +23,55 @@
     <!--For security, should possibly add an authorized key pair to this form-->
     <div class="formContainer">
         <h3>Upload Dataset Zip</h3>
-        <form action="/archiveUpload" method="POST" enctype="multipart/form-data">
+        <form method="POST" enctype="multipart/form-data">
             <input type="file" name="file" accept=".zip" class="fileUpload" />
-            <input type="submit"/>
+            <input type="submit" name="archiveUploadForm" />
         </form>
     </div>
 
     <div class="formContainer">
         <h3>Set Parameters</h3>
-        <form action="/setParameter" method="POST">
+        <form method="POST">
             <label for="save_checkpoint_every_n_steps">Save Checkpoint Every N Steps:</label>
-            <input type="number" name="save_checkpoint_every_n_steps">
-            <input type="submit">
+            <input type="number" name="save_checkpoint_every_n_steps" />
+            <input type="submit" name="setParameterForm" />
         </form>
     </div>
 
     <div class="formContainer">
         <h3>Start Fine-Tuning</h3>
-        <form action="/startFineTuning" method="POST">
-            <input type="submit">
+        <form method="POST">
+            <input type="submit" name="startFineTuningForm" />
         </form>
     </div>
 
     <div class="formContainer">
         <h3>Generate Sound</h3>
-        <form action="/inferSingle" method="POST">
+        <form method="POST">
             <label for="prompt">Prompt:</label>
-            <input type="text" name="prompt">
-            <input type="submit">
+            <input type="text" name="prompt" />
+            <input type="submit" name="inferSingleForm" />
         </form>
+        {% if variableElements["displayInferenceAudio"] %}
+        <audio controls>
+            <source src="{{variableElements["inferencePath"]}}" type="audio/wav">
+          Your browser does not support the audio element.
+        </audio>
+        {% endif %}
     </div>
 
     <div class="formContainer">
         <h3>Download Latest Checkpoint</h3>
-        <button onclick="window.location.href='/downloadCheckpoint/latest'">Download</button>
+        <form method="POST">
+            <input type="submit" name="downloadCheckpointLatestForm" value="Download" />
+        </form>
     </div>
 
     <div class="formContainer">
-        <h3>Reboot API</h3>
-        <button onclick="window.location.href='/restartAPI'">Restart</button>
+        <h3>Restart API</h3>
+        <form method="POST">
+            <input type="submit" name="restartAPIForm" value="Restart" />
+        </form>
     </div>
 </body>
 </html>
