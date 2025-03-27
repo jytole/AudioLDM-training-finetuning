@@ -14,6 +14,6 @@ timeout = 90 # enable timeout to avoid cloudflare shutting down the endpoint
 bind = "0.0.0.0:8000"
 
 # Logging
-accesslog = os.path.join(webappFolder, "flaskAccessLogs-" + current_time + ".log")
-errorlog = os.path.join(webappFolder, "flaskErrorLogs-" + current_time + ".log")
+accesslog = os.path.join(webappFolder, "logs", "flaskAccessLogs-" + current_time + ".log")
+errorlog = os.path.join(webappFolder, "logs", "flaskErrorLogs-" + current_time + ".log")
 capture_output = True
