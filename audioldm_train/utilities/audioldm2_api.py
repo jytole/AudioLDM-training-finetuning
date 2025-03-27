@@ -45,7 +45,7 @@ class AudioLDM2APIObject:
                  config_yaml_path="audioldm_train/config/2025_02_25_api_default/default.yaml", 
                  perform_validation=False):
         
-        # assert torch.cuda.is_available(), "CUDA is not available. API failed to initialize."
+        assert torch.cuda.is_available(), "CUDA is not available. API failed to initialize."
         
         print("Initializing AudioLDM2 API...")
         
