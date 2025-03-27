@@ -42,7 +42,7 @@ import audioldm_train.utilities.processFromZip as processFromZip
 class AudioLDM2APIObject:
     def __init__(self, 
                  configs=None, 
-                 config_yaml_path="audioldm_train/config/2025_02_25_api_default/default.yaml", 
+                 config_yaml_path="audioldm_train/config/2025_03_27_api_default_finetune/default_finetune.yaml", 
                  perform_validation=False):
         
         assert torch.cuda.is_available(), "CUDA is not available. API failed to initialize."
@@ -161,7 +161,7 @@ class AudioLDM2APIObject:
         try:
             config_reload_from_ckpt = self.configs["reload_from_ckpt"]
         except:
-            config_reload_from_ckpt = None
+            config_reload_from_ckpt = "data/checkpoints/audioldm-m-full.ckpt"
 
         checkpoint_path = os.path.join(self.configs["log_directory"], self.exp_group_name, self.exp_name, "checkpoints")
 
