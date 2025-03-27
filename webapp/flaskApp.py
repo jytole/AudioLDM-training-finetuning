@@ -40,6 +40,8 @@ with app.app_context():
     socket = context.socket(zmq.REQ)
     socket.connect(SERVER_ENDPOINT)
     
+    variableElements = {"inferencePath": "fake.mp3", "displayInferenceAudio": False}
+    
 def sendToServer(message, retries=REQUEST_RETRIES):
     global socket
     socket.send_string(message)
@@ -114,15 +116,33 @@ def getFromServer(message):
         socket.send_string(message)
 
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 def index():
-    return render_template("index.html")
+    # handle all the forms
+    if request.method == "POST":
+        if "archiveUploadForm" in request.form:
+            print("archiveUploadForm")
+            archiveUpload()
+        elif "setParameterForm" in request.form:
+            print("setParameterForm")
+            setParameter()
+        elif "startFineTuningForm" in request.form:
+            print("startFineTuningForm")
+            startFineTuning()
+        elif "inferSingleForm" in request.form:
+            print("inferSingleForm")
+            inferSingle()
+        elif "downloadCheckpointLatestForm" in request.form:
+            print("downloadCheckpointLatestForm")
+            downloadCheckpointLatest()
+        elif "restartAPIForm" in request.form:
+            print("restartAPIForm")
+            restartAPIServer()
+    return render_template("index.html", variableElements=variableElements)
 
-## Set up a function to handle the upload of an archive file
-## Accepts POST requests to the upload URL including any files, 
+## handle the upload of an archive file through a submitted form
 ## saves the file, then calls an unzip helper function
 ### REQUIRES: werkzeug.utils.secure_filename, flask.request
-@app.route("/archiveUpload", methods=['POST'])
 def archiveUpload():
     if 'file' in request.files:
         file = request.files['file']
@@ -133,15 +153,14 @@ def archiveUpload():
             
             if(sendToServer("handleDataUpload;" + savePath)):
                 flash("successful upload")
-                return render_template("index.html")
+                return True
             else:
                 flash("failed upload")
-                return render_template("index.html")
+                return False
 
     flash("No file uploaded")
-    return render_template("index.html")
+    return False
 
-@app.route("/setParameter", methods=['POST'])
 def setParameter():
     textInput = request.form['save_checkpoint_every_n_steps']
     
@@ -149,54 +168,27 @@ def setParameter():
         return "Successfully set parameter"
     return "Failed to set parameter"
 
-# attempt 7335
-@app.route("/startFineTuning", methods=['POST'])
 def startFineTuning():
     sendToServer("finetune")
     return "Fine tuning started. Please reference torchServer.log for progress."
-            
-# @app.route("/startFineTuning", methods=['POST'])
-# def startFineTuning():
-#     return '''<div>start</div>
-#     <script>
-#         var xhr = new XMLHttpRequest();
-#         xhr.open('GET', '/fineTuneAction', true);
-#         xhr.onreadystatechange = function(e) {
-#             var div = document.createElement('div');
-#             div.innerHTML = '' + this.readyState + ':' + this.responseText;
-#             document.body.appendChild(div);
-#         };
-#         xhr.send();
-#     </script>
-#     '''
 
-# @app.route("/fineTuneAction")
-# def fineTuneAction():
-#     def generate():
-#         app.logger.info("Starting fine tuning")
-#         # shared_dict["apiInstance"].finetune()
-#         apiInstance.finetune()
-#         app.logger.info("Finished fine tuning")
-#         yield ''
-#     return Response(generate(), mimetype='text/plain')
-
-@app.route("/inferSingle", methods=['POST'])
 def inferSingle():
     prompt = request.form['prompt']
     waveformpath = getFromServer("inferSingle;PROMPT:" + prompt)
     
     if not waveformpath:
-        return "Inference Failed. Corrupted Message."
+        return False
     
-    return send_file(waveformpath)
+    variableElements["inferencePath"] = os.path.join("static", os.path.basename(waveformpath)) # set relative path to static/filename
+    shutil.copy(waveformpath, os.path.join(projectRoot, "webapp", variableElements["inferencePath"])) # copy inferred file to static
+    variableElements["displayInferenceAudio"] = True # tell browser to display the audio
+    
+    return True
 
-@app.route('/downloadCheckpoint/latest')
 def downloadCheckpointLatest():
-    # checkpointPath = os.path.join(projectRoot,apiInstance.prepareCheckpointDownload())
     checkpointPath = os.path.join(projectRoot,getFromServer("prepareCheckpointDownload"))
     return send_file(checkpointPath)
 
-@app.route("/restartAPI")
 def restartAPIServer():
     if(sendToServer("ping", 5)):
         return "API still running"
