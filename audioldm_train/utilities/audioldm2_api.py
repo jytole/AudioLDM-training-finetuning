@@ -145,6 +145,8 @@ class AudioLDM2APIObject:
                         file_path = os.path.join(root, file)
                         archive.write(file_path, os.path.relpath(file_path, logsDir))
 
+        return compressedPath
+
     def __readInferencePromptsFile(self, promptsJsonPath):
         # Read in file
         promptsList = []
