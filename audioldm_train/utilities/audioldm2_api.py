@@ -45,7 +45,7 @@ class AudioLDM2APIObject:
                  config_yaml_path="audioldm_train/config/2025_03_27_api_default_finetune/default_finetune.yaml", 
                  perform_validation=False):
         
-        assert torch.cuda.is_available(), "CUDA is not available. API failed to initialize."
+        # assert torch.cuda.is_available(), "CUDA is not available. API failed to initialize."
         
         print("Initializing AudioLDM2 API...")
         
@@ -162,6 +162,8 @@ class AudioLDM2APIObject:
             config_reload_from_ckpt = self.configs["reload_from_ckpt"]
         except:
             config_reload_from_ckpt = "data/checkpoints/audioldm-m-full.ckpt"
+            
+        self.setReloadFromCheckpoint(True)
 
         checkpoint_path = os.path.join(self.configs["log_directory"], self.exp_group_name, self.exp_name, "checkpoints")
 
@@ -421,3 +423,6 @@ class AudioLDM2APIObject:
         set_nested_dict_value(self.configs, targetParam, val)
 
         return True
+    
+    def debugFunc(self):
+        print("debug message")

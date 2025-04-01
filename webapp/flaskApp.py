@@ -138,6 +138,9 @@ def index():
         elif "restartAPIForm" in request.form:
             print("restartAPIForm")
             restartAPIServer()
+        elif "debugForm" in request.form:
+            print("debugForm")
+            debugFunc()
     return render_template("index.html", variableElements=variableElements)
 
 ## handle the upload of an archive file through a submitted form
@@ -196,6 +199,10 @@ def restartAPIServer():
     ## boot the API?
         apiServerProcess = spawnAPIServer()
         return "API not responding. New API instance booted"
+    
+def debugFunc():
+    sendToServer("debug")
+    return True
 
 # if __name__ == "__main__":
 #     app.run(debug=True)

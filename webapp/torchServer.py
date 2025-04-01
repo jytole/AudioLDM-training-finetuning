@@ -78,6 +78,9 @@ while True:
         reply = "ack;" + apiInstance.prepareCheckpointDownload()
     elif(messageArr[0] == "ping"):
         reply = "ack"
+    elif(messageArr[0] == "debug"):
+        apiInstance.debugFunc()
+        reply = "ack"
 
     #  Do some 'work'
     # time.sleep(1)
