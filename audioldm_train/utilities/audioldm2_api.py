@@ -71,7 +71,7 @@ class AudioLDM2APIObject:
             self.__performValidation()
 
         ## Variables to be shared between functions
-        self.resume_from_checkpoint = None
+        self.checkpoint_path = None
         self.test_data_subset_folder = None
 
         self.dataset = None
@@ -180,48 +180,68 @@ class AudioLDM2APIObject:
             val_dataset,
             batch_size=1,
         )
-
+        
         try:
             config_reload_from_ckpt = self.configs["reload_from_ckpt"]
         except:
-            config_reload_from_ckpt = "data/checkpoints/audioldm-m-full.ckpt"
-
-        self.setReloadFromCheckpoint(True)
-
-        checkpoint_path = os.path.join(
+            config_reload_from_ckpt = None
+            
+        checkpoint_dir = os.path.join(
             self.configs["log_directory"],
             self.exp_group_name,
             self.exp_name,
             "checkpoints",
         )
+        
+        if len(os.listdir(checkpoint_dir)) > 0:
+            print("Load checkpoints from path: %s" % checkpoint_dir)
+            restore_step, n_step = get_restore_step(checkpoint_dir)
+            self.checkpoint_path = os.path.join(checkpoint_dir, restore_step)
+            print("Resume from checkpoint", self.checkpoint_path)
+        elif config_reload_from_ckpt is not None:
+            self.checkpoint_path = config_reload_from_ckpt
+            print(
+                "Reload ckpt specified in the config file %s"
+                % self.checkpoint_path
+            )
+        else:
+            print("Attempt to load audioldm-m-full")
+            self.checkpoint_path = "data/checkpoints/audioldm-m-full.ckpt"
+
+        self.setReloadFromCheckpoint(True)
 
         wandb_path = os.path.join(
             self.configs["log_directory"], self.exp_group_name, self.exp_name
         )
 
-        os.makedirs(checkpoint_path, exist_ok=True)
+        os.makedirs(checkpoint_dir, exist_ok=True)
         shutil.copy(self.config_yaml_path, wandb_path)
 
-        if len(os.listdir(checkpoint_path)) > 0:
-            print("Load checkpoint from path: %s" % checkpoint_path)
-            restore_step, n_step = get_restore_step(checkpoint_path)
-            resume_from_checkpoint = os.path.join(checkpoint_path, restore_step)
-            print("Resume from checkpoint", resume_from_checkpoint)
+        ## set the path (resume_from_checkpoint) of the checkpoint to be loaded from
+        ## if a checkpoint exists in logs (checkpoint_dir)
+        if len(os.listdir(checkpoint_dir)) > 0:
+            print("Load checkpoint from path: %s" % checkpoint_dir)
+            restore_step, n_step = get_restore_step(checkpoint_dir)
+            self.checkpoint_path = os.path.join(checkpoint_dir, restore_step)
+            print("Resume from checkpoint", self.checkpoint_path)
         elif config_reload_from_ckpt is not None:
-            resume_from_checkpoint = config_reload_from_ckpt
+            self.checkpoint_path = config_reload_from_ckpt
             print(
-                "Reload ckpt specified in the config file %s" % resume_from_checkpoint
+                "Reload ckpt specified in the config file %s"
+                % self.checkpoint_path
             )
         else:
             print("Train from scratch")
-            resume_from_checkpoint = None
+            self.checkpoint_path = None
 
+        # instantiates the model defined in self.configs (default: a custom LatentDiffusion)
         self.latent_diffusion = instantiate_from_config(self.configs["model"])
+
         self.latent_diffusion.set_log_dir(
             self.configs["log_directory"], self.exp_group_name, self.exp_name
         )
 
-        checkpoint = torch.load(resume_from_checkpoint)
+        checkpoint = torch.load(self.checkpoint_path)
         self.latent_diffusion.load_state_dict(checkpoint["state_dict"])
 
         self.latent_diffusion.eval()
@@ -231,13 +251,15 @@ class AudioLDM2APIObject:
             val_loader,
             unconditional_guidance_scale=self.configs["model"]["params"][
                 "evaluation_params"
-            ]["unconditional_guidance_scale"],
+            ][
+                "unconditional_guidance_scale"
+            ],  ## might control hallucinations TODO investigate
             ddim_steps=self.configs["model"]["params"]["evaluation_params"][
                 "ddim_sampling_steps"
-            ],
+            ],  ## denoising diffusion sampling steps
             n_gen=self.configs["model"]["params"]["evaluation_params"][
                 "n_candidates_per_samples"
-            ],
+            ],  ## candidate sounds to generate
         )
 
     def inferSingle(self, prompt):
@@ -357,25 +379,26 @@ class AudioLDM2APIObject:
             save_last=False,
         )
 
-        os.makedirs(checkpoint_path, exist_ok=True)
+        os.makedirs(checkpoint_dir, exist_ok=True)
         shutil.copy(self.config_yaml_path, wandb_path)
 
-        # set self.resume_from_checkpoint
+        # set self.checkpoint_path
         is_external_checkpoints = False
-        if len(os.listdir(checkpoint_path)) > 0:
-            print("Load checkpoints from path: %s" % checkpoint_path)
-            restore_step, n_step = get_restore_step(checkpoint_path)
-            resume_from_checkpoint = os.path.join(checkpoint_path, restore_step)
-            print("Resume from checkpoint", resume_from_checkpoint)
+        if len(os.listdir(checkpoint_dir)) > 0:
+            print("Load checkpoints from path: %s" % checkpoint_dir)
+            restore_step, n_step = get_restore_step(checkpoint_dir)
+            self.checkpoint_path = os.path.join(checkpoint_dir, restore_step)
+            print("Resume from checkpoint", self.checkpoint_path)
         elif config_reload_from_ckpt is not None:
-            resume_from_checkpoint = config_reload_from_ckpt
+            self.checkpoint_path = config_reload_from_ckpt
             is_external_checkpoints = True
             print(
-                "Reload ckpt specified in the config file %s" % resume_from_checkpoint
+                "Reload ckpt specified in the config file %s"
+                % self.checkpoint_path
             )
         else:
             print("Train from scratch")
-            resume_from_checkpoint = None
+            self.checkpoint_path = None
 
         devices = torch.cuda.device_count()
 
@@ -413,13 +436,13 @@ class AudioLDM2APIObject:
     ## internal function for running the torch training process
     def __train(self, is_external_checkpoints=False):
         if is_external_checkpoints:
-            if self.resume_from_checkpoint is not None:
-                ckpt = torch.load(self.resume_from_checkpoint)["state_dict"]
+            if self.checkpoint_path is not None:
+                ckpt = torch.load(self.checkpoint_path)["state_dict"]
 
                 key_not_in_model_state_dict = []
                 size_mismatch_keys = []
                 state_dict = self.latent_diffusion.state_dict()
-                print("Filtering key for reloading:", self.resume_from_checkpoint)
+                print("Filtering key for reloading:", self.checkpoint_path)
                 print(
                     "State dict key size:",
                     len(list(state_dict.keys())),
@@ -455,7 +478,7 @@ class AudioLDM2APIObject:
                 self.latent_diffusion,
                 self.dataloader,
                 self.val_dataloader,
-                ckpt_path=self.resume_from_checkpoint,
+                ckpt_path=self.checkpoint_path,
             )
 
     # The full training function, called to both train from scratch and to finetune
