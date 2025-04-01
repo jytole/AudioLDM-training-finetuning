@@ -41,6 +41,41 @@ import audioldm_train.utilities.processFromZip as processFromZip
 
 ## Create an API class that can hold an instance of all the settings we need
 class AudioLDM2APIObject:
+    """A class used to store an instance of AudioLDM2 and all necessary parameters.
+
+    Attributes:
+        perform_validation (bool):
+            flag to indicate if validation should be performed
+        exp_name (str):
+            experiment name
+        exp_group_name (str):
+            experiment group name
+        config_yaml_path (str):
+            the path to a .yaml config file
+        configs (any):
+            contents of a .yaml config file
+        resume_from_checkpoint (bool):
+            flag to indicate if training should resume from a checkpoint
+        test_data_subset_folder (str):
+            path to folder of test data
+        dataset (AudioDataset):
+            AudioDataset of training split of data
+        dataloader (DataLoader):
+            DataLoader of training split of data
+        val_dataset (AudioDataset):
+            AudioDataset of validation split of data
+        val_dataloader (DataLoader):
+            DataLoader of validation split of data
+        checkpoint_callback (ModelCheckpoint):
+            ModelCheckpoint for handling callbacks during training
+        latent_diffusion (DDPM):
+            DDPM object, loaded based on self.configs. defaults to LatentDiffusion
+        wandb_logger (WandbLogger):
+            object to log stats
+        trainer (Trainer):
+            object to control training config via flags
+    """
+
     def __init__(
         self,
         configs=None,
@@ -48,7 +83,7 @@ class AudioLDM2APIObject:
         perform_validation=False,
     ):
 
-        # assert torch.cuda.is_available(), "CUDA is not available. API failed to initialize."
+        assert torch.cuda.is_available(), "CUDA is not available. API failed to initialize."
 
         print("Initializing AudioLDM2 API...")
 
@@ -84,15 +119,32 @@ class AudioLDM2APIObject:
         self.trainer = None
 
     def setReloadFromCheckpoint(self, flag):
+        """sets the reloadFromCheckpoint flag
+
+        Args:
+            flag (bool): value to load into self.configs
+        """
+        
         self.configs["reload_from_ckpt"] = flag
 
     def __performValidation(self):
+        """initialize the variables related to performing validation"""
+        
         self.configs["model"]["params"]["cond_stage_config"][
             "crossattn_audiomae_generated"
         ]["params"]["use_gt_mae_output"] = False
         self.configs["step"]["limit_val_batches"] = None
 
     def handleDataUpload(self, zipPath):
+        """forwarding function to trigger processFromZip.process(zipPath)
+
+        Args:
+            zipPath (str): a path to the dataset zipfile for processing
+
+        Returns:
+            str: "Successful Dataset Processing" upon completion
+        """
+        
         # Note that this could be written to set metadata_root depending on where processFromZip is configured to extract things
         ## but for now processFromZip universally makes it match the audioset formatting, so this is nonessential
         return processFromZip.process(zipPath)
@@ -100,6 +152,14 @@ class AudioLDM2APIObject:
     # Function to return the path of a checkpoint which can be downloaded by the user
     ## Helper function for a client-side implementation of a file download
     def prepareCheckpointDownload(self):
+        """
+        compresses latest checkpoint, returns path where it can be
+        found for download
+
+        Returns:
+            str: path to compressed checkpoint
+        """
+        
         # Search through the checkpoints directory for the most recent checkpoint
         checkpointDir = os.path.join(
             self.configs["log_directory"],
@@ -127,6 +187,14 @@ class AudioLDM2APIObject:
         return compressedPath
 
     def prepareAllValidationsDownload(self):
+        """
+        compresses all files produced for validation steps, returns
+        where it can be found for download
+
+        Returns:
+            str: path to allValidations.zip
+        """
+        
         logsDir = os.path.join(
             self.configs["log_directory"], self.exp_group_name, self.exp_name
         )
@@ -148,6 +216,15 @@ class AudioLDM2APIObject:
         return compressedPath
 
     def __readInferencePromptsFile(self, promptsJsonPath):
+        """reads a json format file of prompts for inference
+
+        Args:
+            promptsJsonPath (string): path to a .json file of prompts
+
+        Returns:
+            dict: representation of prompts and target filepaths
+        """
+        
         # Read in file
         promptsList = []
         with open(promptsJsonPath, "r") as f:
@@ -170,7 +247,16 @@ class AudioLDM2APIObject:
             )
         return {"data": data}
 
-    def __infer(self, dataset_json):
+    def __infer(self, promptsJson):
+        """perform inference
+
+        Args:
+            promptsJson (dictionary): dictionary of prompts
+
+        Returns:
+            str: path to folder of generated files
+        """
+        
         if "dataloader_add_ons" in self.configs["data"].keys():
             dataloader_add_ons = self.configs["data"]["dataloader_add_ons"]
         else:
@@ -180,7 +266,7 @@ class AudioLDM2APIObject:
             self.configs,
             split="test",
             add_ons=dataloader_add_ons,
-            dataset_json=dataset_json,
+            dataset_json=promptsJson,
         )
 
         val_loader = DataLoader(
@@ -270,21 +356,42 @@ class AudioLDM2APIObject:
         )
 
     def inferSingle(self, prompt):
+        """perform a single inference (generation of audio in AudioLDM2)
+
+        Args:
+            prompt (str): the prompt to be generated
+
+        Returns:
+            str: path to folder of generated files
+        """
+        
         # Create json object
-        dataset_json = {
+        promptsJson = {
             "data": {
                 "wav": "",
                 "caption": prompt,
             }
         }
-        return self.__infer(dataset_json)
+        return self.__infer(promptsJson)
 
     def inferFromFile(self, promptsJsonPath):
-        dataset_json = self.__readInferencePromptsFile(promptsJsonPath)
-        return self.__infer(dataset_json)
+        """perform multiple inferences (generation of audio in AudioLDM2)
+
+        Can be used for convenient batch testing
+
+        Args:
+            promptsJsonPath (str): path to json file containing prompts to generate
+
+        Returns:
+            str: path to folder of generated files
+        """
+        
+        promptsJson = self.__readInferencePromptsFile(promptsJsonPath)
+        return self.__infer(promptsJson)
 
     def __initializeSystemSettings(self):
-        ## use self.configs to initialize system settings
+        """initialize seed and precision from self.configs"""
+        
         if "seed" in self.configs.keys():
             seed_everything(self.configs["seed"])
         else:
@@ -297,6 +404,8 @@ class AudioLDM2APIObject:
             )  # precision can be highest, high, medium
 
     def __initializeDatasetSplits(self):
+        """Initialize train and val dataset split attributes"""
+
         # catch missing dataloader_add_ons
         if "dataloader_add_ons" in self.configs["data"].keys():
             dataloader_add_ons = self.configs["data"]["dataloader_add_ons"]
@@ -337,6 +446,8 @@ class AudioLDM2APIObject:
         )
 
     def __copyTestData(self):
+        """Copy data from test dataset into logs dir"""
+        
         self.test_data_subset_folder = os.path.join(
             os.path.dirname(self.configs["log_directory"]),
             "testset_data",
@@ -346,7 +457,12 @@ class AudioLDM2APIObject:
         copy_test_subset_data(self.val_dataset.data, self.test_data_subset_folder)
 
     def __initTrainer(self):
-        ## init local variables
+        """Initialize all model and trainer attributes
+
+        Returns:
+            bool: flag to indicate if external checkpoints were loaded
+        """
+        
         try:
             config_reload_from_ckpt = self.configs["reload_from_ckpt"]
         except:
@@ -442,6 +558,12 @@ class AudioLDM2APIObject:
 
     ## internal function for running the torch training process
     def __train(self, is_external_checkpoints=False):
+        """Run self.trainer.fit; resume from checkpoint if needed
+
+        Args:
+            is_external_checkpoints (bool, optional): flag to indicate if external checkpoints were loaded. Defaults to False.
+        """
+        
         if is_external_checkpoints:
             if self.checkpoint_path is not None:
                 ckpt = torch.load(self.checkpoint_path)["state_dict"]
@@ -488,10 +610,11 @@ class AudioLDM2APIObject:
                 ckpt_path=self.checkpoint_path,
             )
 
-    # The full training function, called to both train from scratch and to finetune
-    # Modularized for better clarity
-    ## Reads self.configs["reload_from_ckpt"] to determine if it should reload from a checkpoint (thus finetuning)
     def __beginTrain(self):
+        """Training function to both train from scratch and finetune. 
+        self.configs["reload_from_ckpt"] determines if finetuning
+        """
+        
         self.__initializeSystemSettings()
         self.__initializeDatasetSplits()
         self.__copyTestData()
@@ -499,21 +622,28 @@ class AudioLDM2APIObject:
         self.__train(is_external_checkpoints)
 
     def finetune(self):
+        """Run finetuning from checkpoint configured in config file
+        reads self.configs["resume_from_ckpt"]"""
+        
         self.setReloadFromCheckpoint(True)
-        return self.__beginTrain()
+        self.__beginTrain()
 
     def trainFromScratch(self):
+        """Finetune from scratch, no checkpoint"""
         self.setReloadFromCheckpoint(False)
-        return self.__beginTrain()
-
-    ## Parameter setting functions
-
-    def set_save_checkpoint_every_n_steps(self, val):
-        self.configs["step"]["save_checkpoint_every_n_steps"] = 5000
+        self.__beginTrain()
 
     # takes list of keys to drop-down and set targetParam
     def set_parameter(self, targetParam, val):
+        """Sets parameter to val
 
+        Args:
+            targetParam (list): Full list of hierarchical keys which identify the parameter
+            val (any): Value to set the parameter to
+
+        Returns:
+            bool: success or failure value
+        """
         # Recursive loop to drill down into desired parameter
         def set_nested_dict_value(d, keys, value):
             for key in keys[:-1]:
@@ -530,4 +660,5 @@ class AudioLDM2APIObject:
         return True
 
     def debugFunc(self):
+        """Debug function"""
         print("debug message")
