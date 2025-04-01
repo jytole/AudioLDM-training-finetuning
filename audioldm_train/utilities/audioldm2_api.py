@@ -364,7 +364,7 @@ class AudioLDM2APIObject:
         max_steps = self.configs["step"]["max_steps"]
         save_top_k = self.configs["step"]["save_top_k"]
 
-        checkpoint_path = os.path.join(
+        checkpoint_dir = os.path.join(
             self.configs["log_directory"],
             self.exp_group_name,
             self.exp_name,
@@ -376,7 +376,7 @@ class AudioLDM2APIObject:
         )
 
         self.checkpoint_callback = ModelCheckpoint(
-            dirpath=checkpoint_path,
+            dirpath=checkpoint_dir,
             monitor="global_step",
             mode="max",
             filename="checkpoint-fad-{val/frechet_inception_distance:.2f}-global_step={global_step:.0f}",
