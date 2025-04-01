@@ -114,10 +114,15 @@ class AudioLDM2APIObject:
                 paths.append(os.path.join(checkpointDir, basename))
         checkpointPath = max(paths, key=os.path.getctime)
         # Compress this checkpoint
-        compressedPath = os.path.splitext(checkpointPath)[0] + ".zip"
-        zipfile.ZipFile(
+        # compressedPath = os.path.splitext(checkpointPath)[0] + ".zip"
+        compressedPath = checkpointDir + "latestCheckpointCompressed.zip"
+        archive = zipfile.ZipFile(
             compressedPath, compression=zipfile.ZIP_DEFLATED, mode="w"
-        ).write(checkpointPath, arcname=os.path.basename(checkpointPath))
+        )
+        archive.write(checkpointPath, arcname=os.path.basename(checkpointPath))
+        archive.writestr(
+            "info.txt", "source checkpoint path: " + compressedPath
+        )  # TODO ensure this works with an extant checkpoint and doesn't mess up any call to "infer"
         # Return file path of compressed checkpoint
         return compressedPath
 
