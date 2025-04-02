@@ -257,6 +257,8 @@ class AudioLDM2APIObject:
             str: path to folder of generated files
         """
         
+        self.__initializeSystemSettings()
+        
         if "dataloader_add_ons" in self.configs["data"].keys():
             dataloader_add_ons = self.configs["data"]["dataloader_add_ons"]
         else:
