@@ -96,14 +96,16 @@
 </body>
 
 <script>
+    /*
     var socket = io();
     socket.on("current_state_update", function(data) {
         console.log("Received message:", data);
     });
+    */
     let current_state = {{ current_state | tojson }};
 
     function debugEmit() {
-        socket.emit("debug");
+        //socket.emit("debug");
     }
 
     //TODO send and save new current_state from flaskApp 

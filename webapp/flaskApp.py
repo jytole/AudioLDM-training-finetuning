@@ -17,6 +17,7 @@ import zmq, logging, sys
 from flask_socketio import SocketIO
 import redis
 import threading
+from flask_cors import CORS
 
 # includes for spawn new API
 import subprocess, shutil
@@ -29,6 +30,7 @@ projectRoot = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 app = Flask(__name__)
 app.config.from_prefixed_env()
+CORS(app)
 
 # nginx prod deployment (tell the app it's behind a 1-layer proxy)
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -70,7 +72,9 @@ with app.app_context():
     
     ## Socket handling code
     
-    socketio = SocketIO(app, message_queue="redis://localhost:6379")
+    # socketio = SocketIO(app, message_queue="redis://localhost:6379")
+    socketio = SocketIO(app, cors_allowed_origins="*")
+    # TODO fix: redis triggers an error loop that creates a very large log file very fast
     
     ## DEBUG could un-tab the following section after start_redis_listener() is moved out
 
