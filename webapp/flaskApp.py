@@ -70,7 +70,7 @@ with app.app_context():
     
     ## Socket handling code
     
-    socketio = SocketIO(app, message_queue="redis://localhost:6379", cors_allowed_origins="*")  # create SocketIO obj
+    socketio = SocketIO(app, message_queue="redis://localhost:6379")
     
     ## DEBUG could un-tab the following section after start_redis_listener() is moved out
 

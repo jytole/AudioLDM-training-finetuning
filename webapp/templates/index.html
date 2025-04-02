@@ -91,6 +91,7 @@
         <form method="POST">
             <input type="submit" name="debugForm" value="Debug" />
         </form>
+        <button onclick="debugEmit()">Debug Emit</button>
     </div>
 </body>
 
@@ -99,10 +100,11 @@
     socket.on("current_state_update", function(data) {
         console.log("Received message:", data);
     });
-
-    socket.emit("debug");
-
     let current_state = {{ current_state | tojson }};
+
+    function debugEmit() {
+        socket.emit("debug");
+    }
 
     //TODO send and save new current_state from flaskApp 
 
