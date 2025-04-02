@@ -30,6 +30,7 @@ logger.addHandler(handler)
 class StreamToLogger(object):
     """
     Fake file-like stream object that redirects writes to a logger instance.
+    This enables logging all std print statements (notably from audioldm2_api)
     """
 
     def __init__(self, logger, level):
@@ -55,21 +56,40 @@ context = zmq.Context()
 socket = context.socket(zmq.REP)
 socket.bind("tcp://*:5555")
 
+killFlag = False
+
 ## Message loop
-while True:
-    #  Wait for next request from client
-    message = socket.recv_string()
+## accepts requests in the format <functionName>;args as follows:
+# handleDataUpload;zipPath
+#   handles the extraction of data folder zipPath
+# set_parameter;path,to,targetParam;val
+#   sets parameter targetParam to val
+# finetune
+#   begins finetuning
+# inferSingle;PROMPT:prompt text to evaluate which can contain semicolons
+#   performs inference with prompt
+# prepareCheckpointDownload
+#   prepares the latest checkpoint for download; ack;path/to/zip
+# ping
+#   returns an ack
+# debug
+#   prints a debug message
+# kill
+#   kills the message loop
+
+while not killFlag:
+    message = socket.recv_string()  #  Wait for next request from client
     messageArr = message.split(";")
-    reply = ""
+    reply = "nack"
     post_loop_finetune = False
 
-    ## Assumes function names are separated from arguments by only semicolon and space
+    # Assumes message format: <functionName>;<args>
     logger.info(f"Received request: {message}")
     if messageArr[0] == "handleDataUpload":
         apiInstance.handleDataUpload(messageArr[1])
         reply = "ack"
     elif messageArr[0] == "set_parameter":
-        paramPath = messageArr[1].split(",")
+        paramPath = messageArr[1].split(",")  # path where "," = "/"
         if apiInstance.set_parameter(paramPath, int(messageArr[2])):
             reply = "ack"
         else:
@@ -78,21 +98,26 @@ while True:
         reply = "ack"
         post_loop_finetune = True
     elif messageArr[0] == "inferSingle":
+        # format inferSingle;PROMPT:<prompt> to support ";" in prompts
         reply = "ack;" + apiInstance.inferSingle(message.split(";PROMPT:")[1])
     elif messageArr[0] == "prepareCheckpointDownload":
         reply = "ack;" + apiInstance.prepareCheckpointDownload()
     elif messageArr[0] == "ping":
         reply = "ack"
     elif messageArr[0] == "debug":
+        logger.debug("torchServer debug function triggered")
         apiInstance.debugFunc()
         reply = "ack"
-
-    #  Do some 'work'
-    # time.sleep(1)
+    elif messageArr[0] == "kill":
+        reply = "ack"
+        killFlag = True
 
     #  Send reply back to client
     socket.send_string(reply)
 
     if post_loop_finetune:
-        ## This will freeze the server for the duration of the finetune, but the flask server should still work
+        logger.debug("torchServer beginning finetune")
+        # This will freeze the server for the duration of the finetune, but the flask server should still work
         apiInstance.finetune()
+
+logger.info("torchServer shut down")

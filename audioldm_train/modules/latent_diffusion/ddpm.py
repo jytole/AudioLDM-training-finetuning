@@ -1,3 +1,6 @@
+# This may be adapted from
+# https://github.com/CompVis/stable-diffusion/blob/main/ldm/models/diffusion/ddpm.py
+
 from multiprocessing.sharedctypes import Value
 import statistics
 import sys
