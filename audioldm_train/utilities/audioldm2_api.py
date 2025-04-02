@@ -359,7 +359,10 @@ class AudioLDM2APIObject:
                 "caption": prompt,
             }
         }
-        return os.path.join(self.__infer(promptsJson), "latestInference.wav")
+        
+        inferenceFolder = self.__infer(promptsJson)
+        
+        return os.path.join(inferenceFolder, "latestInference.wav")
 
     def inferFromFile(self, promptsJsonPath):
         """perform multiple inferences (generation of audio in AudioLDM2)
