@@ -357,7 +357,7 @@ class AudioLDM2APIObject:
             "data": {
                 "wav": "latestInference.wav",
                 "caption": prompt,
-            }
+            },
         }
         
         inferenceFolder = self.__infer(promptsJson)
