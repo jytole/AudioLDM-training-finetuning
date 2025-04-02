@@ -308,11 +308,11 @@ class AudioLDM2APIObject:
             self.checkpoint_path = config_reload_from_ckpt
             print(
                 "Reload ckpt specified in the config file %s"
-                % os.path.abspath(self.checkpoint_path)
+                % self.checkpoint_path
             )
         else:
             print("Attempt to load audioldm-m-full")
-            self.checkpoint_path = os.path.abspath("./data/checkpoints/audioldm-m-full.ckpt")
+            self.checkpoint_path = "./data/checkpoints/audioldm-m-full.ckpt"
 
         # instantiates the model defined in self.configs (default: a custom LatentDiffusion)
         self.latent_diffusion = instantiate_from_config(self.configs["model"])
