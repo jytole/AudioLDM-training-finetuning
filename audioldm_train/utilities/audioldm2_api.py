@@ -286,6 +286,8 @@ class AudioLDM2APIObject:
             "checkpoints",
         )
         
+        os.makedirs(checkpoint_dir, exist_ok=True)  # avoid "directory does not exist"
+        
         if len(os.listdir(checkpoint_dir)) > 0:
             print("Load checkpoints from path: %s" % checkpoint_dir)
             restore_step, n_step = get_restore_step(checkpoint_dir)
