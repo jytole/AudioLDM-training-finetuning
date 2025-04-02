@@ -147,7 +147,12 @@ def index():
         elif "debugForm" in request.form:
             print("debugForm")
             debugFunc()
-    return render_template("index.html", variableElements=variableElements)
+            
+    rendered_template = render_template("index.html", current_state=current_state)
+    response = make_response(rendered_template)
+    response.headers['Content-Type'] = 'text/html; charset=utf-8'
+    
+    return response
 
 
 ## handle the upload of an archive file through a submitted form

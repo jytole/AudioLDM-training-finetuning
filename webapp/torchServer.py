@@ -77,6 +77,8 @@ killFlag = False
 # kill
 #   kills the message loop
 
+## TODO fix every request being triggered twice
+
 while not killFlag:
     message = socket.recv_string()  #  Wait for next request from client
     messageArr = message.split(";")

@@ -2,6 +2,8 @@
 <html lang="en-US">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>AudioLDM2 Fine-Tuning</title>
 
     <!--Get filesheet from webapp/static/css/style.css-->
@@ -24,7 +26,7 @@
     <div class="formContainer">
         <h3>Upload Dataset Zip</h3>
         <form method="POST" enctype="multipart/form-data">
-            <input type="file" name="file" accept=".zip" class="fileUpload" />
+            <input type="file" name="file" accept=".zip" class="fileUpload" title="Data archive in .zip format" placeholder="Upload Zip File"/>
             <input type="submit" name="archiveUploadForm" />
         </form>
     </div>
@@ -49,7 +51,7 @@
         <h3>Generate Sound</h3>
         <form method="POST">
             <label for="prompt">Prompt:</label>
-            <input type="text" name="prompt" />
+            <input type="text" name="prompt" id="prompt" title="Prompt for generation" placeholder="A dog barking on a quiet night"/>
             <input type="submit" name="inferSingleForm" />
         </form>
         {% if variableElements["displayInferenceAudio"] %}
@@ -67,12 +69,12 @@
         </form>
     </div>
 
-    <div class="formContainer">
+    <!--<div class="formContainer">
         <h3>Restart API</h3>
         <form method="POST">
             <input type="submit" name="restartAPIForm" value="Restart" />
         </form>
-    </div>
+    </div>-->
 
     <div class="formContainer">
         <h3>Debug</h3>
