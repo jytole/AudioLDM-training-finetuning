@@ -83,7 +83,7 @@ class AudioLDM2APIObject:
         perform_validation=False,
     ):
 
-        assert torch.cuda.is_available(), "CUDA is not available. API failed to initialize."
+        # assert torch.cuda.is_available(), "CUDA is not available. API failed to initialize."
 
         print("Initializing AudioLDM2 API...")
 

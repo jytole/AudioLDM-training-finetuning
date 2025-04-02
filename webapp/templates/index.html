@@ -9,6 +9,7 @@
     <!--Get filesheet from webapp/static/css/style.css-->
     <link rel="stylesheet" href="{{ url_for('static', filename= 'css/style.css') }}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
 </head>
 <body>
     {% block content %}
@@ -92,7 +93,15 @@
         </form>
     </div>
 </body>
+
 <script>
+    var socket = io();
+    socket.on("current_state_update", function(data) {
+        console.log("Received message:", data);
+    });
+
+    socket.emit("debug");
+
     let current_state = {{ current_state | tojson }};
 
     //TODO send and save new current_state from flaskApp 

@@ -1,4 +1,12 @@
-from flask import Flask, render_template, request, Response, send_file, flash
+"""
+File to define and facilite AudioLDM2 Interface Flask App
+
+
+"""
+import eventlet
+eventlet.monkey_patch()
+
+from flask import Flask, render_template, request, Response, send_file, flash, make_response
 from werkzeug.utils import secure_filename
 import os
 
@@ -8,6 +16,7 @@ import zmq, logging, sys
 # flask socket stuff
 from flask_socketio import SocketIO
 import redis
+import threading
 
 # includes for spawn new API
 import subprocess, shutil
@@ -59,11 +68,49 @@ with app.app_context():
                      },
                     }
     
-    socketio = SocketIO(app, message_queue="redis://localhost:6379")
+    ## Socket handling code
+    
+    socketio = SocketIO(app, message_queue="redis://localhost:6379", cors_allowed_origins="*")  # create SocketIO obj
+    
+    ## DEBUG could un-tab the following section after start_redis_listener() is moved out
 
-@socketio.on("connect")
-def handle_connect():
-    logger.info("Client connected to SocketIO")
+    @socketio.on("connect")  # log all new clients
+    def handle_connect():
+        logger.info("Client connected to SocketIO")
+        
+    @socketio.on("debug")
+    def debugSocket():
+        logger.info("Socket Debug Triggered")
+        print("socket debug triggered")
+        
+    # # Background thread to listen for Redis messages
+    # # Emits message as "child_message"
+    # def redis_listener():
+    #     redis_client = redis.StrictRedis(host="localhost", port=6379, db=0)
+    #     pubsub = redis_client.pubsub()
+    #     pubsub.subscribe("flask-socketio")  # Subscribe to the Redis channel
+
+    #     for message in pubsub.listen():
+    #         if message["type"] == "current_state_update":
+    #             data = message["data"].decode("utf-8")
+    #             socketio.emit("current_state_update", data)  # Emit the message to connected clients
+    #         elif message["type"] == "debug":
+    #             socketio.emit("debugReceived")
+    #             logger.info("debug message received")
+
+    # ## DEBUG SECTION
+    # # Start redis_listener
+    # @socketio.on("start_task")
+    # def start_redis_listener():
+    #     redis_listener_thread = threading.Thread(target=redis_listener, daemon=True).start()
+    #     socketio.emit("task_update", {"data": "Task started!"})
+    #     logger.info("redis_listener started")
+        
+    #     return redis_listener_thread
+        
+    # start_redis_listener()
+    # ## In prod, the redis_listener would be initialized to read the 
+    # ## logfile and emit a message when specific messages are received
 
 ## TODO use this example
 def child_process_example():
@@ -261,8 +308,10 @@ def restartAPIServer():
 
 def debugFunc():
     sendToServer("debug")
+    # child_process_example()
+    # socketio.emit("debug")
     return True
 
 
-# if __name__ == "__main__":
-#     app.run(debug=True)
+if __name__ == "__main__":
+    socketio.run(app, debug=True)
