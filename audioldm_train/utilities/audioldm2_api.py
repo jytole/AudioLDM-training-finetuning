@@ -285,23 +285,6 @@ class AudioLDM2APIObject:
             self.exp_name,
             "checkpoints",
         )
-        
-        os.makedirs(checkpoint_dir, exist_ok=True)  # avoid "directory does not exist"
-        
-        if len(os.listdir(checkpoint_dir)) > 0:
-            print("Load checkpoints from path: %s" % checkpoint_dir)
-            restore_step, n_step = get_restore_step(checkpoint_dir)
-            self.checkpoint_path = os.path.join(checkpoint_dir, restore_step)
-            print("Resume from checkpoint", self.checkpoint_path)
-        elif config_reload_from_ckpt is not None:
-            self.checkpoint_path = config_reload_from_ckpt
-            print(
-                "Reload ckpt specified in the config file %s"
-                % self.checkpoint_path
-            )
-        else:
-            print("Attempt to load audioldm-m-full")
-            self.checkpoint_path = "data/checkpoints/audioldm-m-full.ckpt"
 
         self.setReloadFromCheckpoint(True)
 
@@ -326,8 +309,8 @@ class AudioLDM2APIObject:
                 % self.checkpoint_path
             )
         else:
-            print("Train from scratch")
-            self.checkpoint_path = None
+            print("Attempt to load audioldm-m-full")
+            self.checkpoint_path = "data/checkpoints/audioldm-m-full.ckpt"
 
         # instantiates the model defined in self.configs (default: a custom LatentDiffusion)
         self.latent_diffusion = instantiate_from_config(self.configs["model"])
