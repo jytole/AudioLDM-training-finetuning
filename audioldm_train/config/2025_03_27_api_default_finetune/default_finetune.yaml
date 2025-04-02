@@ -2,7 +2,7 @@ metadata_root: "./data/dataset/metadata/dataset_root.json"
 log_directory: "./log/latent_diffusion"
 project: "audioldm"
 precision: "high"
-reload_from_ckpt: "data/checkpoints/audioldm-m-full.ckpt"
+reload_from_ckpt: "./data/checkpoints/audioldm-m-full.ckpt"
 
 variables:
   sampling_rate: &sampling_rate 16000 
