@@ -34,3 +34,7 @@ input.fileUpload {
     border: 2px #eee solid;
     border-radius: 2px;
 }
+
+input[type="text"] {
+    width: 20em;
+}

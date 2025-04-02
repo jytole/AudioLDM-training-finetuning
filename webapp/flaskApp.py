@@ -5,6 +5,10 @@ import os
 # includes for zmq comms
 import zmq, logging, sys
 
+# flask socket stuff
+from flask_socketio import SocketIO
+import redis
+
 # includes for spawn new API
 import subprocess, shutil
 
@@ -44,8 +48,29 @@ with app.app_context():
     socket = context.socket(zmq.REQ)
     socket.connect(SERVER_ENDPOINT)
 
-    variableElements = {"inferencePath": "fake.mp3", "displayInferenceAudio": False}
+    current_state = {"inferencePath": "fake.mp3", 
+                     "displayInferenceAudio": False,
+                     "params": {
+                         "step,save_checkpoint_every_n_steps": 5000,
+                         "reload_from_ckpt": "./data/checkpoints/audioldm-m-full.ckpt",
+                         "model,params,evaluation_params,unconditional_guidance_scale": 3.5,
+                         "model,params,evaluation_params,ddim_sampling_steps": 200,
+                         "model,params,evaluation_params,n_candidates_per_samples": 3,
+                     },
+                    }
+    
+    socketio = SocketIO(app, message_queue="redis://localhost:6379")
 
+@socketio.on("connect")
+def handle_connect():
+    logger.info("Client connected to SocketIO")
+
+## TODO use this example
+def child_process_example():
+    redis_client = redis.StrictRedis(host="localhost", port=6379, db=0)
+    message = {"event": "current_state_update",
+               "data": current_state}
+    redis_client.publish("flask-socketio", message)
 
 def sendToServer(message, retries=REQUEST_RETRIES):
     global socket
@@ -178,17 +203,24 @@ def archiveUpload():
 
 
 def setParameter():
-    textInput = request.form["save_checkpoint_every_n_steps"]
+    paramPathInput = request.form["parameter"]
+    valInput = request.form["value"]
+    
+    message = "set_parameter;" + paramPathInput + ";" + valInput
 
-    if sendToServer("set_parameter;step,save_checkpoint_every_n_steps;" + textInput):
+    if sendToServer(message):
         return "Successfully set parameter"
     return "Failed to set parameter"
 
 
 def startFineTuning():
     sendToServer("finetune")
+    
     return "Fine tuning started. Please reference torchServer.log for progress."
 
+def monitorFineTune():
+    # monitor the latest file in webapp/logs beginning with "torchServer"
+    return True
 
 def inferSingle():
     prompt = request.form["prompt"]
@@ -197,14 +229,14 @@ def inferSingle():
     if not waveformpath:
         return False
 
-    variableElements["inferencePath"] = os.path.join(
+    current_state["inferencePath"] = os.path.join(
         "static", os.path.basename(waveformpath)
     )  # set relative path to static/filename
     shutil.copy(
         waveformpath,
-        os.path.join(projectRoot, "webapp", variableElements["inferencePath"]),
+        os.path.join(projectRoot, "webapp", current_state["inferencePath"]),
     )  # copy inferred file to static
-    variableElements["displayInferenceAudio"] = (
+    current_state["displayInferenceAudio"] = (
         True  # tell browser to display the audio
     )
 

@@ -27,6 +27,9 @@ ipdb = "^0.13.13"
 flask = "^3.1.0"
 gunicorn = "^23.0.0"
 zmq = "^0.0.0"
+flask-socketio = "^5.5.1"
+redis = "^5.2.1"
+eventlet = "^0.39.1"
 
 
 [build-system]
