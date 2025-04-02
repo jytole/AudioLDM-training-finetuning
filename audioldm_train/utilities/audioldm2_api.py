@@ -118,14 +118,14 @@ class AudioLDM2APIObject:
         self.wandb_logger = None
         self.trainer = None
 
-    def setReloadFromCheckpoint(self, flag):
-        """sets the reloadFromCheckpoint flag
+    def setReloadFromCheckpoint(self, val):
+        """sets the reloadFromCheckpoint config variable
 
         Args:
-            flag (bool): value to load into self.configs
+            val (str): path to .ckpt to load
         """
         
-        self.configs["reload_from_ckpt"] = flag
+        self.configs["reload_from_ckpt"] = val
 
     def __performValidation(self):
         """initialize the variables related to performing validation"""
@@ -288,7 +288,7 @@ class AudioLDM2APIObject:
             "checkpoints",
         )
 
-        self.setReloadFromCheckpoint(True)
+        # self.setReloadFromCheckpoint(True)
 
         wandb_path = os.path.join(
             self.configs["log_directory"], self.exp_group_name, self.exp_name
@@ -620,7 +620,7 @@ class AudioLDM2APIObject:
 
     def trainFromScratch(self):
         """Finetune from scratch, no checkpoint"""
-        self.setReloadFromCheckpoint(False)
+        # self.setReloadFromCheckpoint(None)
         self.__beginTrain()
 
     # takes list of keys to drop-down and set targetParam
