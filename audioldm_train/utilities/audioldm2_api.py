@@ -615,7 +615,7 @@ class AudioLDM2APIObject:
         """Run finetuning from checkpoint configured in config file
         reads self.configs["resume_from_ckpt"]"""
         
-        self.setReloadFromCheckpoint(True)
+        # self.setReloadFromCheckpoint(True)
         self.__beginTrain()
 
     def trainFromScratch(self):
