@@ -151,6 +151,7 @@ class AudioLDM2APIObject:
 
     # Function to return the path of a checkpoint which can be downloaded by the user
     ## Helper function for a client-side implementation of a file download
+    ## TODO send message from torchServer to indicate working (this takes longer than I expected)
     def prepareCheckpointDownload(self):
         """
         compresses latest checkpoint, returns path where it can be
@@ -352,13 +353,16 @@ class AudioLDM2APIObject:
             str: path to folder of generated files
         """
         
-        # Create json object
-        promptsJson = {
-            "data": {
+        data = []
+        data.append(
+            {
                 "wav": "latestInference.wav",
                 "caption": prompt,
-            },
-        }
+            }
+        )
+        
+        # Create json object
+        promptsJson = {"data": data}
         
         inferenceFolder = self.__infer(promptsJson)
         
