@@ -103,7 +103,11 @@ while not killFlag:
         # format inferSingle;PROMPT:<prompt> to support ";" in prompts
         reply = "ack;" + apiInstance.inferSingle(message.split(";PROMPT:")[1])
     elif messageArr[0] == "prepareCheckpointDownload":
-        reply = "ack;" + apiInstance.prepareCheckpointDownload()
+        path = apiInstance.prepareCheckpointDownload()
+        if not path:
+            logger.debug("No checkpoint available")
+        else:
+            reply = "ack;" + path
     elif messageArr[0] == "ping":
         reply = "ack"
     elif messageArr[0] == "debug":

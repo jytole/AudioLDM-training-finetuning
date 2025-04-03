@@ -16,7 +16,7 @@
     <div class="container">
         {% for message in get_flashed_messages() %}
         <div class="alert alert-light">
-            <button type="button" class="close" data-dismiss="alert" onclick="this.parentElement.style.display='none'">&times;</button>
+            <button type="button" class="close" data-dismiss="alert" onclick=delete_flash(this)>&times;</button>
             {{ message }}
         </div>
         {% endfor %}
@@ -48,6 +48,11 @@
             <input type="text" name="value" id="paramValue" title="Value of parameter" placeholder="5000"/>
             <input type="submit" name="setParameterForm" />
         </form>
+    </div>
+
+    <div class="monitorBox">
+        <h3>AudioLDM2 Monitor</h3>
+        <p id="monitorContent"></p>
     </div>
 
     <div class="formContainer">
@@ -96,12 +101,11 @@
 </body>
 
 <script>
-    /*
     var socket = io();
     socket.on("current_state_update", function(data) {
         console.log("Received message:", data);
+        //set current_state object accordingly
     });
-    */
     let current_state = {{ current_state | tojson }};
 
     function debugEmit() {
@@ -114,6 +118,14 @@
         var selection = this.value;
         var params = current_state["params"];
         $('#paramValue').attr("placeholder", params[selection]);
+    });
+
+    function delete_flash(flash){
+        $(flash).parent().remove()
+    }
+
+    socket.on("monitor", function(data) {
+        $('#monitor').text(data);
     });
 </script>
 </html>
