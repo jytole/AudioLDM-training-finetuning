@@ -124,12 +124,12 @@ class AudioLDM2APIObject:
         Args:
             val (str): path to .ckpt to load
         """
-        
+
         self.configs["reload_from_ckpt"] = val
 
     def __performValidation(self):
         """initialize the variables related to performing validation"""
-        
+
         self.configs["model"]["params"]["cond_stage_config"][
             "crossattn_audiomae_generated"
         ]["params"]["use_gt_mae_output"] = False
@@ -144,7 +144,7 @@ class AudioLDM2APIObject:
         Returns:
             str: "Successful Dataset Processing" upon completion
         """
-        
+
         # Note that this could be written to set metadata_root depending on where processFromZip is configured to extract things
         ## but for now processFromZip universally makes it match the audioset formatting, so this is nonessential
         return processFromZip.process(zipPath)
@@ -160,7 +160,7 @@ class AudioLDM2APIObject:
         Returns:
             str: path to compressed checkpoint
         """
-        
+
         # Search through the checkpoints directory for the most recent checkpoint
         checkpointDir = os.path.join(
             self.configs["log_directory"],
@@ -168,7 +168,7 @@ class AudioLDM2APIObject:
             self.exp_name,
             "checkpoints",
         )
-        
+
         # Return false if no checkpoints available
         files = os.listdir(checkpointDir)
         if len(files) <= 0:
@@ -199,7 +199,7 @@ class AudioLDM2APIObject:
         Returns:
             str: path to allValidations.zip
         """
-        
+
         logsDir = os.path.join(
             self.configs["log_directory"], self.exp_group_name, self.exp_name
         )
@@ -229,7 +229,7 @@ class AudioLDM2APIObject:
         Returns:
             dict: representation of prompts and target filepaths
         """
-        
+
         # Read in file
         promptsList = []
         with open(promptsJsonPath, "r") as f:
@@ -261,9 +261,9 @@ class AudioLDM2APIObject:
         Returns:
             str: path to folder of generated files
         """
-        
+
         self.__initializeSystemSettings()
-        
+
         if "dataloader_add_ons" in self.configs["data"].keys():
             dataloader_add_ons = self.configs["data"]["dataloader_add_ons"]
         else:
@@ -280,12 +280,12 @@ class AudioLDM2APIObject:
             val_dataset,
             batch_size=1,
         )
-        
+
         try:
             config_reload_from_ckpt = self.configs["reload_from_ckpt"]
         except:
             config_reload_from_ckpt = None
-            
+
         checkpoint_dir = os.path.join(
             self.configs["log_directory"],
             self.exp_group_name,
@@ -311,10 +311,7 @@ class AudioLDM2APIObject:
             print("Resume from checkpoint", self.checkpoint_path)
         elif config_reload_from_ckpt is not None:
             self.checkpoint_path = config_reload_from_ckpt
-            print(
-                "Reload ckpt specified in the config file %s"
-                % self.checkpoint_path
-            )
+            print("Reload ckpt specified in the config file %s" % self.checkpoint_path)
         else:
             print("Attempt to load audioldm-m-full")
             self.checkpoint_path = "./data/checkpoints/audioldm-m-full.ckpt"
@@ -356,7 +353,7 @@ class AudioLDM2APIObject:
         Returns:
             str: path to the generated file
         """
-        
+
         data = []
         data.append(
             {
@@ -364,12 +361,12 @@ class AudioLDM2APIObject:
                 "caption": prompt,
             }
         )
-        
+
         # Create json object
         promptsJson = {"data": data}
-        
+
         inferenceFolder = self.__infer(promptsJson)
-        
+
         return os.path.join(inferenceFolder, "latestInference.wav")
 
     def inferFromFile(self, promptsJsonPath):
@@ -383,13 +380,13 @@ class AudioLDM2APIObject:
         Returns:
             str: path to folder of generated files
         """
-        
+
         promptsJson = self.__readInferencePromptsFile(promptsJsonPath)
         return self.__infer(promptsJson)
 
     def __initializeSystemSettings(self):
         """initialize seed and precision from self.configs"""
-        
+
         if "seed" in self.configs.keys():
             seed_everything(self.configs["seed"])
         else:
@@ -445,7 +442,7 @@ class AudioLDM2APIObject:
 
     def __copyTestData(self):
         """Copy data from test dataset into logs dir"""
-        
+
         self.test_data_subset_folder = os.path.join(
             os.path.dirname(self.configs["log_directory"]),
             "testset_data",
@@ -460,7 +457,7 @@ class AudioLDM2APIObject:
         Returns:
             bool: flag to indicate if external checkpoints were loaded
         """
-        
+
         try:
             config_reload_from_ckpt = self.configs["reload_from_ckpt"]
         except:
@@ -513,10 +510,7 @@ class AudioLDM2APIObject:
         elif config_reload_from_ckpt is not None:
             self.checkpoint_path = config_reload_from_ckpt
             is_external_checkpoints = True
-            print(
-                "Reload ckpt specified in the config file %s"
-                % self.checkpoint_path
-            )
+            print("Reload ckpt specified in the config file %s" % self.checkpoint_path)
         else:
             print("Train from scratch")
             self.checkpoint_path = None
@@ -561,7 +555,7 @@ class AudioLDM2APIObject:
         Args:
             is_external_checkpoints (bool, optional): flag to indicate if external checkpoints were loaded. Defaults to False.
         """
-        
+
         if is_external_checkpoints:
             if self.checkpoint_path is not None:
                 ckpt = torch.load(self.checkpoint_path)["state_dict"]
@@ -609,10 +603,10 @@ class AudioLDM2APIObject:
             )
 
     def __beginTrain(self):
-        """Training function to both train from scratch and finetune. 
+        """Training function to both train from scratch and finetune.
         self.configs["reload_from_ckpt"] determines if finetuning
         """
-        
+
         self.__initializeSystemSettings()
         self.__initializeDatasetSplits()
         self.__copyTestData()
@@ -622,7 +616,7 @@ class AudioLDM2APIObject:
     def finetune(self):
         """Run finetuning from checkpoint configured in config file
         reads self.configs["resume_from_ckpt"]"""
-        
+
         # self.setReloadFromCheckpoint(True)
         self.__beginTrain()
 
@@ -642,6 +636,7 @@ class AudioLDM2APIObject:
         Returns:
             bool: success or failure value
         """
+
         # Recursive loop to drill down into desired parameter
         def set_nested_dict_value(d, keys, value):
             for key in keys[:-1]:
