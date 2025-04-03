@@ -16,3 +16,4 @@ checkpoints
 *.tar
 condor*
 wandb
+dump.rdb

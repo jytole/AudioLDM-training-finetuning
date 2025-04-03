@@ -45,7 +45,7 @@
                 <option value="model,params,evaluation_params,n_candidates_per_samples">Evaluation: N Candidates Per Sample</option>
             </select>
             <label for="paramValue">Value:</label>
-            <input type="text" name="value" id="paramValue" title="Value of parameter" placeholder="5000"/>
+            <input type="text" name="value" id="paramValue" title="Value of parameter" placeholder="{{ current_state["params"]["step,save_checkpoint_every_n_steps"] }}"/>
             <input type="submit" name="setParameterForm" />
         </form>
     </div>
@@ -102,11 +102,15 @@
 
 <script>
     var socket = io();
-    socket.on("current_state_update", function(data) {
-        console.log("Received message:", data);
-        //set current_state object accordingly
-    });
+
+    // on render of template, set current_state
     let current_state = {{ current_state | tojson }};
+    
+    // when received from socket, update current_state
+    socket.on("current_state_update", function(data) {
+        console.log("Received state:", data);
+        current_state = data;
+    });
 
     function debugEmit() {
         //socket.emit("debug");

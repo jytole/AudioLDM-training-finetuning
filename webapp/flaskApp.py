@@ -41,7 +41,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
-# Server init variables
+# Torch server init variables
 REQUEST_TIMEOUT = 2500
 REQUEST_RETRIES = 3
 SERVER_ENDPOINT = "tcp://localhost:5555"
@@ -169,6 +169,9 @@ try:
 except:
     logger.error("SocketIO failed to connect: is redis running?")
     sys.exit("Exiting to prevent infinite log file")
+
+def emitCurrentState():
+    socketio.emit("current_state_update", current_state)
 
 def sendToServer(message, retries=REQUEST_RETRIES):
     global socket
@@ -299,7 +302,6 @@ def archiveUpload():
     flash("No file uploaded")
     return False
 
-
 def setParameter():
     paramPathInput = request.form["parameter"]
     valInput = request.form["value"]
@@ -307,6 +309,8 @@ def setParameter():
     message = "set_parameter;" + paramPathInput + ";" + valInput
 
     if sendToServer(message):
+        current_state["params"][paramPathInput] = valInput
+        emitCurrentState()
         flash("Successfully set parameter")
         return "Successfully set parameter"
     else:
