@@ -83,7 +83,7 @@ class AudioLDM2APIObject:
         perform_validation=False,
     ):
 
-        # assert torch.cuda.is_available(), "CUDA is not available. API failed to initialize."
+        assert torch.cuda.is_available(), "CUDA is not available. API failed to initialize."
 
         print("Initializing AudioLDM2 API...")
 
@@ -354,7 +354,7 @@ class AudioLDM2APIObject:
             prompt (str): the prompt to be generated
 
         Returns:
-            str: path to folder of generated files
+            str: path to the generated file
         """
         
         data = []
