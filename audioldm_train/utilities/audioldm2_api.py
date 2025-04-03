@@ -168,7 +168,11 @@ class AudioLDM2APIObject:
             self.exp_name,
             "checkpoints",
         )
+        
+        # Return false if no checkpoints available
         files = os.listdir(checkpointDir)
+        if len(files) <= 0:
+            return False
         paths = []
         for basename in files:
             if basename.endswith(".ckpt"):
