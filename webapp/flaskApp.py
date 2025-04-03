@@ -8,7 +8,7 @@ eventlet.monkey_patch()
 
 from flask import Flask, render_template, request, Response, send_file, flash, make_response
 from werkzeug.utils import secure_filename
-import os
+import os, signal
 
 # includes for zmq comms
 import zmq, logging, sys
@@ -27,7 +27,6 @@ import subprocess, shutil
 
 ## init logging
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
 
 projectRoot = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -55,8 +54,7 @@ def spawnAPIServer():
 
 
 with app.app_context():
-    logging.basicConfig(level=logging.INFO)
-    logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
+    logging.basicConfig(level=logging.DEBUG)
 
     logging.info("Connecting to AudioLDM2 process through zmq...")
     context = zmq.Context()
@@ -75,100 +73,108 @@ with app.app_context():
                     }
     
 ## Socket handling code
+
+try:
+    # Test Redis connection
+    redis_client = redis.StrictRedis(host="localhost", port=6379, db=0)
+    redis_client.ping()  # Check if Redis is reachable
+    logger.info("Redis is running and reachable")
+    
+except redis.exceptions.ConnectionError as e:
+    logger.error("Redis is not running or unreachable: %s", e)
+    logger.error("Shutting down master")
+    os.kill(os.getppid(), signal.SIGTERM)
     
 # socketio = SocketIO(app, message_queue="redis://localhost:6379")
-try:
-    socketio = SocketIO(app, message_queue="redis://localhost:6379", cors_allowed_origins="*")
+socketio = SocketIO(app, message_queue="redis://localhost:6379", cors_allowed_origins="*")
 
-    # TODO fix: redis triggers an error loop that creates a very large log file very fast
+# TODO fix: redis triggers an error loop that creates a very large log file very fast
 
-    ## DEBUG could un-tab the following section after start_redis_listener() is moved out
+## DEBUG could un-tab the following section after start_redis_listener() is moved out
 
-    @socketio.on("connect")  # log all new clients
-    def handle_connect():
-        logger.info("Client connected to SocketIO")
-        
-    @socketio.on("debug")
-    def debugSocket():
-        logger.info("Socket Debug Triggered")
-        print("socket debug triggered")
-        
-    # Background thread to listen for Redis messages
-    # Emits message as "child_message"
-    def redis_listener():
-        pubsub = redis_client.pubsub()
-        pubsub.subscribe("flask-socketio")  # Subscribe to the Redis channel
-
-        for message in pubsub.listen():
-            if message["type"] == "current_state_update":
-                data = message["data"].decode("utf-8")
-                socketio.emit("current_state_update", data)  # Emit the message to connected clients
-            elif message["type"] == "debug":
-                socketio.emit("debugReceived")
-                logger.info("listener received debug message")
-
-    # https://stackoverflow.com/questions/5419888/reading-from-a-frequently-updated-file
-    def follow(logFile):
-        logFile.seek(0,2)
-        while True:
-            line = logFile.readline()
-            if not line:
-                time.sleep(0.1)
-                continue
-            yield line
-        
-    def torchServer_monitor():
-        # pubsub = redis_client.pubsub()
-        # pubsub.subscribe("flask-socketio")  # Subscribe to the Redis channel
-        logDir = os.path.join(projectRoot, "webapp/logs")
-        files = os.listdir(logDir)
-        if len(files) <= 0:
-            return False
-        paths = []
-        for basename in files:
-            if "torchServer-" in basename:
-                paths.append(os.path.join(logDir, basename))
-        logFilePath = max(paths, key=os.path.getctime)
-        
-        logFile = open(logFilePath)
-        logLines = follow(logFile)
-        for line in logLines:
-            if "CUDA is not available" in line:
-                # flash("Operation Failed! CUDA is not available.")
-                socketio.emit("monitor", "Operation Failed! CUDA is not available.")
-                return False
-            elif "Traceback (most recent call last):" in line:
-                # flash("Traceback found. Likely crash.")
-                socketio.emit("monitor", "Traceback found. Likely crash.")
-                return False
-                
-    def watch_torchServer():
-        redis_listener_thread = threading.Thread(target=torchServer_monitor, daemon=True)
-        return True
-
-    ## DEBUG SECTION
-    # Start redis_listener
-    @socketio.on("start_task")
-    def start_redis_listener():
-        redis_listener_thread = threading.Thread(target=redis_listener, daemon=True).start()
-        socketio.emit("task_update", {"data": "Task started!"})
-        logger.info("redis_listener started")
-        
-        return redis_listener_thread
-
-    ## In prod, the redis_listener would be initialized to read the 
-    ## logfile and emit a message when specific messages are received
-
-    ## TODO use this example
-    def child_process_example():
-        redis_client = redis.StrictRedis(host="localhost", port=6379, db=0)
-        message = {"event": "current_state_update",
-                "data": current_state}
-        redis_client.publish("flask-socketio", message)
+@socketio.on("connect")  # log all new clients
+def handle_connect():
+    """log a message when client connects"""
+    logger.info("Client connected to SocketIO")
     
-except:
-    logger.error("SocketIO failed to connect: is redis running?")
-    sys.exit("Exiting to prevent infinite log file")
+@socketio.on("debug")
+def debugSocket():
+    logger.info("Socket Debug Triggered")
+    print("socket debug triggered")
+    
+# Background thread to listen for Redis messages
+# Emits message as "child_message"
+def redis_listener():
+    pubsub = redis_client.pubsub()
+    pubsub.subscribe("flask-socketio")  # Subscribe to the Redis channel
+
+    for message in pubsub.listen():
+        if message["type"] == "current_state_update":
+            data = message["data"].decode("utf-8")
+            socketio.emit("current_state_update", data)  # Emit the message to connected clients
+        elif message["type"] == "debug":
+            socketio.emit("debugReceived")
+            logger.info("listener received debug message")
+
+# https://stackoverflow.com/questions/5419888/reading-from-a-frequently-updated-file
+def follow(logFile):
+    logFile.seek(0,2)
+    while True:
+        line = logFile.readline()
+        if not line:
+            time.sleep(0.1)
+            continue
+        yield line
+    
+def torchServer_monitor():
+    # pubsub = redis_client.pubsub()
+    # pubsub.subscribe("flask-socketio")  # Subscribe to the Redis channel
+    logDir = os.path.join(projectRoot, "webapp/logs")
+    files = os.listdir(logDir)
+    if len(files) <= 0:
+        return False
+    paths = []
+    for basename in files:
+        if "torchServer-" in basename:
+            paths.append(os.path.join(logDir, basename))
+    logFilePath = max(paths, key=os.path.getctime)
+    
+    logFile = open(logFilePath)
+    logLines = follow(logFile)
+    socketio.emit("monitor", "Monitoring torch log file!")
+    for line in logLines:
+        if "CUDA is not available" in line:
+            # flash("Operation Failed! CUDA is not available.")
+            socketio.emit("monitor", "Operation Failed! CUDA is not available.")
+            return False
+        elif "Traceback (most recent call last):" in line:
+            # flash("Traceback found. Likely crash.")
+            socketio.emit("monitor", "Traceback found. Likely crash.")
+            return False
+            
+def watch_torchServer():
+    redis_listener_thread = threading.Thread(target=torchServer_monitor, daemon=True)
+    return True
+
+## DEBUG SECTION
+# Start redis_listener
+@socketio.on("start_task")
+def start_redis_listener():
+    redis_listener_thread = threading.Thread(target=redis_listener, daemon=True).start()
+    socketio.emit("task_update", {"data": "Task started!"})
+    logger.info("redis_listener started")
+    
+    return redis_listener_thread
+
+## In prod, the redis_listener would be initialized to read the 
+## logfile and emit a message when specific messages are received
+
+## TODO use this example
+def child_process_example():
+    redis_client = redis.StrictRedis(host="localhost", port=6379, db=0)
+    message = {"event": "current_state_update",
+            "data": current_state}
+    redis_client.publish("flask-socketio", message)
 
 def emitCurrentState():
     socketio.emit("current_state_update", current_state)
