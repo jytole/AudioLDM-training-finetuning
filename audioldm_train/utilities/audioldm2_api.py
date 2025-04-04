@@ -636,6 +636,16 @@ class AudioLDM2APIObject:
         Returns:
             bool: success or failure value
         """
+        
+        try:
+            val = int(val)
+        except ValueError:
+            if val.lower() == "true":
+                val = True
+            elif val.lower() == "false":
+                val = False
+            else:
+                val = val
 
         # Recursive loop to drill down into desired parameter
         def set_nested_dict_value(d, keys, value):

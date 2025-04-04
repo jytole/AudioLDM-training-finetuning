@@ -1,3 +1,11 @@
+"""Script to host and log an internal server for AudioLDM2 functionality.
+
+Assumes that the webapp init scripts launch this application once.
+Makes it possible to send and receive messages from a single
+AudioLDM2 instance, minimizing memory overloading and crashes.
+
+Interfaces with audioldm2_api.py"""
+
 import time
 import zmq
 import zipfile
@@ -56,7 +64,7 @@ context = zmq.Context()
 socket = context.socket(zmq.REP)
 socket.bind("tcp://*:5555")
 
-killFlag = False
+killFlag = False  # NOTE change flag to True to make sphinx documentation
 
 ## Message loop
 ## accepts requests in the format <functionName>;args as follows:
@@ -92,7 +100,7 @@ while not killFlag:
         reply = "ack"
     elif messageArr[0] == "set_parameter":
         paramPath = messageArr[1].split(",")  # path where "," = "/"
-        if apiInstance.set_parameter(paramPath, int(messageArr[2])):
+        if apiInstance.set_parameter(paramPath, messageArr[2]):  # TODO implement non-int param setting...
             reply = "ack"
         else:
             reply = messageArr[1]
