@@ -17,3 +17,5 @@ checkpoints
 condor*
 wandb
 dump.rdb
+docs/*
+!docs/source
