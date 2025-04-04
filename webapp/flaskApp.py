@@ -1,24 +1,34 @@
-"""
-File to define and facilite AudioLDM2 Interface Flask App
+"""Script to define and facilite AudioLDM2 Interface Flask App
 
-Interfaces with torchServer.py
+Current implementation serves the flask-based webapp through
+gunicorn with an nginx proxy.
+Serves rendered templates to user with some context included.
+Connects to client for interactive content via flask_socketio.
+Webapp connects to AudioLDM2 script via zmq.
+
+**BAD PRACTICE**: cors_allowed_origins="*", but web security
+is hard.
+
+
+Expected environment variables:
+    To connect "flash" messages and otherwise authorize client comms:
+    FLASK_SECRET_KEY
+
+    To enable WANDB logging and avoid failure:
+    WANDB_API_KEY
 """
-import eventlet
-eventlet.monkey_patch()
 
 from flask import Flask, render_template, request, Response, send_file, flash, make_response
 from werkzeug.utils import secure_filename
-import os, signal
+import os
 
 # includes for zmq comms
-import zmq, logging, sys
+import zmq, logging
 
 # flask socket stuff
 from flask_socketio import SocketIO
-import redis
 import threading
 from flask_cors import CORS
-from flask_redis import FlaskRedis
 
 import time
 
@@ -33,7 +43,6 @@ projectRoot = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 app = Flask(__name__)
 app.config.from_prefixed_env()
 CORS(app)
-redis_client = FlaskRedis(app)
 
 # nginx prod deployment (tell the app it's behind a 1-layer proxy)
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -47,12 +56,17 @@ SERVER_ENDPOINT = "tcp://localhost:5555"
 
 
 def spawnAPIServer():
+    """Method to spawn the torchServer, to be used if it crashes.
+
+    Returns:
+        Popen: Subprocess running `python webapp/torchServer.py`
+    """
     p = subprocess.Popen(
         [shutil.which("python"), os.path.join(projectRoot, "webapp/torchServer.py")]
     )
     return p
 
-
+# global app init stuff
 with app.app_context():
     logging.basicConfig(level=logging.DEBUG)
 
@@ -71,26 +85,11 @@ with app.app_context():
                          "model,params,evaluation_params,n_candidates_per_samples": 3,
                      },
                     }
-    
+
 ## Socket handling code
-
-try:
-    # Test Redis connection
-    redis_client = redis.StrictRedis(host="localhost", port=6379, db=0)
-    redis_client.ping()  # Check if Redis is reachable
-    logger.info("Redis is running and reachable")
+# TODO figure out why socket closes on all submitted forms (?)
     
-except redis.exceptions.ConnectionError as e:
-    logger.error("Redis is not running or unreachable: %s", e)
-    logger.error("Shutting down master")
-    os.kill(os.getppid(), signal.SIGTERM)
-    
-# socketio = SocketIO(app, message_queue="redis://localhost:6379")
-socketio = SocketIO(app, message_queue="redis://localhost:6379", cors_allowed_origins="*")
-
-# TODO fix: redis triggers an error loop that creates a very large log file very fast
-
-## DEBUG could un-tab the following section after start_redis_listener() is moved out
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 @socketio.on("connect")  # log all new clients
 def handle_connect():
@@ -99,25 +98,21 @@ def handle_connect():
     
 @socketio.on("debug")
 def debugSocket():
+    """log socketio debug message"""
     logger.info("Socket Debug Triggered")
-    print("socket debug triggered")
-    
-# Background thread to listen for Redis messages
-# Emits message as "child_message"
-def redis_listener():
-    pubsub = redis_client.pubsub()
-    pubsub.subscribe("flask-socketio")  # Subscribe to the Redis channel
-
-    for message in pubsub.listen():
-        if message["type"] == "current_state_update":
-            data = message["data"].decode("utf-8")
-            socketio.emit("current_state_update", data)  # Emit the message to connected clients
-        elif message["type"] == "debug":
-            socketio.emit("debugReceived")
-            logger.info("listener received debug message")
 
 # https://stackoverflow.com/questions/5419888/reading-from-a-frequently-updated-file
 def follow(logFile):
+    """Helper function to monitor a constantly growing file.
+    
+    Yields lines of the file as they come in.
+
+    Args:
+        logFile (stream): File to be monitored
+
+    Yields:
+        lines: Lines, as they arrive. A "generator"
+    """
     logFile.seek(0,2)
     while True:
         line = logFile.readline()
@@ -126,9 +121,13 @@ def follow(logFile):
             continue
         yield line
     
+# TODO consider what messages to look for in a log, maybe progress updates?
 def torchServer_monitor():
-    # pubsub = redis_client.pubsub()
-    # pubsub.subscribe("flask-socketio")  # Subscribe to the Redis channel
+    """Monitor the latest torchServer log file, emit updates to clients
+
+    Returns:
+        success: boolean value
+    """
     logDir = os.path.join(projectRoot, "webapp/logs")
     files = os.listdir(logDir)
     if len(files) <= 0:
@@ -139,47 +138,46 @@ def torchServer_monitor():
             paths.append(os.path.join(logDir, basename))
     logFilePath = max(paths, key=os.path.getctime)
     
+    logger.info("monitoring: " + logFilePath)
+    
     logFile = open(logFilePath)
     logLines = follow(logFile)
-    socketio.emit("monitor", "Monitoring torch log file!")
+    # socketio.emit("monitor", "Monitoring torch log file!")
     for line in logLines:
         if "CUDA is not available" in line:
-            # flash("Operation Failed! CUDA is not available.")
+            logger.info("monitor found CUDA fail")
             socketio.emit("monitor", "Operation Failed! CUDA is not available.")
             return False
         elif "Traceback (most recent call last):" in line:
-            # flash("Traceback found. Likely crash.")
+            logger.info("monitor found traceback fail")
             socketio.emit("monitor", "Traceback found. Likely crash.")
             return False
             
 def watch_torchServer():
-    redis_listener_thread = threading.Thread(target=torchServer_monitor, daemon=True)
+    """Start a thread with the torchServer monitor;
+    allows user to continue interacting with the webapp 
+
+    Returns:
+        success: True when begun
+    """
+    torchServer_watch_thread = threading.Thread(target=torchServer_monitor, daemon=True)
+    torchServer_watch_thread.start()
     return True
 
-## DEBUG SECTION
-# Start redis_listener
-@socketio.on("start_task")
-def start_redis_listener():
-    redis_listener_thread = threading.Thread(target=redis_listener, daemon=True).start()
-    socketio.emit("task_update", {"data": "Task started!"})
-    logger.info("redis_listener started")
-    
-    return redis_listener_thread
-
-## In prod, the redis_listener would be initialized to read the 
-## logfile and emit a message when specific messages are received
-
-## TODO use this example
-def child_process_example():
-    redis_client = redis.StrictRedis(host="localhost", port=6379, db=0)
-    message = {"event": "current_state_update",
-            "data": current_state}
-    redis_client.publish("flask-socketio", message)
-
 def emitCurrentState():
+    """emits the current_state dictionary"""
     socketio.emit("current_state_update", current_state)
 
 def sendToServer(message, retries=REQUEST_RETRIES):
+    """Sends message to torchServer, expect "ack" in return
+
+    Args:
+        message (str): Message to be sent to the torchServer via zmq
+        retries (int, optional): Number of times to try resending message. Defaults to REQUEST_RETRIES (3).
+
+    Returns:
+        success: boolean flag
+    """
     global socket
     socket.send_string(message)
 
@@ -198,7 +196,7 @@ def sendToServer(message, retries=REQUEST_RETRIES):
 
         retries_left -= 1
         logging.warning("No response from server")
-        # Socket is confused. Close and remove it.
+        # Socket is not answering. Close and remove it.
         socket.setsockopt(zmq.LINGER, 0)
         socket.close()
 
@@ -218,11 +216,20 @@ def sendToServer(message, retries=REQUEST_RETRIES):
 ## Send a message to server and expect a parseable response
 ## assume server will respond with ack;REST_OF_MESSAGE
 ## Only returns up until the next ";"
-def getFromServer(message):
+def getFromServer(message, retries=REQUEST_RETRIES):
+    """Sends message to torchServer, expect "ack;<data>" in return
+
+    Args:
+        message (str): Message to be sent to the torchServer via zmq
+        retries (int, optional): Number of times to try resending message. Defaults to REQUEST_RETRIES (3).
+
+    Returns:
+        success: boolean flag
+    """
     global socket
     socket.send_string(message)
 
-    retries_left = REQUEST_RETRIES
+    retries_left = retries
     while True:
         if (socket.poll(REQUEST_TIMEOUT) & zmq.POLLIN) != 0:
             reply = socket.recv_string()
@@ -237,7 +244,7 @@ def getFromServer(message):
 
         retries_left -= 1
         logging.warning("No response from server")
-        # Socket is confused. Close and remove it.
+        # Socket is not answering. Close and remove it.
         socket.setsockopt(zmq.LINGER, 0)
         socket.close()
 
@@ -256,28 +263,32 @@ def getFromServer(message):
 
 @app.route("/", methods=["GET", "POST"])
 def index():
+    """http request handler for index (/)
+    
+    Renders template with current_state; answers requests in the form of forms
+
+    Returns:
+        response: http response containing the rendered template
+    """
     # handle all the forms
     if request.method == "POST":
         if "archiveUploadForm" in request.form:
-            print("archiveUploadForm")
+            logger.debug("archiveUploadForm")
             archiveUpload()
         elif "setParameterForm" in request.form:
-            print("setParameterForm")
+            logger.debug("setParameterForm")
             setParameter()
         elif "startFineTuningForm" in request.form:
-            print("startFineTuningForm")
+            logger.debug("startFineTuningForm")
             startFineTuning()
         elif "inferSingleForm" in request.form:
-            print("inferSingleForm")
+            logger.debug("inferSingleForm")
             inferSingle()
         elif "downloadCheckpointLatestForm" in request.form:
-            print("downloadCheckpointLatestForm")
+            logger.debug("downloadCheckpointLatestForm")
             downloadCheckpointLatest()
-        elif "restartAPIForm" in request.form:
-            print("restartAPIForm")
-            restartAPIServer()
         elif "debugForm" in request.form:
-            print("debugForm")
+            logger.debug("debugForm")
             debugFunc()
             
     rendered_template = render_template("index.html", current_state=current_state)
@@ -291,6 +302,11 @@ def index():
 ## saves the file, then calls an unzip helper function
 ### REQUIRES: werkzeug.utils.secure_filename, flask.request
 def archiveUpload():
+    """Function to handle the upload of a data archive
+
+    Returns:
+        success: boolean flag
+    """
     if "file" in request.files:
         file = request.files["file"]
         if file.filename != "":
@@ -309,6 +325,13 @@ def archiveUpload():
     return False
 
 def setParameter():
+    """Sets the parameter requested in the form
+    
+    Expects a form submitted containing "parameter" and "value" fields
+
+    Returns:
+        success: boolean flag
+    """
     paramPathInput = request.form["parameter"]
     valInput = request.form["value"]
     
@@ -318,26 +341,38 @@ def setParameter():
         current_state["params"][paramPathInput] = valInput
         emitCurrentState()
         flash("Successfully set parameter")
-        return "Successfully set parameter"
+        return True
     else:
         flash("Failed to set parameter")
-    return "Failed to set parameter"
+    return False
 
 
 def startFineTuning():
+    """Start the finetuning process on torchServer.
+    
+    Flashes message(s) with progress updates
+
+    Returns:
+        success: boolean flag
+    """
     if sendToServer("finetune"):
-        flash("Fine tuning started. Please reference torchServer.log for progress")
+        flash("Fine tuning started.")
         watch_torchServer()
+        return True
     else:
         flash("AudioLDM2 not available. Is it running?")
-
-def monitorFineTune():
-    # monitor the latest file in webapp/logs beginning with "torchServer"
-    return True
+        return False
 
 def inferSingle():
+    """Perform a single inference on torchServer
+    
+    Shares the audiofile in current_state
+
+    Returns:
+        success: boolean flag
+    """
     prompt = request.form["prompt"]
-    waveformpath = getFromServer("inferSingle;PROMPT:" + prompt)
+    waveformpath = getFromServer("inferSingle;PROMPT:" + prompt) # TODO handle long render times (sendToServer?)
 
     if not waveformpath:
         flash("Failed to perform inference")
@@ -357,8 +392,13 @@ def inferSingle():
     flash("Inference complete")
     return True
 
-
+## TODO add possibility of checkpoint handling being google cloud based, rather than huge file transfer
 def downloadCheckpointLatest():
+    """Download the latest checkpoint
+
+    Returns:
+        send_file: a file transfer for the client, handled by flask
+    """
     path = getFromServer("prepareCheckpointDownload")
     if not path:
         flash("No checkpoint available")
@@ -368,22 +408,12 @@ def downloadCheckpointLatest():
     )
     return send_file(checkpointPath)
 
-
-def restartAPIServer():
-    if sendToServer("ping", 5):
-        return "API still running"
-    else:
-        ## boot the API?
-        apiServerProcess = spawnAPIServer()
-        return "API not responding. New API instance booted"
-
-
 def debugFunc():
+    """debug function to show how requests are acting
+
+    Returns:
+        success: boolean flag
+    """
     sendToServer("debug")
-    # child_process_example()
-    # socketio.emit("debug")
+    socketio.emit("debug")
     return True
-
-
-# if __name__ == "__main__":
-#     socketio.run(app, debug=True)
