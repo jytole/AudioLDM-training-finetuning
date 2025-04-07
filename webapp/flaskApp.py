@@ -183,7 +183,7 @@ def wait_for_inference(attempt_limit=5000):
         time.sleep(5)
         logger.info("Waiting for inference to complete...")
         waveformpath = getFromServer("checkInferenceComplete", retries=1)
-        if not waveformpath:
+        if waveformpath:
             logger.info("Inference complete (n=" + str(attempts) + ")")
             serverComplete = True
         if attempts > attempt_limit:
