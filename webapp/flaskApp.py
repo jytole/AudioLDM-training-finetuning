@@ -183,7 +183,7 @@ def wait_for_inference(attempt_limit=5000):
         time.sleep(5)
         logger.info("Waiting for inference to complete...")
         waveformpath = getFromServer("checkInferenceComplete", retries=1)
-        if waveformpath:
+        if waveformpath and waveformpath != "nack":
             logger.info("Inference complete (n=" + str(attempts) + ")")
             serverComplete = True
         if attempts > attempt_limit:
@@ -247,7 +247,7 @@ def sendToServer(message, retries=REQUEST_RETRIES):
         # Create new connection
         socket = context.socket(zmq.REQ)
         socket.connect(SERVER_ENDPOINT)
-        logging.info("Resending (%s)", request)
+        logging.info("Resending (%s)", message)
 
         if retries_left == 0:
             logging.error("Server seems to be offline, abandoning request")
