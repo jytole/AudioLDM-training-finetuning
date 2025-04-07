@@ -94,6 +94,7 @@ while not killFlag:
     messageArr = message.split(";")
     reply = "nack"
     post_loop_finetune = False
+    post_loop_infer = False
 
     # Assumes message format: <functionName>;<args>
     logger.info(f"Received request: {message}")
@@ -111,8 +112,10 @@ while not killFlag:
         post_loop_finetune = True
     elif messageArr[0] == "inferSingle":
         # format inferSingle;PROMPT:<prompt> to support ";" in prompts
-        waveformpath = apiInstance.inferSingle(message.split(";PROMPT:")[1])
-        reply = "ack;" + apiInstance.inferSingle(message.split(";PROMPT:")[1])
+        # waveformpath = apiInstance.inferSingle(message.split(";PROMPT:")[1])
+        # reply = "ack;" + apiInstance.inferSingle(message.split(";PROMPT:")[1])
+        reply = "ack"
+        post_loop_infer = True
     elif messageArr[0] == "checkInferenceComplete":
         reply = "ack;" + waveformpath
     elif messageArr[0] == "prepareCheckpointDownload":
@@ -138,5 +141,11 @@ while not killFlag:
         logger.debug("torchServer beginning finetune")
         # This will freeze the server for the duration of the finetune, but the flask server should still work
         apiInstance.finetune()
+        post_loop_finetune = False
+        logger.debug("torchServer finetune complete")
+        
+    if post_loop_infer:
+        waveformpath = apiInstance.inferSingle(message.split(";PROMPT:")[1])
+        post_loop_infer = False
 
 logger.info("torchServer shut down")
