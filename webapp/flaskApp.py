@@ -164,10 +164,10 @@ def watch_torchServer():
     torchServer_watch_thread.start()
     return True
 
-def wait_for_inference(attempt_limit=100):
+def wait_for_inference(attempt_limit=5000):
     """Poll the torchServer for inference completion 
     
-    Timeout is ATTEMPT_LIMIT * 2 seconds
+    Timeout is ATTEMPT_LIMIT * 5 seconds
     
     Args:
         attempt_limit (int): Number of times to poll the server for completion, defaults to 100
@@ -180,11 +180,11 @@ def wait_for_inference(attempt_limit=100):
     serverComplete = False
     attempts = 0
     while not serverComplete:
-        time.sleep(2)
+        time.sleep(5)
         logger.info("Waiting for inference to complete...")
         waveformpath = getFromServer("checkInferenceComplete", retries=1)
         if waveformpath != "nack":
-            logger.info("Inference complete")
+            logger.info("Inference complete (n=" + str(attempts) + ")")
             serverComplete = True
         if attempts > attempt_limit:
             return False
