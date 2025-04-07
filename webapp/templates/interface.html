@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="static/favicon.png">
+
+    <title>AudioLDM2 Fine-Tuning</title>
+
+    <!--Get filesheet from webapp/static/css/style.css-->
+    <link rel="stylesheet" href="{{ url_for('static', filename= 'css/style.css') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+</head>
+<body>
+    <p>
+        content
+    </p>
+</body>
+<script>
+    var socket = io();
+
+    // on render of template, set current_state
+    let current_state = {{ current_state | tojson }};
+
+    updateCurrentState();
+
+    function updateCurrentState() {
+        if (current_state["displayInferenceAudio"]) {
+            $('#inferenceAudioContainer').show();
+        } else {
+            $('#inferenceAudioContainer').hide();
+        }
+        $('#inferencePrompt').text(current_state["inferencePrompt"]);
+        $('#inferenceAudio').attr("src", current_state["inferencePath"]);
+    }
+    
+    // when received from socket, update current_state
+    socket.on("current_state_update", function(data) {
+        console.log("Received state:", data);
+        current_state = data;
+        updateCurrentState();
+        location.href = "/";
+    });
+
+    function debugEmit() {
+        //socket.emit("debug");
+    }
+
+    //TODO send and save new current_state from flaskApp 
+
+    $("#parameter").change(function () {
+        var selection = this.value;
+        var params = current_state["params"];
+        $('#paramValue').attr("placeholder", params[selection]);
+    });
+
+    function delete_flash(flash){
+        $(flash).parent().remove()
+    }
+
+    socket.on("monitor", function(data) {
+        $('#monitorContent').text(data);
+    });
+</script>
+</html>
