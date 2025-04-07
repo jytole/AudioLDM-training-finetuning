@@ -205,7 +205,6 @@ def wait_for_inference(attempt_limit=5000):
     
     emitCurrentState()
     socketio.emit("monitor", "Inference complete!")
-    flash("Inference complete!")
     return True
 
 def emitCurrentState():
