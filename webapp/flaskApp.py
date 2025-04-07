@@ -296,7 +296,7 @@ def getFromServer(message, retries=REQUEST_RETRIES):
         # Create new connection
         socket = context.socket(zmq.REQ)
         socket.connect(SERVER_ENDPOINT)
-        logging.info("Resending (%s)", request)
+        logging.info("Resending (%s)", message)
 
         if retries_left == 0:
             logging.error("Server seems to be offline, abandoning request")
