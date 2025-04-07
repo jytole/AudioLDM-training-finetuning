@@ -77,6 +77,7 @@ with app.app_context():
 
     current_state = {"inferencePath": "fake.mp3", 
                      "displayInferenceAudio": False,
+                     "inferencePrompt": "fake prompt",
                      "params": {
                          "step,save_checkpoint_every_n_steps": 5000,
                          "reload_from_ckpt": "./data/checkpoints/audioldm-m-full.ckpt",
@@ -230,27 +231,27 @@ def sendToServer(message, retries=REQUEST_RETRIES):
         if (socket.poll(REQUEST_TIMEOUT) & zmq.POLLIN) != 0:
             reply = socket.recv_string()
             if reply == "ack":
-                logging.info("Server replied OK (%s)", reply)
+                logger.debug("Server replied OK (%s)", reply)
                 retries_left = REQUEST_RETRIES
                 return True
             else:
-                logging.error("Failed: %s", reply)
+                logger.debug("Failed: %s", reply)
                 return True
 
         retries_left -= 1
-        logging.warning("No response from server")
+        logger.debug("No response from server")
         # Socket is not answering. Close and remove it.
         socket.setsockopt(zmq.LINGER, 0)
         socket.close()
 
-        logging.info("Reconnecting to server…")
+        logger.debug("Reconnecting to server…")
         # Create new connection
         socket = context.socket(zmq.REQ)
         socket.connect(SERVER_ENDPOINT)
-        logging.info("Resending (%s)", message)
+        logger.debug("Resending (%s)", message)
 
         if retries_left == 0:
-            logging.error("Server seems to be offline, abandoning request")
+            logger.debug("Server seems to be offline, abandoning request")
             return False
 
         socket.send_string(message)
@@ -278,27 +279,27 @@ def getFromServer(message, retries=REQUEST_RETRIES):
             reply = socket.recv_string()
             replyArr = reply.split(";")
             if replyArr[0] == "ack":
-                logging.info("Server replied OK (%s)", reply)
+                logger.debug("Server replied OK (%s)", reply)
                 retries_left = REQUEST_RETRIES
                 return replyArr[1]
             else:
-                logging.error("Did not receive ack: %s", reply)
+                logger.debug("Did not receive ack: %s", reply)
                 return False
 
         retries_left -= 1
-        logging.warning("No response from server")
+        logger.debug("No response from server")
         # Socket is not answering. Close and remove it.
         socket.setsockopt(zmq.LINGER, 0)
         socket.close()
 
-        logging.info("Reconnecting to server…")
+        logger.info("Reconnecting to server…")
         # Create new connection
         socket = context.socket(zmq.REQ)
         socket.connect(SERVER_ENDPOINT)
-        logging.info("Resending (%s)", message)
+        logger.debug("Resending (%s)", message)
 
         if retries_left == 0:
-            logging.error("Server seems to be offline, abandoning request")
+            logger.debug("Server seems to be offline, abandoning request")
             return False
 
         socket.send_string(message)
@@ -418,6 +419,11 @@ def inferSingle():
     # waveformpath = getFromServer("inferSingle;PROMPT:" + prompt) # TODO handle long render times (sendToServer?)
     
     sendToServer("inferSingle;PROMPT:" + prompt)
+    
+    current_state["displayInferenceAudio"] = False
+    current_state["inferencePath"] = "fake.mp3"
+    current_state["inferencePrompt"] = prompt
+    emitCurrentState()
     
     wait_for_inference_thread = threading.Thread(target=wait_for_inference, daemon=True)
     wait_for_inference_thread.start()
