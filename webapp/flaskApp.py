@@ -164,6 +164,50 @@ def watch_torchServer():
     torchServer_watch_thread.start()
     return True
 
+def wait_for_inference(attempt_limit=100):
+    """Poll the torchServer for inference completion 
+    
+    Timeout is ATTEMPT_LIMIT * 2 seconds
+    
+    Args:
+        attempt_limit (int): Number of times to poll the server for completion, defaults to 100
+
+    Returns:
+        success: boolean value
+    """
+    # server polling loop
+    waveformpath = "nack"
+    serverComplete = False
+    attempts = 0
+    while not serverComplete:
+        time.sleep(2)
+        logger.info("Waiting for inference to complete...")
+        waveformpath = getFromServer("checkInferenceComplete", retries=1)
+        if waveformpath != "nack":
+            logger.info("Inference complete")
+            serverComplete = True
+        if attempts > attempt_limit:
+            return False
+        attempts += 1
+
+    # update current state when waveformpath is received
+    current_state["inferencePath"] = os.path.join(
+        "static", os.path.basename(waveformpath)
+    )  # set relative path to static/filename
+    shutil.copy(
+        waveformpath,
+        os.path.join(projectRoot, "webapp", current_state["inferencePath"]),
+    )  # copy inferred file to static
+    current_state["displayInferenceAudio"] = (
+        True  # tell browser to display the audio
+    )
+    logger.info("inference path updated: " + current_state["inferencePath"])
+    
+    emitCurrentState()
+    socketio.emit("monitor", "Inference complete!")
+    flash("Inference complete!")
+    return True
+
 def emitCurrentState():
     """emits the current_state dictionary"""
     socketio.emit("current_state_update", current_state)
@@ -372,24 +416,14 @@ def inferSingle():
         success: boolean flag
     """
     prompt = request.form["prompt"]
-    waveformpath = getFromServer("inferSingle;PROMPT:" + prompt) # TODO handle long render times (sendToServer?)
+    # waveformpath = getFromServer("inferSingle;PROMPT:" + prompt) # TODO handle long render times (sendToServer?)
+    
+    sendToServer("inferSingle;PROMPT:" + prompt)
+    
+    wait_for_inference_thread = threading.Thread(target=wait_for_inference, daemon=True)
+    wait_for_inference_thread.start()
 
-    if not waveformpath:
-        flash("Failed to perform inference")
-        return False
-
-    current_state["inferencePath"] = os.path.join(
-        "static", os.path.basename(waveformpath)
-    )  # set relative path to static/filename
-    shutil.copy(
-        waveformpath,
-        os.path.join(projectRoot, "webapp", current_state["inferencePath"]),
-    )  # copy inferred file to static
-    current_state["displayInferenceAudio"] = (
-        True  # tell browser to display the audio
-    )
-
-    flash("Inference complete")
+    flash("Inference begun")
     return True
 
 ## TODO add possibility of checkpoint handling being google cloud based, rather than huge file transfer

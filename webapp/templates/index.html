@@ -123,6 +123,9 @@
 
     socket.on("monitor", function(data) {
         $('#monitorContent').text(data);
+        if data == "Inference complete!" {
+            location.reload();
+        }
     });
 </script>
 </html>

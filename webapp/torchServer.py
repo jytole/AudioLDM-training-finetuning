@@ -87,6 +87,8 @@ killFlag = False  # NOTE change flag to True to make sphinx documentation
 
 ## TODO fix every request being triggered twice
 
+waveformpath = "nack"
+
 while not killFlag:
     message = socket.recv_string()  #  Wait for next request from client
     messageArr = message.split(";")
@@ -109,7 +111,10 @@ while not killFlag:
         post_loop_finetune = True
     elif messageArr[0] == "inferSingle":
         # format inferSingle;PROMPT:<prompt> to support ";" in prompts
+        waveformpath = apiInstance.inferSingle(message.split(";PROMPT:")[1])
         reply = "ack;" + apiInstance.inferSingle(message.split(";PROMPT:")[1])
+    elif messageArr[0] == "checkInferenceComplete":
+        reply = "ack;" + waveformpath
     elif messageArr[0] == "prepareCheckpointDownload":
         path = apiInstance.prepareCheckpointDownload()
         if not path:
