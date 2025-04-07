@@ -199,9 +199,7 @@ def wait_for_inference(attempt_limit=5000):
         waveformpath,
         os.path.join(projectRoot, "webapp", current_state["inferencePath"]),
     )  # copy inferred file to static
-    current_state["displayInferenceAudio"] = (
-        True  # tell browser to display the audio
-    )
+    current_state["displayInferenceAudio"] = True  # tell browser to display the audio
     logger.info("inference path updated: " + current_state["inferencePath"])
     
     emitCurrentState()

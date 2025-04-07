@@ -101,6 +101,8 @@
     // on render of template, set current_state
     let current_state = {{ current_state | tojson }};
 
+    updateCurrentState();
+
     function updateCurrentState() {
         if (current_state["displayInferenceAudio"]) {
             $('#inferenceAudioContainer').show();
