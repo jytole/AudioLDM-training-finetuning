@@ -85,6 +85,12 @@ with app.app_context():
                          "model,params,evaluation_params,ddim_sampling_steps": 200,
                          "model,params,evaluation_params,n_candidates_per_samples": 3,
                      },
+                     "datasets": {
+                         
+                     },
+                     "checkpoints": {
+                         
+                     }
                     }
 
 ## Socket handling code
@@ -329,11 +335,17 @@ def index():
         elif "downloadCheckpointLatestForm" in request.form:
             logger.debug("downloadCheckpointLatestForm")
             downloadCheckpointLatest()
+        elif "scanFileSystemForm" in request.form:
+            logger.debug("scanFileSystemForm")
+            scanFileSystem()
+        elif "processImportedDatasetForm" in request.form:
+            logger.debug("processImportedDatasetForm")
+            processImportedDataset()
         elif "debugForm" in request.form:
             logger.debug("debugForm")
             debugFunc()
             
-    rendered_template = render_template("interface.html", current_state=current_state)
+    rendered_template = render_template("index.html", current_state=current_state)
     response = make_response(rendered_template)
     response.headers['Content-Type'] = 'text/html; charset=utf-8'
     
@@ -365,6 +377,38 @@ def archiveUpload():
 
     flash("No file uploaded")
     return False
+
+def processImportedDataset():
+    """Function to handle the processing of an imported dataset
+
+    Returns:
+        success: boolean flag
+    """
+    savePath = os.path.join(projectRoot, "webapp/static/datasets", request.form["importedDatasetZip"])
+    if sendToServer("handleDataUpload;" + savePath):
+        flash("successful upload")
+        return True
+    else:
+        flash("failed upload")
+        return False
+
+def scanFileSystem():
+    """Function to scan the filesystem for imports (datasets, checkpoints) and
+    change the current_state to reflect the results.
+    Emits current_state after scan.
+    
+    Checks static/checkpoints and static/datasets for files.
+    
+    Returns:
+        success: boolean flag
+    """
+    checkpoints_path = os.path.join(projectRoot, "webapp/static/checkpoints")
+    datasets_path = os.path.join(projectRoot, "webapp/static/datasets")
+    
+    current_state["checkpoints"] = [f for f in os.listdir(checkpoints_path) if (os.path.isfile(os.path.join(checkpoints_path, f)) and os.path.splitext(f)[1] == ".zip")]
+    current_state["datasets"] = [f for f in os.listdir(datasets_path) if (os.path.isfile(os.path.join(datasets_path, f)) and os.path.splitext(f)[1] == ".zip")]
+    emitCurrentState()
+    return True
 
 def setParameter():
     """Sets the parameter requested in the form
@@ -414,7 +458,6 @@ def inferSingle():
         success: boolean flag
     """
     prompt = request.form["prompt"]
-    # waveformpath = getFromServer("inferSingle;PROMPT:" + prompt) # TODO handle long render times (sendToServer?)
     
     sendToServer("inferSingle;PROMPT:" + prompt)
     
@@ -429,7 +472,6 @@ def inferSingle():
     flash("Inference begun")
     return True
 
-## TODO add possibility of checkpoint handling being google cloud based, rather than huge file transfer
 def downloadCheckpointLatest():
     """Download the latest checkpoint
 

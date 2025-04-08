@@ -19,3 +19,4 @@ wandb
 dump.rdb
 docs/*
 !docs/source
+!webapp/static/checkpoints

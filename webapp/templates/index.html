@@ -34,6 +34,24 @@
     </div>
 
     <div class="formContainer">
+        <h3>Process Imported Dataset Zip</h3>
+        <form method="POST" id="importedDatasetForm" style="display: none;">
+            <label for="importedDatasetZip">Select Dataset Zip:</label>
+            <select name="importedDatasetZip" id="importedDatasetZip">
+            </select>
+            <input type="submit" name="processImportedDatasetForm" />
+        </form>
+    </div>
+
+    <div class="formContainer">
+        <h3>Scan File System</h3>
+        <form method="POST">
+            <input type="submit" name="scanFileSystemForm" value="Scan" />
+        </form>
+        <button onclick="debugEmit()">Debug Emit</button>
+    </div>
+
+    <div class="formContainer">
         <h3>Set Parameters</h3>
         <form method="POST">
             <label for="parameter">Parameter:</label>
@@ -111,6 +129,19 @@
         }
         $('#inferencePrompt').text(current_state["inferencePrompt"]);
         $('#inferenceAudio').attr("src", current_state["inferencePath"]);
+
+        if (Object.keys(current_state["datasets"]).length != 0) {
+            $('#importedDatasetForm').show();
+            $('#importedDatasetZip').empty();
+            current_state["datasets"].forEach(function(dataset) {
+                $('#importedDatasetZip').append($('<option>', {
+                    value: dataset,
+                    text: dataset
+                }));
+            });
+        } else {
+            $('#importedDatasetForm').hide();
+        }
     }
     
     // when received from socket, update current_state
