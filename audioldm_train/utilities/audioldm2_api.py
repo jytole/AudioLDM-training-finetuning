@@ -309,12 +309,7 @@ class AudioLDM2APIObject:
 
         ## set the path (resume_from_checkpoint) of the checkpoint to be loaded from
         ## if a checkpoint exists in logs (checkpoint_dir)
-        if len(os.listdir(checkpoint_dir)) > 0:
-            print("Load checkpoint from path: %s" % checkpoint_dir)
-            restore_step, n_step = get_restore_step(checkpoint_dir)
-            self.checkpoint_path = os.path.join(checkpoint_dir, restore_step)
-            print("Resume from checkpoint", self.checkpoint_path)
-        elif config_reload_from_ckpt is not None:
+        if config_reload_from_ckpt is not None:
             self.checkpoint_path = config_reload_from_ckpt
             print("Reload ckpt specified in the config file %s" % self.checkpoint_path)
         else:
@@ -507,12 +502,7 @@ class AudioLDM2APIObject:
 
         # set self.checkpoint_path
         is_external_checkpoints = False
-        if len(os.listdir(checkpoint_dir)) > 0:
-            print("Load checkpoints from path: %s" % checkpoint_dir)
-            restore_step, n_step = get_restore_step(checkpoint_dir)
-            self.checkpoint_path = os.path.join(checkpoint_dir, restore_step)
-            print("Resume from checkpoint", self.checkpoint_path)
-        elif config_reload_from_ckpt is not None:
+        if config_reload_from_ckpt is not None:
             self.checkpoint_path = config_reload_from_ckpt
             is_external_checkpoints = True
             print("Reload ckpt specified in the config file %s" % self.checkpoint_path)
@@ -649,6 +639,8 @@ class AudioLDM2APIObject:
                 val = True
             elif val.lower() == "false":
                 val = False
+            elif val.lower() == "none":
+                val = None
             else:
                 val = val
 
