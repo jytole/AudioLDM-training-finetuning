@@ -384,7 +384,7 @@ def processImportedDataset():
     Returns:
         success: boolean flag
     """
-    savePath = "./webapp/static/datasets" + request.form["importedDatasetZip"]
+    savePath = "./webapp/static/datasets/" + request.form["importedDatasetZip"]
     if sendToServer("handleDataUpload;" + savePath):
         flash("successful upload")
         return True
