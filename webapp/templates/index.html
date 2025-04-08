@@ -33,9 +33,19 @@
         </form>
     </div>
 
-    <div class="formContainer">
+    <div class="formContainer" style="display: none;">
+        <h3>Select Checkpoint</h3>
+        <form method="POST" id="checkpointSelectForm">
+            <label for="checkpointSelect">Select Dataset Zip:</label>
+            <select name="checkpointSelect" id="checkpointSelect">
+            </select>
+            <input type="submit" name="checkpointSelectForm" />
+        </form>
+    </div>
+
+    <div class="formContainer" style="display: none;">
         <h3>Process Imported Dataset Zip</h3>
-        <form method="POST" id="importedDatasetForm" style="display: none;">
+        <form method="POST" id="importedDatasetForm">
             <label for="importedDatasetZip">Select Dataset Zip:</label>
             <select name="importedDatasetZip" id="importedDatasetZip">
             </select>
@@ -131,7 +141,7 @@
         $('#inferenceAudio').attr("src", current_state["inferencePath"]);
 
         if (Object.keys(current_state["datasets"]).length != 0) {
-            $('#importedDatasetForm').show();
+            $('#importedDatasetForm').parent().show();
             $('#importedDatasetZip').empty();
             current_state["datasets"].forEach(function(dataset) {
                 $('#importedDatasetZip').append($('<option>', {
@@ -140,7 +150,20 @@
                 }));
             });
         } else {
-            $('#importedDatasetForm').hide();
+            $('#importedDatasetForm').parent().hide();
+        }
+
+        if (Object.keys(current_state["checkpoints"]).length != 0) {
+            $('#checkpointSelectForm').parent().show();
+            $('#checkpointSelect').empty();
+            current_state["checkpoints"].forEach(function(checkpoint) {
+                $('#checkpointSelect').append($('<option>', {
+                    value: checkpoint,
+                    text: checkpoint
+                }));
+            });
+        } else {
+            $('#importedDatasetForm').parent().hide();
         }
     }
     

@@ -341,6 +341,9 @@ def index():
         elif "processImportedDatasetForm" in request.form:
             logger.debug("processImportedDatasetForm")
             processImportedDataset()
+        elif "checkpointSelectForm" in request.form:
+            logger.debug("checkpointSelectForm")
+            checkpointSelect()
         elif "debugForm" in request.form:
             logger.debug("debugForm")
             debugFunc()
@@ -405,8 +408,13 @@ def scanFileSystem():
     checkpoints_path = os.path.join(projectRoot, "webapp/static/checkpoints")
     datasets_path = os.path.join(projectRoot, "webapp/static/datasets")
     
-    current_state["checkpoints"] = [f for f in os.listdir(checkpoints_path) if (os.path.isfile(os.path.join(checkpoints_path, f)) and os.path.splitext(f)[1] == ".zip")]
+    current_state["checkpoints"] = [os.path.join(checkpoints_path, f) for f in os.listdir(checkpoints_path) if (os.path.isfile(os.path.join(checkpoints_path, f)) and os.path.splitext(f)[1] == ".ckpt")]
     current_state["datasets"] = [f for f in os.listdir(datasets_path) if (os.path.isfile(os.path.join(datasets_path, f)) and os.path.splitext(f)[1] == ".zip")]
+    checkpointDir = getFromServer("getResumeCheckpointDir")
+    if checkpointDir:
+        for f in os.listdir(checkpointDir):
+            if os.path.isfile(os.path.join(checkpointDir, f)) and os.path.splitext(f)[1] == ".ckpt":
+                current_state["checkpoints"].append(os.path.join(checkpointDir, f))
     emitCurrentState()
     return True
 
@@ -432,6 +440,17 @@ def setParameter():
         flash("Failed to set parameter")
     return False
 
+def checkpointSelect():
+    valInput = request.form["checkpointSelect"]
+    message = "set_parameter;reload_from_ckpt;" + valInput
+    
+    if sendToServer(message):
+        current_state["params"]["reload_from_ckpt"] = valInput
+        emitCurrentState()
+        flash("Successfully set checkpoint")
+        return True
+    else:
+        flash("Failed to set parameter")
 
 def startFineTuning():
     """Start the finetuning process on torchServer.

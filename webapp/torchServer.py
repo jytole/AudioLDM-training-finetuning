@@ -125,6 +125,9 @@ while not killFlag:
             logger.debug("No checkpoint available")
         else:
             reply = "ack;" + path
+    elif messageArr[0] == "getResumeCheckpointDir":
+        path = apiInstance.getResumeCheckpointDir()
+        reply = "ack;" + path
     elif messageArr[0] == "ping":
         reply = "ack"
     elif messageArr[0] == "debug":

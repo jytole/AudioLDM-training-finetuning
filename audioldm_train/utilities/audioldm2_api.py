@@ -83,7 +83,7 @@ class AudioLDM2APIObject:
         perform_validation=False,
     ):
 
-        assert torch.cuda.is_available(), "CUDA is not available. API failed to initialize."
+        # assert torch.cuda.is_available(), "CUDA is not available. API failed to initialize."
 
         print("Initializing AudioLDM2 API...")
 
@@ -658,6 +658,20 @@ class AudioLDM2APIObject:
         set_nested_dict_value(self.configs, targetParam, val)
 
         return True
+    
+    def getResumeCheckpointDir(self):
+        """Returnt the path to the checkpoint directory
+
+        Returns:
+            checkpointDir (str): path to checkpoint dir
+        """
+        checkpointDir = os.path.join(
+            self.configs["log_directory"],
+            self.exp_group_name,
+            self.exp_name,
+            "checkpoints",
+        )
+        return checkpointDir
 
     def debugFunc(self):
         """Debug function"""
