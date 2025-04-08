@@ -23,9 +23,12 @@ def findCSV(path):
 # Structure the data as the audioldm yaml expects it (like audioset)
 # Adapted from:
 # https://github.com/haoheliu/AudioLDM-training-finetuning/issues/41
-def structureData(csvPath):
+def structureData(csvPath, train_split_proportion=0.6):
     # Load the CSV file
     data = pd.read_csv(csvPath)
+    
+    # shuffle the data
+    data = data.sample(frac=1).reset_index(drop=True)
 
     # Define paths
     root_dir = './data'
@@ -57,19 +60,23 @@ def structureData(csvPath):
     train_data = []
     test_data = []
     val_data = []
+    
+    # Calculate split indices
+    data_len = len(data)
+    train_end = int(data_len * train_split_proportion)
+    val_end = train_end + int((data_len - train_end) / 2)
 
     for i, row in data.iterrows():
         datapoint = {
             'wav': os.path.basename(row['audio']),
             'caption': row['caption']
         }
-        # You can define your own condition to split between train, test, and val
-        if i % 5 == 0:  # Example condition for test
-            test_data.append(datapoint)
-        elif i % 5 == 1:  # Example condition for validation
+        if i < train_end:
+            train_data.append(datapoint)
+        elif i < val_end:
             val_data.append(datapoint)
         else:
-            train_data.append(datapoint)
+            test_data.append(datapoint)
 
     # Save the train metadata
     train_metadata = {'data': train_data}
@@ -111,9 +118,9 @@ def structureData(csvPath):
 ### 2. looks for .yaml file of captions
 ### 3. processes it into the "audiocaps" format that AudioLDM expects
 
-def process(zipPath):
+def process(zipPath, train_split_proportion=0.6):
     extractPath = unzipDataFile(zipPath)
     csvPath = findCSV(extractPath)
-    structureData(csvPath)
+    structureData(csvPath, train_split_proportion)
     print("Dataset extracted and processed")
     return "Successful Dataset Processing"

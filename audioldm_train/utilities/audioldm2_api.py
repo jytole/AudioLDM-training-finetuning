@@ -135,11 +135,16 @@ class AudioLDM2APIObject:
         ]["params"]["use_gt_mae_output"] = False
         self.configs["step"]["limit_val_batches"] = None
 
-    def handleDataUpload(self, zipPath):
+    def handleDataUpload(self, zipPath, train_split_proportion=0.6):
         """forwarding function to trigger processFromZip.process(zipPath)
+        
+        processFromZip.process expects a zip file containing a .csv file in the root
+        with columns "audio" and "caption". "audio" should contain the relative path
+        to the source audio file within the zip file.
 
         Args:
             zipPath (str): a path to the dataset zipfile for processing
+            train_split_proportion (float): proportion of data to use for training. Must be between 0 and 1.
 
         Returns:
             str: "Successful Dataset Processing" upon completion
@@ -147,7 +152,7 @@ class AudioLDM2APIObject:
 
         # Note that this could be written to set metadata_root depending on where processFromZip is configured to extract things
         ## but for now processFromZip universally makes it match the audioset formatting, so this is nonessential
-        return processFromZip.process(zipPath)
+        return processFromZip.process(zipPath, train_split_proportion)
 
     # Function to return the path of a checkpoint which can be downloaded by the user
     ## Helper function for a client-side implementation of a file download
