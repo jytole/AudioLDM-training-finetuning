@@ -348,7 +348,7 @@ def index():
             logger.debug("debugForm")
             debugFunc()
             
-    rendered_template = render_template("index.html", current_state=current_state)
+    rendered_template = render_template("interface.html", current_state=current_state)
     response = make_response(rendered_template)
     response.headers['Content-Type'] = 'text/html; charset=utf-8'
     

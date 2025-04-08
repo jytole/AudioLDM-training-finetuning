@@ -13,15 +13,155 @@
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
 </head>
 <body>
-    <p>
-        content
-    </p>
+    <h1>AudioLDM2 Fine-Tuning and Inference Pipeline</h1>
+    {% block content %}
+    <div class="container">
+        {% for message in get_flashed_messages() %}
+        <div class="alert alert-light">
+            <button type="button" class="close" data-dismiss="alert" onclick=delete_flash(this)>&times;</button>
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endblock %}
+    <div class="navBar">
+        <div class="tabButton active" id="tabButtonFineTune">
+            <p>Fine-Tune</p>
+        </div>
+        <div class="tabButton" id="tabButtonInference">
+            <p>Inference</p>
+        </div>
+        <div class="tabButton" id="tabButtonOptions">
+            <p>Options</p>
+        </div>
+    </div>
+    <div class="finetuneContainer tabSection">
+        <div class="formContainer">
+            <h3>Upload Dataset Zip</h3>
+            <form method="POST" enctype="multipart/form-data">
+                <input type="file" name="file" accept=".zip" class="fileUpload" title="Data archive in .zip format" placeholder="Upload Zip File"/>
+                <input type="submit" name="archiveUploadForm" />
+            </form>
+        </div>
+
+        <div class="formContainer" style="display: none;">
+            <h3>Select Checkpoint</h3>
+            <form method="POST" id="checkpointSelectForm">
+                <label for="checkpointSelect">Select Dataset Zip:</label>
+                <select name="checkpointSelect" id="checkpointSelect">
+                </select>
+                <input type="submit" name="checkpointSelectForm" />
+            </form>
+        </div>
+
+        <div class="formContainer" style="display: none;">
+            <h3>Process Imported Dataset Zip</h3>
+            <form method="POST" id="importedDatasetForm">
+                <label for="importedDatasetZip">Select Dataset Zip:</label>
+                <select name="importedDatasetZip" id="importedDatasetZip">
+                </select>
+                <input type="submit" name="processImportedDatasetForm" />
+            </form>
+        </div>
+
+        <div class="formContainer">
+            <h3>Scan File System</h3>
+            <form method="POST">
+                <input type="submit" name="scanFileSystemForm" value="Scan" />
+            </form>
+        </div>
+
+        <div class="formContainer">
+            <h3>Start Fine-Tuning</h3>
+            <form method="POST">
+                <input type="submit" name="startFineTuningForm" />
+            </form>
+        </div>
+
+        <div class="formContainer">
+            <h3>Download Latest Checkpoint</h3>
+            <form method="POST">
+                <input type="submit" name="downloadCheckpointLatestForm" value="Download" />
+            </form>
+        </div>
+    </div>
+
+    <div class="inferenceContainer tabSection" style="display: none;">
+        <div class="formContainer">
+            <h3>Generate Sound</h3>
+            <form method="POST">
+                <label for="prompt">Prompt:</label>
+                <input type="text" name="prompt" id="prompt" title="Prompt for generation" placeholder="A dog barking on a quiet night"/>
+                <input type="submit" name="inferSingleForm" />
+            </form>
+            <div class="audioContainer" id="inferenceAudioContainer" style="display: none;">
+                <h3>Generated Sound</h3>
+                <p id="inferencePrompt"></p>
+                <audio controls>
+                    <source src="{{current_state["inferencePath"]}}" type="audio/wav", id="inferenceAudio">
+                Your browser does not support the audio element.
+                </audio>
+            </div>
+        </div>
+    </div>
+
+    <div class="optionsContainer tabSection" style="display: none;">
+        <div class="formContainer">
+            <h3>Set Parameters</h3>
+            <form method="POST">
+                <label for="parameter">Parameter:</label>
+                <select name="parameter" id="parameter">
+                    <option value="step,save_checkpoint_every_n_steps">Save Checkpoint Every N Steps</option>
+                    <option value="reload_from_ckpt">Reload From Checkpoint</option>
+                    <option value="model,params,evaluation_params,unconditional_guidance_scale">Evaluation: Unconditional Guidance Scale</option>
+                    <option value="model,params,evaluation_params,ddim_sampling_steps">Evaluation: DDIM Sampling Steps</option>
+                    <option value="model,params,evaluation_params,n_candidates_per_samples">Evaluation: N Candidates Per Sample</option>
+                </select>
+                <label for="paramValue">Value:</label>
+                <input type="text" name="value" id="paramValue" title="Value of parameter" placeholder="{{ current_state["params"]["step,save_checkpoint_every_n_steps"] }}"/>
+                <input type="submit" name="setParameterForm" />
+            </form>
+        </div>
+
+        <div class="formContainer">
+            <h3>AudioLDM2 Monitor</h3>
+            <p id="monitorContent"></p>
+        </div>
+
+        <div class="formContainer">
+            <h3>Debug</h3>
+            <form method="POST">
+                <input type="submit" name="debugForm" value="Debug" />
+            </form>
+            <button onclick="debugEmit()">Debug Emit</button>
+        </div>
+    </div>
 </body>
 <script>
     var socket = io();
 
     // on render of template, set current_state
     let current_state = {{ current_state | tojson }};
+
+    // add event listeners to tab tab buttons
+    $('#tabButtonFineTune').click(function() {
+        $('.tabSection').hide();
+        $('.tabButton').removeClass('active');
+        $('.finetuneContainer').show();
+        $('#tabButtonFineTune').addClass('active');
+    });
+    $('#tabButtonInference').click(function() {
+        $('.tabSection').hide();
+        $('.tabButton').removeClass('active');
+        $('.inferenceContainer').show();
+        $('#tabButtonInference').addClass('active');
+    });
+    $('#tabButtonOptions').click(function() {
+        $('.tabSection').hide();
+        $('.tabButton').removeClass('active');
+        $('.optionsContainer').show();
+        $('#tabButtonOptions').addClass('active');
+    });
 
     updateCurrentState();
 
@@ -33,6 +173,32 @@
         }
         $('#inferencePrompt').text(current_state["inferencePrompt"]);
         $('#inferenceAudio').attr("src", current_state["inferencePath"]);
+
+        if (Object.keys(current_state["datasets"]).length != 0) {
+            $('#importedDatasetForm').parent().show();
+            $('#importedDatasetZip').empty();
+            current_state["datasets"].forEach(function(dataset) {
+                $('#importedDatasetZip').append($('<option>', {
+                    value: dataset,
+                    text: dataset
+                }));
+            });
+        } else {
+            $('#importedDatasetForm').parent().hide();
+        }
+
+        if (Object.keys(current_state["checkpoints"]).length != 0) {
+            $('#checkpointSelectForm').parent().show();
+            $('#checkpointSelect').empty();
+            current_state["checkpoints"].forEach(function(checkpoint) {
+                $('#checkpointSelect').append($('<option>', {
+                    value: checkpoint,
+                    text: checkpoint
+                }));
+            });
+        } else {
+            $('#importedDatasetForm').parent().hide();
+        }
     }
     
     // when received from socket, update current_state
@@ -46,8 +212,6 @@
     function debugEmit() {
         //socket.emit("debug");
     }
-
-    //TODO send and save new current_state from flaskApp 
 
     $("#parameter").change(function () {
         var selection = this.value;
