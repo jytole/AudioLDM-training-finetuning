@@ -95,11 +95,12 @@ while not killFlag:
     reply = "nack"
     post_loop_finetune = False
     post_loop_infer = False
+    post_loop_handleUpload = False
 
     # Assumes message format: <functionName>;<args>
     logger.info(f"Received request: {message}")
     if messageArr[0] == "handleDataUpload":
-        apiInstance.handleDataUpload(messageArr[1])
+        post_loop_handleUpload = True
         reply = "ack"
     elif messageArr[0] == "set_parameter":
         paramPath = messageArr[1].split(",")  # path where "," = "/"
@@ -147,5 +148,9 @@ while not killFlag:
     if post_loop_infer:
         waveformpath = apiInstance.inferSingle(message.split(";PROMPT:")[1])
         post_loop_infer = False
+        
+    if post_loop_handleUpload:
+        apiInstance.handleDataUpload(messageArr[1])
+        post_loop_handleUpload = False
 
 logger.info("torchServer shut down")
