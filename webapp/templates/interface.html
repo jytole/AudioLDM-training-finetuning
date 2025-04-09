@@ -47,7 +47,7 @@
         <div class="formContainer" style="display: none;">
             <h3>Select Checkpoint</h3>
             <form method="POST" id="checkpointSelectForm">
-                <label for="checkpointSelect">Select Dataset Zip:</label>
+                <label for="checkpointSelect">Select Checkpoint:</label>
                 <select name="checkpointSelect" id="checkpointSelect">
                 </select>
                 <input type="submit" name="checkpointSelectForm" />
@@ -149,18 +149,24 @@
         $('.tabButton').removeClass('active');
         $('.finetuneContainer').show();
         $('#tabButtonFineTune').addClass('active');
+        current_state["tab"] = "finetune";
+        socket.emit("tab_change", "finetune")
     });
     $('#tabButtonInference').click(function() {
         $('.tabSection').hide();
         $('.tabButton').removeClass('active');
         $('.inferenceContainer').show();
         $('#tabButtonInference').addClass('active');
+        current_state["tab"] = "inference";
+        socket.emit("tab_change", "inference")
     });
     $('#tabButtonOptions').click(function() {
         $('.tabSection').hide();
         $('.tabButton').removeClass('active');
         $('.optionsContainer').show();
         $('#tabButtonOptions').addClass('active');
+        current_state["tab"] = "options";
+        socket.emit("tab_change", "options")
     });
 
     updateCurrentState();
@@ -199,6 +205,25 @@
         } else {
             $('#importedDatasetForm').parent().hide();
         }
+
+        if(current_state["tab"] == "inference") {
+            $('.tabSection').hide();
+            $('.tabButton').removeClass('active');
+            $('.inferenceContainer').show();
+            $('#tabButtonInference').addClass('active');
+        }
+        else if(current_state["tab"] == "options") {
+            $('.tabSection').hide();
+            $('.tabButton').removeClass('active');
+            $('.optionsContainer').show();
+            $('#tabButtonOptions').addClass('active');
+        }
+        else {
+            $('.tabSection').hide();
+            $('.tabButton').removeClass('active');
+            $('.finetuneContainer').show();
+            $('#tabButtonFineTune').addClass('active');
+        }
     }
     
     // when received from socket, update current_state
@@ -224,7 +249,7 @@
     }
 
     socket.on("monitor", function(data) {
-        $('#monitorContent').text(data);
+        $('#monitorContent').append(data + "<br>");
     });
 </script>
 </html>

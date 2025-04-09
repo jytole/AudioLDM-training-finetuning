@@ -90,7 +90,8 @@ with app.app_context():
                      },
                      "checkpoints": {
                          
-                     }
+                     },
+                     "tab": "finetune"  # TODO: add tab state and updating system to interface.html
                     }
 
 ## Socket handling code
@@ -98,15 +99,20 @@ with app.app_context():
     
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-@socketio.on("connect")  # log all new clients
-def handle_connect():
-    """log a message when client connects"""
-    logger.info("Client connected to SocketIO")
+@socketio.on('connect')
+def connect(sid):
+    logger.info('connect ' + str(sid))
+
+@socketio.on('tab_change')
+def tab_change(data):
+    current_state["tab"] = data
+    emitCurrentState()
+    logger.info('tab_change ' + str(data))
+    # socketio.emit('my response', {'response': 'my response'})
     
-@socketio.on("debug")
-def debugSocket():
-    """log socketio debug message"""
-    logger.info("Socket Debug Triggered")
+@socketio.on('disconnect')
+def disconnect(sid):
+    logger.info('disconnect ' + str(sid))
 
 # https://stackoverflow.com/questions/5419888/reading-from-a-frequently-updated-file
 def follow(logFile):
@@ -149,12 +155,24 @@ def torchServer_monitor():
     
     logFile = open(logFilePath)
     logLines = follow(logFile)
+    
+    epoch = -1
     # socketio.emit("monitor", "Monitoring torch log file!")
     for line in logLines:
         if "CUDA is not available" in line:
             logger.info("monitor found CUDA fail")
             socketio.emit("monitor", "Operation Failed! CUDA is not available.")
             return False
+        elif "Epoch" in line:
+            numStart = line.find("Epoch ") + 6
+            numEnd = line.find(":", numStart)
+            epoch = int(line[numStart:numEnd])
+            socketio.emit("monitor", "Epoch: " + str(epoch))
+        elif "Validation DataLoader" in line:
+            numStart = line.find("Validation DataLoader ") + 22
+            numEnd = line.find(":", numStart)
+            valNum = int(line[numStart:numEnd])
+            socketio.emit("monitor", "ValNum: ", str(valNum))
         elif "Traceback (most recent call last):" in line:
             logger.info("monitor found traceback fail")
             socketio.emit("monitor", "Traceback found. Likely crash.")
