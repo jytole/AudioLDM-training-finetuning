@@ -158,6 +158,7 @@ def torchServer_monitor():
     logLines = follow(logFile)
     
     epoch = -1
+    valNum = -1
     # socketio.emit("monitor", "Monitoring torch log file!")
     for line in logLines:
         if "CUDA is not available" in line:
@@ -167,13 +168,17 @@ def torchServer_monitor():
         elif "Epoch" in line:
             numStart = line.find("Epoch ") + 6
             numEnd = line.find(":", numStart)
-            epoch = int(line[numStart:numEnd])
-            socketio.emit("monitor", "Epoch: " + str(epoch))
+            epochNew = int(line[numStart:numEnd])
+            if epochNew != epoch:
+                epoch = epochNew
+                socketio.emit("monitor", "Epoch: " + str(epoch))
         elif "Validation DataLoader" in line:
             numStart = line.find("Validation DataLoader ") + 22
             numEnd = line.find(":", numStart)
-            valNum = int(line[numStart:numEnd])
-            socketio.emit("monitor", "ValNum: ", str(valNum))
+            valNumNew = int(line[numStart:numEnd])
+            if valNumNew != valNum:
+                valNum = valNumNew
+                socketio.emit("monitor", "ValNum: ", str(valNum))
         elif "Traceback (most recent call last):" in line:
             logger.info("monitor found traceback fail")
             socketio.emit("monitor", "Traceback found. Likely crash.")
