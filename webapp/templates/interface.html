@@ -125,17 +125,28 @@
         </div>
 
         <div class="formContainer">
-            <h3>AudioLDM2 Monitor</h3>
-            <p id="monitorContent"></p>
-        </div>
-
-        <div class="formContainer">
             <h3>Debug</h3>
             <form method="POST">
                 <input type="submit" name="debugForm" value="Debug" />
             </form>
             <button onclick="debugEmit()">Debug Emit</button>
         </div>
+    </div>
+
+    <div class="formContainer">
+        <h3>AudioLDM2 Monitor</h3>
+        <div class="quickViewWrapper">
+            <div class="quickView">
+                <p>Server Status:<span id="serverStatusVal"></span></p>
+            </div>
+            <div class="quickView">
+                <p>Epoch:<span id="epochVal"></span></p>
+            </div>
+            <div class="quickView">
+                <p>Validation Step:<span id="valNumVal"></span></p>
+            </div>
+        </div>
+        <p id="monitorContent"></p>
     </div>
 </body>
 <script>
@@ -225,6 +236,10 @@
             $('.finetuneContainer').show();
             $('#tabButtonFineTune').addClass('active');
         }
+
+        $('#serverStatusVal').text(current_state["torchServerStatus"]);
+        $('#epochVal').text(current_state["epoch"]);
+        $('#valNumVal').text(current_state["valNum"]);
     }
     
     // when received from socket, update current_state

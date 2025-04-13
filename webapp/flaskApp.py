@@ -92,7 +92,10 @@ with app.app_context():
                      "checkpoints": {
                          
                      },
-                     "tab": "finetune"  # TODO: add tab state and updating system to interface.html
+                     "tab": "finetune",
+                     "torchServerStatus": "idle",
+                     "epoch": -1,
+                     "valNum": -1,
                     }
 
 ## Socket handling code
@@ -136,12 +139,17 @@ def follow(logFile):
         yield line
     
 # TODO consider what messages to look for in a log, maybe progress updates?
-def torchServer_monitor():
+def torchServer_monitor(timeout=100):
     """Monitor the latest torchServer log file, emit updates to clients
+    
+    Args:
+        timeout (int): Seconds torchServer must not print to the log before monitor deems it to be idle
 
     Returns:
         success: boolean value
     """
+    global current_state, socketio, projectRoot, logger
+    
     logDir = os.path.join(projectRoot, "webapp/logs")
     files = os.listdir(logDir)
     if len(files) <= 0:
@@ -157,41 +165,52 @@ def torchServer_monitor():
     logFile = open(logFilePath)
     logLines = follow(logFile)
     
-    epoch = -1
-    valNum = -1
-    # socketio.emit("monitor", "Monitoring torch log file!")
+    current_state["epoch"] = -1
+    current_state["valNum"] = -1
+    t = threading.Timer(timeout, logLines.close())
+    t.start()
     for line in logLines:
+        t.cancel()
         if "CUDA is not available" in line:
             logger.info("monitor found CUDA fail")
             socketio.emit("monitor", "Operation Failed! CUDA is not available.")
-            return False
+            logLines.close()
         elif "Epoch" in line:
             numStart = line.find("Epoch ") + 6
             numEnd = line.find(":", numStart)
             epochNew = int(line[numStart:numEnd])
-            if epochNew != epoch:
-                epoch = epochNew
-                socketio.emit("monitor", "Epoch: " + str(epoch))
+            if epochNew != current_state["epoch"]:
+                current_state["epoch"] = epochNew
+                socketio.emit("monitor", "Epoch: " + str(current_state["epoch"]))
         elif "Validation DataLoader" in line:
             numStart = line.find("Validation DataLoader ") + 22
             numEnd = line.find(":", numStart)
             valNumNew = int(line[numStart:numEnd])
-            if valNumNew != valNum:
-                valNum = valNumNew
-                socketio.emit("monitor", "ValNum: ", str(valNum))
+            if valNumNew != current_state["valNum"]:
+                current_state["valNum"] = valNumNew
+                socketio.emit("monitor", "ValNum: ", str(current_state["valNum"]))
         elif "Traceback (most recent call last):" in line:
             logger.info("monitor found traceback fail")
             socketio.emit("monitor", "Traceback found. Likely crash.")
-            return False
+            logLines.close()
+        t = threading.Timer(timeout, logLines.close())
+        t.start()
+    
+    current_state["torchServerStatus"] = "idle"
+    socketio.emit("current_state_update", current_state)
+    
             
-def watch_torchServer():
+def watch_torchServer(timeout=100):
     """Start a thread with the torchServer monitor;
     allows user to continue interacting with the webapp 
+    
+    Args:
+        timeout (int): Seconds torchServer must not print to the log before monitor deems it to be idle
 
     Returns:
         success: True when begun
     """
-    torchServer_watch_thread = threading.Thread(target=torchServer_monitor, daemon=True)
+    torchServer_watch_thread = threading.Thread(target=torchServer_monitor, args=[timeout], daemon=True)
     torchServer_watch_thread.start()
     return True
 
@@ -396,10 +415,13 @@ def archiveUpload():
             file.save(savePath)
 
             if sendToServer("handleDataUpload;" + savePath):
-                flash("successful upload")
+                flash("Upload begun. Please wait.")
+                current_state["torchServerStatus"] = "processing dataset"
+                emitCurrentState()
+                watch_torchServer(10) # watch the server, call it idle after 10 sec inactivity
                 return True
             else:
-                flash("failed upload")
+                flash("Failed upload")
                 return False
 
     flash("No file uploaded")
@@ -413,10 +435,13 @@ def processImportedDataset():
     """
     savePath = "./webapp/static/datasets/" + request.form["importedDatasetZip"]
     if sendToServer("handleDataUpload;" + savePath):
-        flash("Upload begun. Server may not respond for a moment.")
+        flash("Processing begun. Please wait.")
+        current_state["torchServerStatus"] = "processing dataset"
+        emitCurrentState()
+        watch_torchServer(10) # watch the server, call it idle after 10 sec inactivity
         return True
     else:
-        flash("failed upload")
+        flash("Failed to reach server.")
         return False
 
 def scanFileSystem():
@@ -486,6 +511,8 @@ def startFineTuning():
     """
     if sendToServer("finetune"):
         flash("Fine tuning started.")
+        current_state["torchServerStatus"] = "finetuning"
+        emitCurrentState()
         watch_torchServer()
         return True
     else:
@@ -502,18 +529,22 @@ def inferSingle():
     """
     prompt = request.form["prompt"]
     
-    sendToServer("inferSingle;PROMPT:" + prompt)
-    
-    current_state["displayInferenceAudio"] = False
-    current_state["inferencePath"] = "fake.mp3"
-    current_state["inferencePrompt"] = prompt
-    emitCurrentState()
-    
-    wait_for_inference_thread = threading.Thread(target=wait_for_inference, daemon=True)
-    wait_for_inference_thread.start()
+    if sendToServer("inferSingle;PROMPT:" + prompt):
+        current_state["displayInferenceAudio"] = False
+        current_state["inferencePath"] = "fake.mp3"
+        current_state["inferencePrompt"] = prompt
+        current_state["torchServerStatus"] = "performing inference"
+        emitCurrentState()
+        watch_torchServer(30) # watch the server, call it idle after 30 sec inactivity
+        
+        wait_for_inference_thread = threading.Thread(target=wait_for_inference, daemon=True)
+        wait_for_inference_thread.start()
 
-    flash("Inference begun")
-    return True
+        flash("Inference begun")
+        return True
+    else:
+        flash("Inference failed to begin")
+        return False
 
 def downloadCheckpointLatest():
     """Download the latest checkpoint
