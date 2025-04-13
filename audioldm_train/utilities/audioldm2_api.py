@@ -686,7 +686,7 @@ class AudioLDM2APIObject:
                 )
                 if not os.path.isdir(latent_diffusion_model_log_path):
                     continue
-                logging.info("Evaluating: ", latent_diffusion_model_log_path)
+                logging.info("Evaluating: ", str(latent_diffusion_model_log_path))
                 exps = os.listdir(latent_diffusion_model_log_path)
                 eval.eval(exps)
         except Exception as e:
