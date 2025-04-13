@@ -40,7 +40,7 @@ def locate_validation_output(path):
 
 
 def evaluate_exp_performance(exp_name):
-    abs_path_exp = os.path.join(latent_diffusion_model_log_path, exp_name)
+    abs_path_exp = os.path.join(os.path.abspath("log/latent_diffusion"), exp_name)
     config_yaml_path = locate_yaml_file(abs_path_exp)
 
     if config_yaml_path is None:
