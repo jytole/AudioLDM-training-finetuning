@@ -688,7 +688,7 @@ class AudioLDM2APIObject:
                     continue
                 logging.info("Evaluating: " + latent_diffusion_model_log_path)
                 exps = os.listdir(latent_diffusion_model_log_path)
-                eval.eval(exps)
+                eval.eval(exps, latent_diffusion_model_log_path)
         except Exception as e:
             logging.error("Error during evaluation: ", e)
             return False

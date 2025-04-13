@@ -39,8 +39,8 @@ def locate_validation_output(path):
     return folders
 
 
-def evaluate_exp_performance(exp_name):
-    abs_path_exp = os.path.join(os.path.abspath("log/latent_diffusion"), exp_name)
+def evaluate_exp_performance(exp_name, latent_diffusion_model_log_path):
+    abs_path_exp = os.path.join(latent_diffusion_model_log_path, exp_name)
     config_yaml_path = locate_yaml_file(abs_path_exp)
 
     if config_yaml_path is None:
@@ -64,10 +64,10 @@ def evaluate_exp_performance(exp_name):
         evaluator.main(folder, test_audio_data_folder)
 
 
-def eval(exps):
+def eval(exps, latent_diffusion_model_log_path):
     for exp in exps:
         try:
-            evaluate_exp_performance(exp)
+            evaluate_exp_performance(exp, latent_diffusion_model_log_path)
         except Exception as e:
             print(exp, e)
 
@@ -99,9 +99,9 @@ if __name__ == "__main__":
         exp_name = args.exp_name
         if exp_name is None:
             exps = os.listdir(latent_diffusion_model_log_path)
-            eval(exps)
+            eval(exps, latent_diffusion_model_log_path)
         else:
-            eval([exp_name])
+            eval([exp_name], latent_diffusion_model_log_path)
     else:
         todo_list = [os.path.abspath("log/latent_diffusion")]
         for todo in todo_list:
@@ -113,4 +113,4 @@ if __name__ == "__main__":
                     continue
                 print(latent_diffusion_model_log_path)
                 exps = os.listdir(latent_diffusion_model_log_path)
-                eval(exps)
+                eval(exps, latent_diffusion_model_log_path)
