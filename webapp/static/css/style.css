@@ -59,3 +59,20 @@ input[type="text"] {
 .tabButton.active {
     background-color: #ccc;
 }
+
+.quickViewWrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.quickView {
+    margin-right: 0.25em;
+    margin-left: 0.25em;
+    border: black, 2px solid;
+    border-radius: 0.25em;
+}
+
+.quickView > p {
+    margin: 0;
+}
