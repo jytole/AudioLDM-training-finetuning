@@ -96,6 +96,7 @@ while not killFlag:
     post_loop_finetune = False
     post_loop_infer = False
     post_loop_handleUpload = False
+    post_loop_eval = False
 
     # Assumes message format: <functionName>;<args>
     logger.info(f"Received request: {message}")
@@ -128,6 +129,9 @@ while not killFlag:
     elif messageArr[0] == "getResumeCheckpointDir":
         path = apiInstance.getResumeCheckpointDir()
         reply = "ack;" + path
+    elif messageArr[0] == "eval":
+        reply = "ack"
+        post_loop_eval = True
     elif messageArr[0] == "ping":
         reply = "ack"
     elif messageArr[0] == "debug":
@@ -142,11 +146,9 @@ while not killFlag:
     socket.send_string(reply)
 
     if post_loop_finetune:
-        logger.debug("torchServer beginning finetune")
         # This will freeze the server for the duration of the finetune, but the flask server should still work
         apiInstance.finetune()
         post_loop_finetune = False
-        logger.debug("torchServer finetune complete")
         
     if post_loop_infer:
         waveformpath = apiInstance.inferSingle(message.split(";PROMPT:")[1])
@@ -155,5 +157,9 @@ while not killFlag:
     if post_loop_handleUpload:
         apiInstance.handleDataUpload(messageArr[1])
         post_loop_handleUpload = False
+    
+    if post_loop_eval:
+        apiInstance.evaluateAll()
+        post_loop_eval = False
 
 logger.info("torchServer shut down")

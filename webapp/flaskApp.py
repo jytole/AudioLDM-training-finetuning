@@ -387,6 +387,9 @@ def index():
         elif "checkpointSelectForm" in request.form:
             logger.debug("checkpointSelectForm")
             checkpointSelect()
+        elif "startEvalForm" in request.form:
+            logger.debug("startEvalForm")
+            startEval()
         elif "debugForm" in request.form:
             logger.debug("debugForm")
             debugFunc()
@@ -560,6 +563,17 @@ def downloadCheckpointLatest():
         projectRoot, path
     )
     return send_file(checkpointPath)
+
+def startEval():
+    if sendToServer("eval"):
+        flash("Evaluation started.")
+        current_state["torchServerStatus"] = "evaluating"
+        emitCurrentState()
+        watch_torchServer(10)
+        return True
+    else:
+        flash("AudioLDM2 not available. Is it running?")
+        return False
 
 def debugFunc():
     """debug function to show how requests are acting

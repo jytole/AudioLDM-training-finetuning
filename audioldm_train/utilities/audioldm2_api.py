@@ -37,6 +37,7 @@ logging.basicConfig(level=logging.WARNING)
 
 ## Data Processing imports
 import audioldm_train.utilities.processFromZip as processFromZip
+import audioldm_train.eval as eval
 
 
 ## Create an API class that can hold an instance of all the settings we need
@@ -660,7 +661,7 @@ class AudioLDM2APIObject:
         return True
     
     def getResumeCheckpointDir(self):
-        """Returnt the path to the checkpoint directory
+        """Return the path to the checkpoint directory
 
         Returns:
             checkpointDir (str): path to checkpoint dir
@@ -672,6 +673,27 @@ class AudioLDM2APIObject:
             "checkpoints",
         )
         return checkpointDir
+    
+    def evaluateAll(self):
+        """Run evaluation process for all folders 
+        beginning with val in log/latent_diffusion"""
+        try:
+            if not os.path.exists("log/latent_diffusion"):
+                return False
+            for latent_diffusion_model_log_path in os.listdir(os.path.abspath("log/latent_diffusion")):
+                latent_diffusion_model_log_path = os.path.join(
+                    os.path.abspath("log/latent_diffusion"), latent_diffusion_model_log_path
+                )
+                if not os.path.isdir(latent_diffusion_model_log_path):
+                    continue
+                logging.info("Evaluating: ", latent_diffusion_model_log_path)
+                exps = os.listdir(latent_diffusion_model_log_path)
+                eval.eval(exps)
+        except Exception as e:
+            logging.error("Error during evaluation: ", e)
+            return False
+        
+        return True
 
     def debugFunc(self):
         """Debug function"""
