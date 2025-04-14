@@ -61,36 +61,12 @@
             </form>
         </div>
 
-        <div class="formContainer" style="display: none;">
-            <h3>Select Checkpoint</h3>
-            <form method="POST" id="checkpointSelectForm">
-                <label for="checkpointSelect">Select Checkpoint:</label>
-                <select name="checkpointSelect" id="checkpointSelect">
-                </select>
-                <input type="submit" name="checkpointSelectForm" />
-            </form>
-        </div>
-
-        <div class="formContainer" style="display: none;">
-            <h3>Process Imported Dataset Zip</h3>
-            <form method="POST" id="importedDatasetForm">
-                <label for="importedDatasetZip">Select Dataset Zip:</label>
-                <select name="importedDatasetZip" id="importedDatasetZip">
-                </select>
-                <input type="submit" name="processImportedDatasetForm" />
-            </form>
-        </div>
-
-        <div class="formContainer">
-            <h3>Scan File System</h3>
-            <form method="POST">
-                <input type="submit" name="scanFileSystemForm" value="Scan" />
-            </form>
-        </div>
-
         <div class="formContainer">
             <h3>Start Fine-Tuning</h3>
             <form method="POST">
+                <label for="checkpointSelect">Select Checkpoint:</label>
+                <select name="checkpointSelect" id="checkpointSelect">
+                </select>
                 <input type="submit" name="startFineTuningForm" value="Start" />
             </form>
         </div>
@@ -114,6 +90,9 @@
         <div class="formContainer">
             <h3>Generate Sound</h3>
             <form method="POST">
+                <label for="checkpointSelect">Select Checkpoint:</label>
+                <select name="checkpointSelect" id="inferenceCheckpointSelect">
+                </select>
                 <label for="prompt">Prompt:</label>
                 <input type="text" name="prompt" id="prompt" title="Prompt for generation" placeholder="A dog barking on a quiet night"/>
                 <input type="submit" name="inferSingleForm" />
@@ -145,6 +124,23 @@
                 <label for="paramValue">Value:</label>
                 <input type="text" name="value" id="paramValue" title="Value of parameter" placeholder="{{ current_state["params"]["step,save_checkpoint_every_n_steps"] }}"/>
                 <input type="submit" name="setParameterForm" />
+            </form>
+        </div>
+
+        <div class="formContainer">
+            <h3>Scan File System</h3>
+            <form method="POST">
+                <input type="submit" name="scanFileSystemForm" value="Scan" />
+            </form>
+        </div>
+
+        <div class="formContainer" style="display: none;">
+            <h3>Process Imported Dataset Zip</h3>
+            <form method="POST" id="importedDatasetForm">
+                <label for="importedDatasetZip">Select Dataset Zip:</label>
+                <select name="importedDatasetZip" id="importedDatasetZip">
+                </select>
+                <input type="submit" name="processImportedDatasetForm" />
             </form>
         </div>
 
@@ -218,6 +214,12 @@
             $('#checkpointSelect').empty();
             current_state["checkpoints"].forEach(function(checkpoint) {
                 $('#checkpointSelect').append($('<option>', {
+                    value: checkpoint,
+                    text: checkpoint
+                }));
+            });
+            current_state["inferenceCheckpoints"].forEach(function(checkpoint) {
+                $('#inferenceCheckpointSelect').append($('<option>', {
                     value: checkpoint,
                     text: checkpoint
                 }));

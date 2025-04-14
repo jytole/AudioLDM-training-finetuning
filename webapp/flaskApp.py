@@ -90,7 +90,10 @@ with app.app_context():
                          
                      },
                      "checkpoints": {
-                         
+                         "./data/checkpoints/audioldm-m-full.ckpt",
+                     },
+                     "inferenceCheckpoints": {
+                         "./log/latent_diffusion/2025_03_27_api_default_finetune/default_finetune/checkpoints/checkpoint-fad-133.00-global_step=4999.ckpt",
                      },
                      "tab": "finetune",
                      "torchServerStatus": "idle",
@@ -250,6 +253,8 @@ def wait_for_inference(attempt_limit=5000):
     )  # copy inferred file to static
     current_state["displayInferenceAudio"] = True  # tell browser to display the audio
     logger.info("inference path updated: " + current_state["inferencePath"])
+    
+    current_state["torchServerStatus"] = "idle"
     
     emitCurrentState()
     socketio.emit("monitor", "Inference complete!")
@@ -460,6 +465,8 @@ def scanFileSystem():
     checkpoints_path = os.path.join(projectRoot, "webapp/static/checkpoints")
     datasets_path = os.path.join(projectRoot, "webapp/static/datasets")
     
+    current_state["inferenceCheckpoints"] = []
+    
     current_state["checkpoints"] = [os.path.join(checkpoints_path, f) for f in os.listdir(checkpoints_path) if (os.path.isfile(os.path.join(checkpoints_path, f)) and os.path.splitext(f)[1] == ".ckpt")]
     current_state["datasets"] = [f for f in os.listdir(datasets_path) if (os.path.isfile(os.path.join(datasets_path, f)) and os.path.splitext(f)[1] == ".zip")]
     checkpointDir = getFromServer("getResumeCheckpointDir")
@@ -467,6 +474,7 @@ def scanFileSystem():
         for f in os.listdir(checkpointDir):
             if os.path.isfile(os.path.join(checkpointDir, f)) and os.path.splitext(f)[1] == ".ckpt":
                 current_state["checkpoints"].append(os.path.join(checkpointDir, f))
+                current_state["inferenceCheckpoints"].append(os.path.join(checkpointDir, f))
     emitCurrentState()
     return True
 
@@ -492,18 +500,6 @@ def setParameter():
         flash("Failed to set parameter")
     return False
 
-def checkpointSelect():
-    valInput = request.form["checkpointSelect"]
-    message = "set_parameter;reload_from_ckpt;" + valInput
-    
-    if sendToServer(message):
-        current_state["params"]["reload_from_ckpt"] = valInput
-        emitCurrentState()
-        flash("Successfully set checkpoint")
-        return True
-    else:
-        flash("Failed to set parameter")
-
 def startFineTuning():
     """Start the finetuning process on torchServer.
     
@@ -512,6 +508,16 @@ def startFineTuning():
     Returns:
         success: boolean flag
     """
+    valInput = request.form["checkpointSelect"]
+    message = "set_parameter;reload_from_ckpt;" + valInput
+    
+    if sendToServer(message):
+        current_state["params"]["reload_from_ckpt"] = valInput
+        emitCurrentState()
+    else:
+        flash("Failed to set checkpoint parameter")
+        return False
+    
     if sendToServer("finetune"):
         flash("Fine tuning started.")
         current_state["torchServerStatus"] = "finetuning"
