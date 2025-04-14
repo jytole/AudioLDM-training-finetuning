@@ -215,13 +215,13 @@
             current_state["checkpoints"].forEach(function(checkpoint) {
                 $('#checkpointSelect').append($('<option>', {
                     value: checkpoint,
-                    text: checkpoint
+                    text: checkpoint.replace(/^.*[\\/]/, '')
                 }));
             });
             current_state["inferenceCheckpoints"].forEach(function(checkpoint) {
                 $('#inferenceCheckpointSelect').append($('<option>', {
                     value: checkpoint,
-                    text: checkpoint
+                    text: checkpoint.replace(/^.*[\\/]/, '')
                 }));
             });
         } else {
