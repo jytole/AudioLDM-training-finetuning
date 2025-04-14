@@ -462,6 +462,7 @@ def scanFileSystem():
     checkpoints_path = os.path.join(projectRoot, "webapp/static/checkpoints")
     datasets_path = os.path.join(projectRoot, "webapp/static/datasets")
     
+    current_state["checkpoints"] = ["./data/checkpoints/audioldm-m-full.ckpt"]
     current_state["inferenceCheckpoints"] = []
     
     current_state["checkpoints"] = [os.path.join(checkpoints_path, f) for f in os.listdir(checkpoints_path) if (os.path.isfile(os.path.join(checkpoints_path, f)) and os.path.splitext(f)[1] == ".ckpt")]
