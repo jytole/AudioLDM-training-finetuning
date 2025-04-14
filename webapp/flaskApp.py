@@ -86,15 +86,15 @@ with app.app_context():
                          "model,params,evaluation_params,ddim_sampling_steps": 200,
                          "model,params,evaluation_params,n_candidates_per_samples": 3,
                      },
-                     "datasets": {
+                     "datasets": [
                          
-                     },
-                     "checkpoints": {
+                     ],
+                     "checkpoints": [
                          "./data/checkpoints/audioldm-m-full.ckpt",
-                     },
-                     "inferenceCheckpoints": {
+                     ],
+                     "inferenceCheckpoints": [
                          "./log/latent_diffusion/2025_03_27_api_default_finetune/default_finetune/checkpoints/checkpoint-fad-133.00-global_step=4999.ckpt",
-                     },
+                     ],
                      "tab": "finetune",
                      "torchServerStatus": "idle",
                      "epoch": -1,
@@ -389,9 +389,6 @@ def index():
         elif "processImportedDatasetForm" in request.form:
             logger.debug("processImportedDatasetForm")
             processImportedDataset()
-        elif "checkpointSelectForm" in request.form:
-            logger.debug("checkpointSelectForm")
-            checkpointSelect()
         elif "startEvalForm" in request.form:
             logger.debug("startEvalForm")
             startEval()
@@ -536,6 +533,16 @@ def inferSingle():
     Returns:
         success: boolean flag
     """
+    valInput = request.form["checkpointSelect"]
+    message = "set_parameter;reload_from_ckpt;" + valInput
+    
+    if sendToServer(message):
+        current_state["params"]["reload_from_ckpt"] = valInput
+        emitCurrentState()
+    else:
+        flash("Failed to set checkpoint parameter")
+        return False
+    
     prompt = request.form["prompt"]
     
     if sendToServer("inferSingle;PROMPT:" + prompt):
