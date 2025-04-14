@@ -57,9 +57,9 @@ def evaluate_exp_performance(exp_name, latent_diffusion_model_log_path):
         elif len(os.listdir(folder)) > 5000:
             test_dataset = "musiccaps"
         else:
-            continue
+            test_dataset = "audiocaps"
 
-        test_audio_data_folder = os.path.join(test_audio_path, test_dataset)
+        test_audio_data_folder = os.path.join("log/testset_data", test_dataset)
 
         evaluator.main(folder, test_audio_data_folder)
 
