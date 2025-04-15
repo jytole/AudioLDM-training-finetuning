@@ -4,8 +4,8 @@ import torch
 from audioldm_eval import EvaluationHelper
 
 SAMPLE_RATE = 16000
-device = torch.device(f"cuda:{0}")
-evaluator = EvaluationHelper(SAMPLE_RATE, device)
+device = torch.device(f"cuda:{0}") # NOTE: Comment out to make sphinx documentation
+evaluator = EvaluationHelper(SAMPLE_RATE, device) # NOTE: Comment out to make sphinx documentation
 
 
 def locate_yaml_file(path):
