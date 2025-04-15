@@ -79,6 +79,7 @@ with app.app_context():
                      "displayInferenceAudio": False,
                      "inferencePrompt": "fake prompt",
                      "params": {
+                         "seed": 0,
                          "step,validation_every_n_epochs": 5,
                          "step,save_checkpoint_every_n_steps": 5000,
                          "reload_from_ckpt": "./data/checkpoints/audioldm-m-full.ckpt",
