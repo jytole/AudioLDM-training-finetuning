@@ -100,7 +100,7 @@ with app.app_context():
                      "monitor": {
                         "torchServerStatus": "idle",
                         "epoch": -1,
-                        "valNum": -1,
+                        "ddimStep": -1,
                         "globalStep": -1,
                      },
                     }
@@ -173,7 +173,8 @@ def torchServer_monitor(timeout=100):
     logLines = follow(logFile)
     
     current_state["monitor"]["epoch"] = -1
-    current_state["monitor"]["valNum"] = -1
+    current_state["monitor"]["ddimStep"] = -1
+    current_state["monitor"]["globalStep"] = -1
     # t = threading.Timer(timeout, logLines.close())
     # t.start()
     for line in logLines:
@@ -202,13 +203,14 @@ def torchServer_monitor(timeout=100):
                     postEmit = True
             if postEmit:
                 socketio.emit("current_state_update", current_state)
-        elif "Validation DataLoader" in line:
-            numStart = line.find("Validation DataLoader ") + 22
-            numEnd = line.find(":", numStart)
-            valNumNew = int(line[numStart:numEnd])
-            if valNumNew != current_state["monitor"]["valNum"]:
-                current_state["monitor"]["valNum"] = valNumNew
-                socketio.emit("current_state_update", current_state)
+        elif "DDIM Sampler" in line:
+            if "/" in line:
+                numEnd = line.find("/")
+                numStart = line.rfind(" ", 0, numEnd) + 1
+                ddimStepNew = int(line[numStart:numEnd])
+                if ddimStepNew != current_state["monitor"]["ddimStep"]:
+                    current_state["monitor"]["ddimStep"] = ddimStepNew
+                    socketio.emit("current_state_update", current_state)
         elif "Traceback (most recent call last):" in line:
             logger.info("monitor found traceback fail")
             socketio.emit("monitor", "Traceback found. Likely crash.")

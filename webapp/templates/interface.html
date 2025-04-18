@@ -49,7 +49,7 @@
                 <p>Global Step:<span id="globalStepVal"></span></p>
             </div>
             <div class="quickView">
-                <p>Validation Step:<span id="valNumVal"></span></p>
+                <p>DDIM Step:<span id="ddimStepVal"></span></p>
             </div>
         </div>
         <p id="monitorContent"></p>
@@ -253,8 +253,8 @@
 
         $('#serverStatusVal').text(current_state["monitor"]["torchServerStatus"]);
         $('#epochVal').text(current_state["monitor"]["epoch"]);
-        $('#valNumVal').text(current_state["monitor"]["valNum"]);
         $('#globalStepVal').text(current_state["monitor"]["globalStep"]);
+        $('#ddimStepVal').text(current_state["monitor"]["ddimStep"]);
     }
     
     // when received from socket, update current_state
