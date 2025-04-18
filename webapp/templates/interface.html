@@ -222,6 +222,7 @@
                     text: checkpoint.replace(/^.*[\\/]/, '')
                 }));
             });
+            $('#inferenceCheckpointSelect').empty();
             current_state["inferenceCheckpoints"].forEach(function(checkpoint) {
                 $('#inferenceCheckpointSelect').append($('<option>', {
                     value: checkpoint,
@@ -259,7 +260,6 @@
     
     // when received from socket, update current_state
     socket.on("current_state_update", function(data) {
-        console.log("Received state:", data);
         current_state = data;
         if($('#inferenceAudio').attr("src") != current_state["inferencePath"]){
             // Reload if audio is new, to fetch the new file
