@@ -37,7 +37,6 @@ logging.basicConfig(level=logging.WARNING)
 
 ## Data Processing imports
 import audioldm_train.utilities.processFromZip as processFromZip
-import audioldm_train.eval as eval
 
 
 ## Create an API class that can hold an instance of all the settings we need
@@ -665,6 +664,9 @@ class AudioLDM2APIObject:
     def evaluateAll(self):
         """Run evaluation process for all folders 
         beginning with val in log/latent_diffusion"""
+        
+        import audioldm_train.eval as eval
+        
         try:
             if not os.path.exists("log/latent_diffusion"):
                 return False
