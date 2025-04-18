@@ -280,7 +280,7 @@ def wait_for_inference(attempt_limit=5000):
     current_state["displayInferenceAudio"] = True  # tell browser to display the audio
     logger.info("inference path updated: " + current_state["inferencePath"])
     
-    current_state["torchServerStatus"] = "idle"
+    current_state["monitor"]["torchServerStatus"] = "idle"
     
     emitCurrentState()
     socketio.emit("monitor", "Inference complete!")
@@ -447,7 +447,7 @@ def archiveUpload():
 
             if sendToServer("handleDataUpload;" + savePath):
                 flash("Upload begun. Please wait.")
-                current_state["torchServerStatus"] = "processing dataset"
+                current_state["monitor"]["torchServerStatus"] = "processing dataset"
                 emitCurrentState()
                 watch_torchServer(10) # watch the server, call it idle after 10 sec inactivity
                 return True
@@ -467,7 +467,7 @@ def processImportedDataset():
     savePath = "./webapp/static/datasets/" + request.form["importedDatasetZip"]
     if sendToServer("handleDataUpload;" + savePath):
         flash("Processing begun. Please wait.")
-        current_state["torchServerStatus"] = "processing dataset"
+        current_state["monitor"]["torchServerStatus"] = "processing dataset"
         emitCurrentState()
         watch_torchServer(10) # watch the server, call it idle after 10 sec inactivity
         return True
@@ -545,7 +545,7 @@ def startFineTuning():
     
     if sendToServer("finetune"):
         flash("Fine tuning started.")
-        current_state["torchServerStatus"] = "finetuning"
+        current_state["monitor"]["torchServerStatus"] = "finetuning"
         emitCurrentState()
         watch_torchServer()
         return True
@@ -577,7 +577,7 @@ def inferSingle():
         current_state["displayInferenceAudio"] = False
         current_state["inferencePath"] = "fake.mp3"
         current_state["inferencePrompt"] = prompt
-        current_state["torchServerStatus"] = "performing inference"
+        current_state["monitor"]["torchServerStatus"] = "performing inference"
         emitCurrentState()
         watch_torchServer(30) # watch the server, call it idle after 30 sec inactivity
         
@@ -608,7 +608,7 @@ def downloadCheckpointLatest():
 def startEval():
     if sendToServer("eval"):
         flash("Evaluation started.")
-        current_state["torchServerStatus"] = "evaluating"
+        current_state["monitor"]["torchServerStatus"] = "evaluating"
         emitCurrentState()
         watch_torchServer(10)
         return True
@@ -622,7 +622,7 @@ def debugFunc():
     Returns:
         success: boolean flag
     """
-    current_state["torchServerStatus"] = "finetuning"
+    current_state["monitor"]["torchServerStatus"] = "finetuning"
     emitCurrentState()
     watch_torchServer()
     return True
