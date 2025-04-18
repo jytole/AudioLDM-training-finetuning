@@ -620,6 +620,7 @@ def debugFunc():
     Returns:
         success: boolean flag
     """
-    sendToServer("debug")
-    socketio.emit("debug")
+    current_state["torchServerStatus"] = "finetuning"
+    emitCurrentState()
+    watch_torchServer()
     return True
