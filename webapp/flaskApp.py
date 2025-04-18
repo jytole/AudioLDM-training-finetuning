@@ -171,9 +171,12 @@ def torchServer_monitor(timeout=100):
     
     current_state["epoch"] = -1
     current_state["valNum"] = -1
+    logger.debug("timer beginning")
     t = threading.Timer(timeout, logLines.close())
     t.start()
+    logger.debug("timer began")
     for line in logLines:
+        logger.debug(line)
         t.cancel()
         if "CUDA is not available" in line:
             logger.info("monitor found CUDA fail")
