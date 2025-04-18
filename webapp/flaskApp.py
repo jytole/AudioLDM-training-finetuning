@@ -171,13 +171,10 @@ def torchServer_monitor(timeout=100):
     
     current_state["epoch"] = -1
     current_state["valNum"] = -1
-    logger.debug("timer beginning")
-    t = threading.Timer(timeout, logLines.close())
-    t.start()
-    logger.debug("timer began")
+    # t = threading.Timer(timeout, logLines.close())
+    # t.start()
     for line in logLines:
-        logger.debug(line)
-        t.cancel()
+        # t.cancel()
         if "CUDA is not available" in line:
             logger.info("monitor found CUDA fail")
             socketio.emit("monitor", "Operation Failed! CUDA is not available.")
@@ -200,8 +197,12 @@ def torchServer_monitor(timeout=100):
             logger.info("monitor found traceback fail")
             socketio.emit("monitor", "Traceback found. Likely crash.")
             logLines.close()
-        t = threading.Timer(timeout, logLines.close())
-        t.start()
+        elif "Received request: " in line:
+            logger.info("torchServer idle, accepting requests again")
+            socketio.emit("monitor", "operation complete")
+            logLines.close()
+        # t = threading.Timer(timeout, logLines.close())
+        # t.start()
     
     current_state["torchServerStatus"] = "idle"
     socketio.emit("current_state_update", current_state)
