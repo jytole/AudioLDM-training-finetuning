@@ -46,6 +46,9 @@
                 <p>Epoch:<span id="epochVal"></span></p>
             </div>
             <div class="quickView">
+                <p>Global Step:<span id="globalStepVal"></span></p>
+            </div>
+            <div class="quickView">
                 <p>Validation Step:<span id="valNumVal"></span></p>
             </div>
         </div>
@@ -248,9 +251,10 @@
             $('#tabButtonFineTune').addClass('active');
         }
 
-        $('#serverStatusVal').text(current_state["torchServerStatus"]);
-        $('#epochVal').text(current_state["epoch"]);
-        $('#valNumVal').text(current_state["valNum"]);
+        $('#serverStatusVal').text(current_state["monitor"]["torchServerStatus"]);
+        $('#epochVal').text(current_state["monitor"]["epoch"]);
+        $('#valNumVal').text(current_state["monitor"]["valNum"]);
+        $('#globalStepVal').text(current_state["monitor"]["globalStep"])
     }
     
     // when received from socket, update current_state

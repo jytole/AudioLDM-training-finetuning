@@ -79,27 +79,30 @@ with app.app_context():
                      "displayInferenceAudio": False,
                      "inferencePrompt": "fake prompt",
                      "params": {
-                         "seed": 0,
-                         "step,validation_every_n_epochs": 5,
-                         "step,save_checkpoint_every_n_steps": 5000,
-                         "reload_from_ckpt": "./data/checkpoints/audioldm-m-full.ckpt",
-                         "model,params,evaluation_params,unconditional_guidance_scale": 3.5,
-                         "model,params,evaluation_params,ddim_sampling_steps": 200,
-                         "model,params,evaluation_params,n_candidates_per_samples": 3,
+                        "seed": 0,
+                        "step,validation_every_n_epochs": 5,
+                        "step,save_checkpoint_every_n_steps": 5000,
+                        "reload_from_ckpt": "./data/checkpoints/audioldm-m-full.ckpt",
+                        "model,params,evaluation_params,unconditional_guidance_scale": 3.5,
+                        "model,params,evaluation_params,ddim_sampling_steps": 200,
+                        "model,params,evaluation_params,n_candidates_per_samples": 3,
                      },
                      "datasets": [
                          
                      ],
                      "checkpoints": [
-                         "./data/checkpoints/audioldm-m-full.ckpt",
+                        "./data/checkpoints/audioldm-m-full.ckpt",
                      ],
                      "inferenceCheckpoints": [
-                         "./log/latent_diffusion/2025_03_27_api_default_finetune/default_finetune/checkpoints/checkpoint-fad-133.00-global_step=4999.ckpt",
+                        "./log/latent_diffusion/2025_03_27_api_default_finetune/default_finetune/checkpoints/checkpoint-fad-133.00-global_step=4999.ckpt",
                      ],
                      "tab": "finetune",
-                     "torchServerStatus": "idle",
-                     "epoch": -1,
-                     "valNum": -1,
+                     "monitor": {
+                        "torchServerStatus": "idle",
+                        "epoch": -1,
+                        "valNum": -1,
+                        "globalStep": -1,
+                     },
                     }
 
 ## Socket handling code
@@ -169,8 +172,8 @@ def torchServer_monitor(timeout=100):
     logFile = open(logFilePath)
     logLines = follow(logFile)
     
-    current_state["epoch"] = -1
-    current_state["valNum"] = -1
+    current_state["monitor"]["epoch"] = -1
+    current_state["monitor"]["valNum"] = -1
     # t = threading.Timer(timeout, logLines.close())
     # t.start()
     for line in logLines:
@@ -179,32 +182,48 @@ def torchServer_monitor(timeout=100):
             logger.info("monitor found CUDA fail")
             socketio.emit("monitor", "Operation Failed! CUDA is not available.")
             logLines.close()
+            current_state["monitor"]["torchServerStatus"] = "crashed"
+            socketio.emit("current_state_update", current_state)
+            return
         elif "Epoch" in line:
+            postEmit = False
             numStart = line.find("Epoch ") + 6
             numEnd = line.find(":", numStart)
             epochNew = int(line[numStart:numEnd])
-            if epochNew != current_state["epoch"]:
-                current_state["epoch"] = epochNew
-                socketio.emit("monitor", "Epoch: " + str(current_state["epoch"]))
+            if epochNew != current_state["monitor"]["epoch"]:
+                current_state["monitor"]["epoch"] = epochNew
+                postEmit = True
+            if "global_step=" in line:
+                numStart = line.find("global_step=") + 12
+                numEnd = line.find(".", numStart)
+                globalStepNew = int(line[numStart:numEnd])
+                if globalStepNew != current_state["monitor"]["globalStep"]:
+                    current_state["monitor"]["globalStep"] = globalStepNew
+                    postEmit = True
+            if postEmit:
+                socketio.emit("current_state_update", current_state)
         elif "Validation DataLoader" in line:
             numStart = line.find("Validation DataLoader ") + 22
             numEnd = line.find(":", numStart)
             valNumNew = int(line[numStart:numEnd])
-            if valNumNew != current_state["valNum"]:
-                current_state["valNum"] = valNumNew
-                socketio.emit("monitor", "ValNum: ", str(current_state["valNum"]))
+            if valNumNew != current_state["monitor"]["valNum"]:
+                current_state["monitor"]["valNum"] = valNumNew
+                socketio.emit("current_state_update", current_state)
         elif "Traceback (most recent call last):" in line:
             logger.info("monitor found traceback fail")
             socketio.emit("monitor", "Traceback found. Likely crash.")
             logLines.close()
+            current_state["monitor"]["torchServerStatus"] = "crashed"
+            socketio.emit("current_state_update", current_state)
+            return
         elif "Received request: " in line:
             logger.info("torchServer idle, accepting requests again")
-            socketio.emit("monitor", "operation complete")
+            socketio.emit("monitor", "Operation complete!")
             logLines.close()
         # t = threading.Timer(timeout, logLines.close())
         # t.start()
     
-    current_state["torchServerStatus"] = "idle"
+    current_state["monitor"]["torchServerStatus"] = "idle"
     socketio.emit("current_state_update", current_state)
     
             
