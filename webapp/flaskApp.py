@@ -422,12 +422,91 @@ def index():
             logger.debug("debugForm")
             debugFunc()
             
-    rendered_template = render_template("interface.html", current_state=current_state)
+    rendered_template = render_template("index.html", current_state=current_state)
     response = make_response(rendered_template)
     response.headers['Content-Type'] = 'text/html; charset=utf-8'
     
     return response
 
+@app.route("/finetuning", methods=["GET", "POST"])
+def finetuningPage():
+    """http request handler for finetuning (/finetuning)
+    
+    Renders template with current_state
+
+    Returns:
+        response: http response containing the rendered template
+    """
+    if request.method == "POST":
+        if "startFineTuningBulkForm" in request.form:
+            logger.debug("/finetuning: startFineTuningForm")
+            ## Handle checkpoint, parameters, and begin finetuning
+    rendered_template = render_template("finetuning.html", current_state=current_state)
+    response = make_response(rendered_template)
+    response.headers['Content-Type'] = 'text/html; charset=utf-8'
+    
+    return response
+
+@app.route("/inference", methods=["GET", "POST"])
+def inferencePage():
+    """http request handler for finetuning (/finetuning)
+    
+    Renders template with current_state
+
+    Returns:
+        response: http response containing the rendered template
+    """
+    if request.method == "POST":
+        if "startFineTuningForm" in request.form:
+            logger.debug("/inference: startFineTuningForm")
+    rendered_template = render_template("inference.html", current_state=current_state)
+    response = make_response(rendered_template)
+    response.headers['Content-Type'] = 'text/html; charset=utf-8'
+    
+    return response
+
+@app.route("/dev", methods=["GET", "POST"])
+def devPage():
+    """http request handler for the dev interface (/dev)
+    
+    Renders template with current_state
+
+    Returns:
+        response: http response containing the rendered template
+    """
+    if request.method == "POST":
+        if "archiveUploadForm" in request.form:
+            logger.debug("archiveUploadForm")
+            archiveUpload()
+        elif "setParameterForm" in request.form:
+            logger.debug("setParameterForm")
+            setParameter()
+        elif "startFineTuningForm" in request.form:
+            logger.debug("startFineTuningForm")
+            startFineTuning()
+        elif "inferSingleForm" in request.form:
+            logger.debug("inferSingleForm")
+            inferSingle()
+        elif "downloadCheckpointLatestForm" in request.form:
+            logger.debug("downloadCheckpointLatestForm")
+            downloadCheckpointLatest()
+        elif "scanFileSystemForm" in request.form:
+            logger.debug("scanFileSystemForm")
+            scanFileSystem()
+        elif "processImportedDatasetForm" in request.form:
+            logger.debug("processImportedDatasetForm")
+            processImportedDataset()
+        elif "startEvalForm" in request.form:
+            logger.debug("startEvalForm")
+            startEval()
+        elif "debugForm" in request.form:
+            logger.debug("debugForm")
+            debugFunc()
+    rendered_template = render_template("interface.html", current_state=current_state)
+    response = make_response(rendered_template)
+    response.headers['Content-Type'] = 'text/html; charset=utf-8'
+    
+    return response
 
 ## handle the upload of an archive file through a submitted form
 ## saves the file, then calls an unzip helper function

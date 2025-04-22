@@ -1,12 +1,82 @@
 h1 {
-    border: 2px #eee solid;
-    color: black;
+    /* border: 2px #eee solid; */
     text-align: center;
-    padding: 10px;
+    margin: 0.5em;
 }
 
 h3 {
     margin: 0.5em;
+    text-align: center;
+}
+
+body {
+    margin: 0px;
+    background-color: #f8fbfd;
+}
+
+.icon {
+    width: 3em;
+    height: 3em;
+    margin: 0.5em;
+}
+
+.navButton {
+    cursor: pointer;
+}
+
+.processStep {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin: 0.5em;
+}
+
+.circledNumber {
+    width: 1.5em;
+    height: 1.5em;
+    border-radius: 50%;
+    background-color: #5D1725;
+    color: white;
+    text-align: center;
+    line-height: 1.5em;
+    font-size: 0.8em;
+    margin-right: 0.8em;
+}
+
+
+
+.titleBar {
+    display: grid;
+    grid-template-columns: 1fr 10fr 1fr; /* Home button on left, title/subtitle centered */
+    align-items: center;
+    border-bottom: 3px #5D1725 solid;
+    background: #5D1725;
+    color: white;
+}
+
+.titleAndSubtitle {
+    grid-column: 2;
+    text-align: center;
+}
+
+input[type="submit"], input[type="file"], .fileUploadLabel {
+    background-color: #5D1725;
+    color: white;
+    border: none;
+    padding: 0.5em 1em;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 1em;
+    margin: 0.5em 0;
+    cursor: pointer;
+    border-radius: 0.5em;
+}
+
+#datasetZipName {
+    margin-left: 0.3em;
+
 }
 
 body {

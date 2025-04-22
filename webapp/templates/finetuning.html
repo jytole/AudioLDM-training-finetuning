@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<!--Splash screen to lead into interface-->
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AudioLDM2 Fine-Tuning</title>
+
+    <!--Get filesheet from webapp/static/css/style.css-->
+    <link rel="stylesheet" href="{{ url_for('static', filename= 'css/style.css') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+</head>
+<body>
+    {% block content %}
+    <div class="container">
+        {% for message in get_flashed_messages() %}
+        <div class="alert alert-light">
+            <button type="button" class="close" data-dismiss="alert" onclick=delete_flash(this)>&times;</button>
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endblock %}
+    <div class="titleBar" id="titleBar">
+        <img src="static/icons/house-solid.svg" class="icon navButton" alt="house" onclick="window.location.href='/'" style="color: white" />
+        <div class="titleAndSubtitle">
+            <h1>AudioLDM2 Fine-Tuning and Inference Pipeline</h1>
+            <h3>Fine-Tune</h3>
+        </div>
+    </div>
+    <div class="finetuneContainer">
+        <div class="formContainer">
+            <h3 class="processStep"><div class="circledNumber">1</div>Upload a Dataset</h3>
+            <p>Upload a dataset in .zip format, containing .wav files and a .csv file with columns "audio" and "caption".</p>
+            <form method="POST" enctype="multipart/form-data">
+                <div style="display: flex; flex-direction: row; align-items: center;">
+                    <input id="datasetZip" type="file" style="display: none;" name="file" accept=".zip" class="fileUpload" title="Data archive in .zip format" placeholder="Upload Zip File" />
+                    <label id="datasetZipButton" for="datasetZip" class="fileUploadLabel">Choose File</label>
+                    <span id="datasetZipName">No file chosen</span>
+                </div>
+                <input type="submit" name="archiveUploadForm" />
+            </form>
+        </div>
+
+        <form method="POST">
+            <div class="formContainer">
+                <h3 class="processStep"><div class="circledNumber">2</div>Select a Checkpoint</h3>
+                    <label for="checkpointSelect">Select Checkpoint:</label>
+                    <select name="checkpointSelect" id="checkpointSelect">
+                    </select>
+            </div>
+
+            <div class="formContainer">
+                <h3 class="processStep"><div class="circledNumber">3</div>Adjust Parameters</h3>
+                    <label for="save_checkpoint_every_n_steps">Save Checkpoint Every N Steps:</label>
+                    <input type="text" name="save_checkpoint_every_n_steps" id="save_checkpoint_every_n_steps" title="Value of parameter" placeholder="{{ current_state["params"]["step,save_checkpoint_every_n_steps"] }}" />
+            </div>
+
+            <div class="formContainer">
+                <h3 class="processStep"><div class="circledNumber">4</div>Begin Fine-Tuning</h3>
+                
+                    <input type="submit" name="startFineTuningBulkForm" value="Start" />
+            </div>
+
+        </form>
+
+        <div class="formContainer">
+            <h3 class="processStep"><div class="circledNumber">5</div>Monitor Progress</h3>
+            <div class="quickViewWrapper">
+                <div class="quickView">
+                    <p>Server Status:<span id="serverStatusVal"></span></p>
+                </div>
+                <div class="quickView">
+                    <p>Epoch:<span id="epochVal"></span></p>
+                </div>
+                <div class="quickView">
+                    <p>Global Step:<span id="globalStepVal"></span></p>
+                </div>
+                <div class="quickView">
+                    <p>DDIM Step:<span id="ddimStepVal"></span></p>
+                </div>
+            </div>
+            <p id="monitorContent"></p>
+        </div>
+
+        <div class="formContainer">
+            <h3 class="processStep"><div class="circledNumber">6</div>Evaluate Results</h3>
+            <form method="POST">
+                <input type="submit" name="startEvalForm" value="Start" />
+            </form>
+        </div>
+
+        <div class="formContainer">
+            <h3 class="processStep"><div class="circledNumber">7</div>Download Final Checkpoint</h3>
+            <form method="POST">
+                <input type="submit" name="downloadCheckpointLatestForm" value="Download" />
+            </form>
+        </div>
+    </div>
+</body>
+<script>
+    var socket = io();
+
+    // on render of template, set current_state
+    let current_state = {{ current_state | tojson }};
+
+    // add event listeners to tab tab buttons
+    $('#tabButtonFineTune').click(function() {
+        $('.tabSection').hide();
+        $('.tabButton').removeClass('active');
+        $('.finetuneContainer').show();
+        $('#tabButtonFineTune').addClass('active');
+        current_state["tab"] = "finetune";
+        socket.emit("tab_change", "finetune")
+    });
+    $('#tabButtonInference').click(function() {
+        $('.tabSection').hide();
+        $('.tabButton').removeClass('active');
+        $('.inferenceContainer').show();
+        $('#tabButtonInference').addClass('active');
+        current_state["tab"] = "inference";
+        socket.emit("tab_change", "inference")
+    });
+    $('#tabButtonOptions').click(function() {
+        $('.tabSection').hide();
+        $('.tabButton').removeClass('active');
+        $('.optionsContainer').show();
+        $('#tabButtonOptions').addClass('active');
+        current_state["tab"] = "options";
+        socket.emit("tab_change", "options")
+    });
+
+    updateCurrentState();
+
+    function updateCurrentState() {
+        if (current_state["displayInferenceAudio"]) {
+            $('#inferenceAudioContainer').show();
+        } else {
+            $('#inferenceAudioContainer').hide();
+        }
+        $('#inferencePrompt').text(current_state["inferencePrompt"]);
+        $('#inferenceAudio').attr("src", current_state["inferencePath"]);
+
+        if (Object.keys(current_state["datasets"]).length != 0) {
+            $('#importedDatasetForm').parent().show();
+            $('#importedDatasetZip').empty();
+            current_state["datasets"].forEach(function(dataset) {
+                $('#importedDatasetZip').append($('<option>', {
+                    value: dataset,
+                    text: dataset
+                }));
+            });
+        } else {
+            $('#importedDatasetForm').parent().hide();
+        }
+
+        if (Object.keys(current_state["checkpoints"]).length != 0) {
+            $('#checkpointSelectForm').parent().show();
+            $('#checkpointSelect').empty();
+            current_state["checkpoints"].forEach(function(checkpoint) {
+                $('#checkpointSelect').append($('<option>', {
+                    value: checkpoint,
+                    text: checkpoint.replace(/^.*[\\/]/, '')
+                }));
+            });
+            $('#inferenceCheckpointSelect').empty();
+            current_state["inferenceCheckpoints"].forEach(function(checkpoint) {
+                $('#inferenceCheckpointSelect').append($('<option>', {
+                    value: checkpoint,
+                    text: checkpoint.replace(/^.*[\\/]/, '')
+                }));
+            });
+        } else {
+            $('#importedDatasetForm').parent().hide();
+        }
+
+        if(current_state["tab"] == "inference") {
+            $('.tabSection').hide();
+            $('.tabButton').removeClass('active');
+            $('.inferenceContainer').show();
+            $('#tabButtonInference').addClass('active');
+        }
+        else if(current_state["tab"] == "options") {
+            $('.tabSection').hide();
+            $('.tabButton').removeClass('active');
+            $('.optionsContainer').show();
+            $('#tabButtonOptions').addClass('active');
+        }
+        else {
+            $('.tabSection').hide();
+            $('.tabButton').removeClass('active');
+            $('.finetuneContainer').show();
+            $('#tabButtonFineTune').addClass('active');
+        }
+
+        $('#serverStatusVal').text(current_state["monitor"]["torchServerStatus"]);
+        $('#epochVal').text(current_state["monitor"]["epoch"]);
+        $('#globalStepVal').text(current_state["monitor"]["globalStep"]);
+        $('#ddimStepVal').text(current_state["monitor"]["ddimStep"]);
+    }
+    
+    // when received from socket, update current_state
+    socket.on("current_state_update", function(data) {
+        current_state = data;
+        if($('#inferenceAudio').attr("src") != current_state["inferencePath"]){
+            // Reload if audio is new, to fetch the new file
+            location.href = "/";
+        };
+        updateCurrentState();
+    });
+
+    function debugEmit() {
+        //socket.emit("debug");
+    }
+
+    $("#parameter").change(function () {
+        var selection = this.value;
+        var params = current_state["params"];
+        $('#paramValue').attr("placeholder", params[selection]);
+    });
+
+    function delete_flash(flash){
+        $(flash).parent().remove()
+    }
+
+    socket.on("monitor", function(data) {
+        $('#monitorContent').append(data + "<br>");
+    });
+
+    const fileUploadField = document.getElementById('datasetZip');
+    const fileName = document.getElementById('datasetZipName');
+    fileUploadField.addEventListener('change', function() {
+        fileName.textContent = this.files[0].name;
+    })
+</script>

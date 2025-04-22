@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!--Splash screen to lead into interface-->
 <html lang="en-US">
 <head>
     <meta charset="UTF-8">
@@ -23,173 +24,22 @@
     </div>
     {% endblock %}
     <h1>AudioLDM2 Fine-Tuning and Inference Pipeline</h1>
-    <!--Form to accept .zip file uploads and send them to the /archiveUpload url-->
-    <!--For security, should possibly add an authorized key pair to this form-->
-    <div class="formContainer">
-        <h3>Upload Dataset Zip</h3>
-        <form method="POST" enctype="multipart/form-data">
-            <input type="file" name="file" accept=".zip" class="fileUpload" title="Data archive in .zip format" placeholder="Upload Zip File"/>
-            <input type="submit" name="archiveUploadForm" />
-        </form>
+    <h3>What would you like to do?</h3>
+    <div>
+        <button id="finetuningButton" onclick="window.location.href='/finetuning'">
+                <p>Fine-Tune<p>
+            </button>
+        <button id="inferenceButton" onclick="window.location.href='/inference'">
+            <p>Generate a Sound<p>
+        </button>
     </div>
 
-    <div class="formContainer" style="display: none;">
-        <h3>Select Checkpoint</h3>
-        <form method="POST" id="checkpointSelectForm">
-            <label for="checkpointSelect">Select Dataset Zip:</label>
-            <select name="checkpointSelect" id="checkpointSelect">
-            </select>
-            <input type="submit" name="checkpointSelectForm" />
-        </form>
-    </div>
-
-    <div class="formContainer" style="display: none;">
-        <h3>Process Imported Dataset Zip</h3>
-        <form method="POST" id="importedDatasetForm">
-            <label for="importedDatasetZip">Select Dataset Zip:</label>
-            <select name="importedDatasetZip" id="importedDatasetZip">
-            </select>
-            <input type="submit" name="processImportedDatasetForm" />
-        </form>
-    </div>
-
-    <div class="formContainer">
-        <h3>Scan File System</h3>
-        <form method="POST">
-            <input type="submit" name="scanFileSystemForm" value="Scan" />
-        </form>
-    </div>
-
-    <div class="formContainer">
-        <h3>Set Parameters</h3>
-        <form method="POST">
-            <label for="parameter">Parameter:</label>
-            <select name="parameter" id="parameter">
-                <option value="step,save_checkpoint_every_n_steps">Save Checkpoint Every N Steps</option>
-                <option value="reload_from_ckpt">Reload From Checkpoint</option>
-                <option value="model,params,evaluation_params,unconditional_guidance_scale">Evaluation: Unconditional Guidance Scale</option>
-                <option value="model,params,evaluation_params,ddim_sampling_steps">Evaluation: DDIM Sampling Steps</option>
-                <option value="model,params,evaluation_params,n_candidates_per_samples">Evaluation: N Candidates Per Sample</option>
-            </select>
-            <label for="paramValue">Value:</label>
-            <input type="text" name="value" id="paramValue" title="Value of parameter" placeholder="{{ current_state["params"]["step,save_checkpoint_every_n_steps"] }}"/>
-            <input type="submit" name="setParameterForm" />
-        </form>
-    </div>
-
-    <div class="formContainer">
-        <h3>AudioLDM2 Monitor</h3>
-        <p id="monitorContent"></p>
-    </div>
-
-    <div class="formContainer">
-        <h3>Start Fine-Tuning</h3>
-        <form method="POST">
-            <input type="submit" name="startFineTuningForm" />
-        </form>
-    </div>
-
-    <div class="formContainer">
-        <h3>Generate Sound</h3>
-        <form method="POST">
-            <label for="prompt">Prompt:</label>
-            <input type="text" name="prompt" id="prompt" title="Prompt for generation" placeholder="A dog barking on a quiet night"/>
-            <input type="submit" name="inferSingleForm" />
-        </form>
-        <div class="audioContainer" id="inferenceAudioContainer" style="display: none;">
-            <h3>Generated Sound</h3>
-            <p id="inferencePrompt"></p>
-            <audio controls>
-                <source src="{{current_state["inferencePath"]}}" type="audio/wav", id="inferenceAudio">
-            Your browser does not support the audio element.
-            </audio>
-        </div>
-    </div>
-
-    <div class="formContainer">
-        <h3>Download Latest Checkpoint</h3>
-        <form method="POST">
-            <input type="submit" name="downloadCheckpointLatestForm" value="Download" />
-        </form>
-    </div>
-    
-    <div class="formContainer">
-        <h3>Debug</h3>
-        <form method="POST">
-            <input type="submit" name="debugForm" value="Debug" />
-        </form>
-        <button onclick="debugEmit()">Debug Emit</button>
-    </div>
 </body>
 
 <script>
     var socket = io();
 
     // on render of template, set current_state
-    let current_state = {{ current_state | tojson }};
-
-    updateCurrentState();
-
-    function updateCurrentState() {
-        if (current_state["displayInferenceAudio"]) {
-            $('#inferenceAudioContainer').show();
-        } else {
-            $('#inferenceAudioContainer').hide();
-        }
-        $('#inferencePrompt').text(current_state["inferencePrompt"]);
-        $('#inferenceAudio').attr("src", current_state["inferencePath"]);
-
-        if (Object.keys(current_state["datasets"]).length != 0) {
-            $('#importedDatasetForm').parent().show();
-            $('#importedDatasetZip').empty();
-            current_state["datasets"].forEach(function(dataset) {
-                $('#importedDatasetZip').append($('<option>', {
-                    value: dataset,
-                    text: dataset
-                }));
-            });
-        } else {
-            $('#importedDatasetForm').parent().hide();
-        }
-
-        if (Object.keys(current_state["checkpoints"]).length != 0) {
-            $('#checkpointSelectForm').parent().show();
-            $('#checkpointSelect').empty();
-            current_state["checkpoints"].forEach(function(checkpoint) {
-                $('#checkpointSelect').append($('<option>', {
-                    value: checkpoint,
-                    text: checkpoint
-                }));
-            });
-        } else {
-            $('#importedDatasetForm').parent().hide();
-        }
-    }
     
-    // when received from socket, update current_state
-    socket.on("current_state_update", function(data) {
-        console.log("Received state:", data);
-        current_state = data;
-        updateCurrentState();
-        location.href = "/";
-    });
-
-    function debugEmit() {
-        //socket.emit("debug");
-    }
-
-    $("#parameter").change(function () {
-        var selection = this.value;
-        var params = current_state["params"];
-        $('#paramValue').attr("placeholder", params[selection]);
-    });
-
-    function delete_flash(flash){
-        $(flash).parent().remove()
-    }
-
-    socket.on("monitor", function(data) {
-        $('#monitorContent').text(data);
-    });
 </script>
 </html>
