@@ -1,0 +1,165 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AudioLDM2 Pipeline documentation &mdash; AudioLDM2 Pipeline 1.8 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+    <link rel="shortcut icon" href="_static/favicon.png"/>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=d13700ae"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            AudioLDM2 Pipeline
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audioldm2_api.html">AudioLDM2 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="flaskApp.html">Flask App</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchServer.html">Torch Server</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">AudioLDM2 Pipeline</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">AudioLDM2 Pipeline documentation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="audioldm2-pipeline-documentation">
+<h1>AudioLDM2 Pipeline documentation<a class="headerlink" href="#audioldm2-pipeline-documentation" title="Link to this heading"></a></h1>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#quick-start">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#full-installation">Full Installation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#process-overview">Process Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#fine-tuning">Fine-Tuning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#generating-sounds">Generating sounds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#parameters">Parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#interface-images">Interface images</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="audioldm2_api.html">AudioLDM2 API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="audioldm2_api.html#audioldm_train.utilities.audioldm2_api.AudioLDM2APIObject"><code class="docutils literal notranslate"><span class="pre">AudioLDM2APIObject</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="flaskApp.html">Flask App</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="flaskApp.html#webapp.flaskApp.archiveUpload"><code class="docutils literal notranslate"><span class="pre">archiveUpload()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="flaskApp.html#webapp.flaskApp.connect"><code class="docutils literal notranslate"><span class="pre">connect()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="flaskApp.html#webapp.flaskApp.debugFunc"><code class="docutils literal notranslate"><span class="pre">debugFunc()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="flaskApp.html#webapp.flaskApp.devPage"><code class="docutils literal notranslate"><span class="pre">devPage()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="flaskApp.html#webapp.flaskApp.disconnect"><code class="docutils literal notranslate"><span class="pre">disconnect()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="flaskApp.html#webapp.flaskApp.downloadCheckpointLatest"><code class="docutils literal notranslate"><span class="pre">downloadCheckpointLatest()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="flaskApp.html#webapp.flaskApp.emitCurrentState"><code class="docutils literal notranslate"><span class="pre">emitCurrentState()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="flaskApp.html#webapp.flaskApp.finetuningPage"><code class="docutils literal notranslate"><span class="pre">finetuningPage()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="flaskApp.html#webapp.flaskApp.follow"><code class="docutils literal notranslate"><span class="pre">follow()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="flaskApp.html#webapp.flaskApp.getFromServer"><code class="docutils literal notranslate"><span class="pre">getFromServer()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="flaskApp.html#webapp.flaskApp.index"><code class="docutils literal notranslate"><span class="pre">index()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="flaskApp.html#webapp.flaskApp.inferSingle"><code class="docutils literal notranslate"><span class="pre">inferSingle()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="flaskApp.html#webapp.flaskApp.inferencePage"><code class="docutils literal notranslate"><span class="pre">inferencePage()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="flaskApp.html#webapp.flaskApp.processImportedDataset"><code class="docutils literal notranslate"><span class="pre">processImportedDataset()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="flaskApp.html#webapp.flaskApp.scanFileSystem"><code class="docutils literal notranslate"><span class="pre">scanFileSystem()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="flaskApp.html#webapp.flaskApp.sendToServer"><code class="docutils literal notranslate"><span class="pre">sendToServer()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="flaskApp.html#webapp.flaskApp.setParameter"><code class="docutils literal notranslate"><span class="pre">setParameter()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="flaskApp.html#webapp.flaskApp.spawnAPIServer"><code class="docutils literal notranslate"><span class="pre">spawnAPIServer()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="flaskApp.html#webapp.flaskApp.startEval"><code class="docutils literal notranslate"><span class="pre">startEval()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="flaskApp.html#webapp.flaskApp.startFineTuning"><code class="docutils literal notranslate"><span class="pre">startFineTuning()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="flaskApp.html#webapp.flaskApp.tab_change"><code class="docutils literal notranslate"><span class="pre">tab_change()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="flaskApp.html#webapp.flaskApp.torchServer_monitor"><code class="docutils literal notranslate"><span class="pre">torchServer_monitor()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="flaskApp.html#webapp.flaskApp.wait_for_inference"><code class="docutils literal notranslate"><span class="pre">wait_for_inference()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="flaskApp.html#webapp.flaskApp.watch_torchServer"><code class="docutils literal notranslate"><span class="pre">watch_torchServer()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="torchServer.html">Torch Server</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="torchServer.html#webapp.torchServer.StreamToLogger"><code class="docutils literal notranslate"><span class="pre">StreamToLogger</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Kyler Smith.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

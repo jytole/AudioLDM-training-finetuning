@@ -1,0 +1,399 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flask App &mdash; AudioLDM2 Pipeline 1.8 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+    <link rel="shortcut icon" href="_static/favicon.png"/>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=d13700ae"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Torch Server" href="torchServer.html" />
+    <link rel="prev" title="AudioLDM2 API" href="audioldm2_api.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            AudioLDM2 Pipeline
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audioldm2_api.html">AudioLDM2 API</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Flask App</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#webapp.flaskApp.archiveUpload"><code class="docutils literal notranslate"><span class="pre">archiveUpload()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#webapp.flaskApp.connect"><code class="docutils literal notranslate"><span class="pre">connect()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#webapp.flaskApp.debugFunc"><code class="docutils literal notranslate"><span class="pre">debugFunc()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#webapp.flaskApp.devPage"><code class="docutils literal notranslate"><span class="pre">devPage()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#webapp.flaskApp.disconnect"><code class="docutils literal notranslate"><span class="pre">disconnect()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#webapp.flaskApp.downloadCheckpointLatest"><code class="docutils literal notranslate"><span class="pre">downloadCheckpointLatest()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#webapp.flaskApp.emitCurrentState"><code class="docutils literal notranslate"><span class="pre">emitCurrentState()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#webapp.flaskApp.finetuningPage"><code class="docutils literal notranslate"><span class="pre">finetuningPage()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#webapp.flaskApp.follow"><code class="docutils literal notranslate"><span class="pre">follow()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#webapp.flaskApp.getFromServer"><code class="docutils literal notranslate"><span class="pre">getFromServer()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#webapp.flaskApp.index"><code class="docutils literal notranslate"><span class="pre">index()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#webapp.flaskApp.inferSingle"><code class="docutils literal notranslate"><span class="pre">inferSingle()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#webapp.flaskApp.inferencePage"><code class="docutils literal notranslate"><span class="pre">inferencePage()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#webapp.flaskApp.processImportedDataset"><code class="docutils literal notranslate"><span class="pre">processImportedDataset()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#webapp.flaskApp.scanFileSystem"><code class="docutils literal notranslate"><span class="pre">scanFileSystem()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#webapp.flaskApp.sendToServer"><code class="docutils literal notranslate"><span class="pre">sendToServer()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#webapp.flaskApp.setParameter"><code class="docutils literal notranslate"><span class="pre">setParameter()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#webapp.flaskApp.spawnAPIServer"><code class="docutils literal notranslate"><span class="pre">spawnAPIServer()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#webapp.flaskApp.startEval"><code class="docutils literal notranslate"><span class="pre">startEval()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#webapp.flaskApp.startFineTuning"><code class="docutils literal notranslate"><span class="pre">startFineTuning()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#webapp.flaskApp.tab_change"><code class="docutils literal notranslate"><span class="pre">tab_change()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#webapp.flaskApp.torchServer_monitor"><code class="docutils literal notranslate"><span class="pre">torchServer_monitor()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#webapp.flaskApp.wait_for_inference"><code class="docutils literal notranslate"><span class="pre">wait_for_inference()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#webapp.flaskApp.watch_torchServer"><code class="docutils literal notranslate"><span class="pre">watch_torchServer()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="torchServer.html">Torch Server</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">AudioLDM2 Pipeline</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Flask App</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/flaskApp.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="flask-app">
+<h1>Flask App<a class="headerlink" href="#flask-app" title="Link to this heading"></a></h1>
+<p>This script defines the server for a webapp which allows clients to interface with AudioLDM2.</p>
+<p id="module-webapp.flaskApp">Script to define and facilite AudioLDM2 Interface Flask App</p>
+<p>Current implementation serves the flask-based webapp through
+gunicorn with an nginx proxy.
+Serves rendered templates to user with some context included.
+Connects to client for interactive content via flask_socketio.
+Webapp connects to AudioLDM2 script via zmq.</p>
+<p><strong>BAD PRACTICE</strong>: cors_allowed_origins=”*”, but web security
+is hard.</p>
+<dl>
+<dt>Expected environment variables:</dt><dd><p>To connect “flash” messages and otherwise authorize client comms:
+FLASK_SECRET_KEY</p>
+<p>To enable WANDB logging and avoid failure:
+WANDB_API_KEY</p>
+</dd>
+</dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="webapp.flaskApp.archiveUpload">
+<span class="sig-prename descclassname"><span class="pre">webapp.flaskApp.</span></span><span class="sig-name descname"><span class="pre">archiveUpload</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#webapp.flaskApp.archiveUpload" title="Link to this definition"></a></dt>
+<dd><p>Function to handle the upload of a data archive</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>success: boolean flag</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="webapp.flaskApp.connect">
+<span class="sig-prename descclassname"><span class="pre">webapp.flaskApp.</span></span><span class="sig-name descname"><span class="pre">connect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sid</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webapp.flaskApp.connect" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="webapp.flaskApp.debugFunc">
+<span class="sig-prename descclassname"><span class="pre">webapp.flaskApp.</span></span><span class="sig-name descname"><span class="pre">debugFunc</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#webapp.flaskApp.debugFunc" title="Link to this definition"></a></dt>
+<dd><p>debug function to show how requests are acting</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>success: boolean flag</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="webapp.flaskApp.devPage">
+<span class="sig-prename descclassname"><span class="pre">webapp.flaskApp.</span></span><span class="sig-name descname"><span class="pre">devPage</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#webapp.flaskApp.devPage" title="Link to this definition"></a></dt>
+<dd><p>http request handler for the dev interface (/dev)</p>
+<p>Renders template with current_state</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>response: http response containing the rendered template</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="webapp.flaskApp.disconnect">
+<span class="sig-prename descclassname"><span class="pre">webapp.flaskApp.</span></span><span class="sig-name descname"><span class="pre">disconnect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sid</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webapp.flaskApp.disconnect" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="webapp.flaskApp.downloadCheckpointLatest">
+<span class="sig-prename descclassname"><span class="pre">webapp.flaskApp.</span></span><span class="sig-name descname"><span class="pre">downloadCheckpointLatest</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#webapp.flaskApp.downloadCheckpointLatest" title="Link to this definition"></a></dt>
+<dd><p>Download the latest checkpoint</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>send_file: a file transfer for the client, handled by flask</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="webapp.flaskApp.emitCurrentState">
+<span class="sig-prename descclassname"><span class="pre">webapp.flaskApp.</span></span><span class="sig-name descname"><span class="pre">emitCurrentState</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#webapp.flaskApp.emitCurrentState" title="Link to this definition"></a></dt>
+<dd><p>emits the current_state dictionary</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="webapp.flaskApp.finetuningPage">
+<span class="sig-prename descclassname"><span class="pre">webapp.flaskApp.</span></span><span class="sig-name descname"><span class="pre">finetuningPage</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#webapp.flaskApp.finetuningPage" title="Link to this definition"></a></dt>
+<dd><p>http request handler for finetuning (/finetuning)</p>
+<p>Renders template with current_state</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>response: http response containing the rendered template</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="webapp.flaskApp.follow">
+<span class="sig-prename descclassname"><span class="pre">webapp.flaskApp.</span></span><span class="sig-name descname"><span class="pre">follow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logFile</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webapp.flaskApp.follow" title="Link to this definition"></a></dt>
+<dd><p>Helper function to monitor a constantly growing file.</p>
+<p>Yields lines of the file as they come in.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>logFile (stream): File to be monitored</p>
+</dd>
+<dt>Yields:</dt><dd><p>lines: Lines, as they arrive. A “generator”</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="webapp.flaskApp.getFromServer">
+<span class="sig-prename descclassname"><span class="pre">webapp.flaskApp.</span></span><span class="sig-name descname"><span class="pre">getFromServer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webapp.flaskApp.getFromServer" title="Link to this definition"></a></dt>
+<dd><p>Sends message to torchServer, expect “ack;&lt;data&gt;” in return</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>message (str): Message to be sent to the torchServer via zmq
+retries (int, optional): Number of times to try resending message. Defaults to REQUEST_RETRIES (3).</p>
+</dd>
+<dt>Returns:</dt><dd><p>success: boolean flag</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="webapp.flaskApp.index">
+<span class="sig-prename descclassname"><span class="pre">webapp.flaskApp.</span></span><span class="sig-name descname"><span class="pre">index</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#webapp.flaskApp.index" title="Link to this definition"></a></dt>
+<dd><p>http request handler for index (/)</p>
+<p>Renders template with current_state; answers requests in the form of forms</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>response: http response containing the rendered template</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="webapp.flaskApp.inferSingle">
+<span class="sig-prename descclassname"><span class="pre">webapp.flaskApp.</span></span><span class="sig-name descname"><span class="pre">inferSingle</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#webapp.flaskApp.inferSingle" title="Link to this definition"></a></dt>
+<dd><p>Perform a single inference on torchServer</p>
+<p>Shares the audiofile in current_state</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>success: boolean flag</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="webapp.flaskApp.inferencePage">
+<span class="sig-prename descclassname"><span class="pre">webapp.flaskApp.</span></span><span class="sig-name descname"><span class="pre">inferencePage</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#webapp.flaskApp.inferencePage" title="Link to this definition"></a></dt>
+<dd><p>http request handler for finetuning (/finetuning)</p>
+<p>Renders template with current_state</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>response: http response containing the rendered template</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="webapp.flaskApp.processImportedDataset">
+<span class="sig-prename descclassname"><span class="pre">webapp.flaskApp.</span></span><span class="sig-name descname"><span class="pre">processImportedDataset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#webapp.flaskApp.processImportedDataset" title="Link to this definition"></a></dt>
+<dd><p>Function to handle the processing of an imported dataset</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>success: boolean flag</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="webapp.flaskApp.scanFileSystem">
+<span class="sig-prename descclassname"><span class="pre">webapp.flaskApp.</span></span><span class="sig-name descname"><span class="pre">scanFileSystem</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#webapp.flaskApp.scanFileSystem" title="Link to this definition"></a></dt>
+<dd><p>Function to scan the filesystem for imports (datasets, checkpoints) and
+change the current_state to reflect the results.
+Emits current_state after scan.</p>
+<p>Checks static/checkpoints and static/datasets for files.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>success: boolean flag</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="webapp.flaskApp.sendToServer">
+<span class="sig-prename descclassname"><span class="pre">webapp.flaskApp.</span></span><span class="sig-name descname"><span class="pre">sendToServer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webapp.flaskApp.sendToServer" title="Link to this definition"></a></dt>
+<dd><p>Sends message to torchServer, expect “ack” in return</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>message (str): Message to be sent to the torchServer via zmq
+retries (int, optional): Number of times to try resending message. Defaults to REQUEST_RETRIES (3).</p>
+</dd>
+<dt>Returns:</dt><dd><p>success: boolean flag</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="webapp.flaskApp.setParameter">
+<span class="sig-prename descclassname"><span class="pre">webapp.flaskApp.</span></span><span class="sig-name descname"><span class="pre">setParameter</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#webapp.flaskApp.setParameter" title="Link to this definition"></a></dt>
+<dd><p>Sets the parameter requested in the form</p>
+<p>Expects a form submitted containing “parameter” and “value” fields</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>success: boolean flag</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="webapp.flaskApp.spawnAPIServer">
+<span class="sig-prename descclassname"><span class="pre">webapp.flaskApp.</span></span><span class="sig-name descname"><span class="pre">spawnAPIServer</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#webapp.flaskApp.spawnAPIServer" title="Link to this definition"></a></dt>
+<dd><p>Method to spawn the torchServer, to be used if it crashes.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>Popen: Subprocess running <cite>python webapp/torchServer.py</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="webapp.flaskApp.startEval">
+<span class="sig-prename descclassname"><span class="pre">webapp.flaskApp.</span></span><span class="sig-name descname"><span class="pre">startEval</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#webapp.flaskApp.startEval" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="webapp.flaskApp.startFineTuning">
+<span class="sig-prename descclassname"><span class="pre">webapp.flaskApp.</span></span><span class="sig-name descname"><span class="pre">startFineTuning</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#webapp.flaskApp.startFineTuning" title="Link to this definition"></a></dt>
+<dd><p>Start the finetuning process on torchServer.</p>
+<p>Flashes message(s) with progress updates</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>success: boolean flag</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="webapp.flaskApp.tab_change">
+<span class="sig-prename descclassname"><span class="pre">webapp.flaskApp.</span></span><span class="sig-name descname"><span class="pre">tab_change</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webapp.flaskApp.tab_change" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="webapp.flaskApp.torchServer_monitor">
+<span class="sig-prename descclassname"><span class="pre">webapp.flaskApp.</span></span><span class="sig-name descname"><span class="pre">torchServer_monitor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webapp.flaskApp.torchServer_monitor" title="Link to this definition"></a></dt>
+<dd><p>Monitor the latest torchServer log file, emit updates to clients</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>timeout (int): Seconds torchServer must not print to the log before monitor deems it to be idle</p>
+</dd>
+<dt>Returns:</dt><dd><p>success: boolean value</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="webapp.flaskApp.wait_for_inference">
+<span class="sig-prename descclassname"><span class="pre">webapp.flaskApp.</span></span><span class="sig-name descname"><span class="pre">wait_for_inference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attempt_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webapp.flaskApp.wait_for_inference" title="Link to this definition"></a></dt>
+<dd><p>Poll the torchServer for inference completion</p>
+<p>Timeout is ATTEMPT_LIMIT * 5 seconds</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>attempt_limit (int): Number of times to poll the server for completion, defaults to 100</p>
+</dd>
+<dt>Returns:</dt><dd><p>success: boolean value</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="webapp.flaskApp.watch_torchServer">
+<span class="sig-prename descclassname"><span class="pre">webapp.flaskApp.</span></span><span class="sig-name descname"><span class="pre">watch_torchServer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webapp.flaskApp.watch_torchServer" title="Link to this definition"></a></dt>
+<dd><p>Start a thread with the torchServer monitor;
+allows user to continue interacting with the webapp</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>timeout (int): Seconds torchServer must not print to the log before monitor deems it to be idle</p>
+</dd>
+<dt>Returns:</dt><dd><p>success: True when begun</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="audioldm2_api.html" class="btn btn-neutral float-left" title="AudioLDM2 API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="torchServer.html" class="btn btn-neutral float-right" title="Torch Server" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Kyler Smith.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

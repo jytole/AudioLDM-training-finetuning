@@ -1,0 +1,284 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AudioLDM2 API &mdash; AudioLDM2 Pipeline 1.8 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+    <link rel="shortcut icon" href="_static/favicon.png"/>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=d13700ae"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Flask App" href="flaskApp.html" />
+    <link rel="prev" title="Usage" href="usage.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            AudioLDM2 Pipeline
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">AudioLDM2 API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#audioldm_train.utilities.audioldm2_api.AudioLDM2APIObject"><code class="docutils literal notranslate"><span class="pre">AudioLDM2APIObject</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#audioldm_train.utilities.audioldm2_api.AudioLDM2APIObject.debugFunc"><code class="docutils literal notranslate"><span class="pre">AudioLDM2APIObject.debugFunc()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#audioldm_train.utilities.audioldm2_api.AudioLDM2APIObject.evaluateAll"><code class="docutils literal notranslate"><span class="pre">AudioLDM2APIObject.evaluateAll()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#audioldm_train.utilities.audioldm2_api.AudioLDM2APIObject.finetune"><code class="docutils literal notranslate"><span class="pre">AudioLDM2APIObject.finetune()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#audioldm_train.utilities.audioldm2_api.AudioLDM2APIObject.getResumeCheckpointDir"><code class="docutils literal notranslate"><span class="pre">AudioLDM2APIObject.getResumeCheckpointDir()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#audioldm_train.utilities.audioldm2_api.AudioLDM2APIObject.handleDataUpload"><code class="docutils literal notranslate"><span class="pre">AudioLDM2APIObject.handleDataUpload()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#audioldm_train.utilities.audioldm2_api.AudioLDM2APIObject.inferFromFile"><code class="docutils literal notranslate"><span class="pre">AudioLDM2APIObject.inferFromFile()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#audioldm_train.utilities.audioldm2_api.AudioLDM2APIObject.inferSingle"><code class="docutils literal notranslate"><span class="pre">AudioLDM2APIObject.inferSingle()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#audioldm_train.utilities.audioldm2_api.AudioLDM2APIObject.prepareAllValidationsDownload"><code class="docutils literal notranslate"><span class="pre">AudioLDM2APIObject.prepareAllValidationsDownload()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#audioldm_train.utilities.audioldm2_api.AudioLDM2APIObject.prepareCheckpointDownload"><code class="docutils literal notranslate"><span class="pre">AudioLDM2APIObject.prepareCheckpointDownload()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#audioldm_train.utilities.audioldm2_api.AudioLDM2APIObject.set_parameter"><code class="docutils literal notranslate"><span class="pre">AudioLDM2APIObject.set_parameter()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#audioldm_train.utilities.audioldm2_api.AudioLDM2APIObject.trainFromScratch"><code class="docutils literal notranslate"><span class="pre">AudioLDM2APIObject.trainFromScratch()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="flaskApp.html">Flask App</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchServer.html">Torch Server</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">AudioLDM2 Pipeline</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">AudioLDM2 API</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/audioldm2_api.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="audioldm2-api">
+<h1>AudioLDM2 API<a class="headerlink" href="#audioldm2-api" title="Link to this heading"></a></h1>
+<p>This module contains all the attributes and functions necessary to handle fine-tuning and inferring with an instance of AudioLDM2.</p>
+<dl class="py class" id="module-audioldm_train.utilities.audioldm2_api">
+<dt class="sig sig-object py" id="audioldm_train.utilities.audioldm2_api.AudioLDM2APIObject">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">audioldm_train.utilities.audioldm2_api.</span></span><span class="sig-name descname"><span class="pre">AudioLDM2APIObject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">configs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_yaml_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'audioldm_train/config/2025_03_27_api_default_finetune/default_finetune.yaml'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perform_validation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audioldm_train.utilities.audioldm2_api.AudioLDM2APIObject" title="Link to this definition"></a></dt>
+<dd><p>A class used to store an instance of AudioLDM2 and all necessary parameters.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><dl class="simple">
+<dt>perform_validation (bool):</dt><dd><p>flag to indicate if validation should be performed</p>
+</dd>
+<dt>exp_name (str):</dt><dd><p>experiment name</p>
+</dd>
+<dt>exp_group_name (str):</dt><dd><p>experiment group name</p>
+</dd>
+<dt>config_yaml_path (str):</dt><dd><p>the path to a .yaml config file</p>
+</dd>
+<dt>configs (any):</dt><dd><p>contents of a .yaml config file</p>
+</dd>
+<dt>resume_from_checkpoint (bool):</dt><dd><p>flag to indicate if training should resume from a checkpoint</p>
+</dd>
+<dt>test_data_subset_folder (str):</dt><dd><p>path to folder of test data</p>
+</dd>
+<dt>dataset (AudioDataset):</dt><dd><p>AudioDataset of training split of data</p>
+</dd>
+<dt>dataloader (DataLoader):</dt><dd><p>DataLoader of training split of data</p>
+</dd>
+<dt>val_dataset (AudioDataset):</dt><dd><p>AudioDataset of validation split of data</p>
+</dd>
+<dt>val_dataloader (DataLoader):</dt><dd><p>DataLoader of validation split of data</p>
+</dd>
+<dt>checkpoint_callback (ModelCheckpoint):</dt><dd><p>ModelCheckpoint for handling callbacks during training</p>
+</dd>
+<dt>latent_diffusion (DDPM):</dt><dd><p>DDPM object, loaded based on self.configs. defaults to LatentDiffusion</p>
+</dd>
+<dt>wandb_logger (WandbLogger):</dt><dd><p>object to log stats</p>
+</dd>
+<dt>trainer (Trainer):</dt><dd><p>object to control training config via flags</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="audioldm_train.utilities.audioldm2_api.AudioLDM2APIObject.debugFunc">
+<span class="sig-name descname"><span class="pre">debugFunc</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#audioldm_train.utilities.audioldm2_api.AudioLDM2APIObject.debugFunc" title="Link to this definition"></a></dt>
+<dd><p>Debug function</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="audioldm_train.utilities.audioldm2_api.AudioLDM2APIObject.evaluateAll">
+<span class="sig-name descname"><span class="pre">evaluateAll</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#audioldm_train.utilities.audioldm2_api.AudioLDM2APIObject.evaluateAll" title="Link to this definition"></a></dt>
+<dd><p>Run evaluation process for all folders 
+beginning with val in log/latent_diffusion</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="audioldm_train.utilities.audioldm2_api.AudioLDM2APIObject.finetune">
+<span class="sig-name descname"><span class="pre">finetune</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#audioldm_train.utilities.audioldm2_api.AudioLDM2APIObject.finetune" title="Link to this definition"></a></dt>
+<dd><p>Run finetuning from checkpoint configured in config file
+reads self.configs[“resume_from_ckpt”]</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="audioldm_train.utilities.audioldm2_api.AudioLDM2APIObject.getResumeCheckpointDir">
+<span class="sig-name descname"><span class="pre">getResumeCheckpointDir</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#audioldm_train.utilities.audioldm2_api.AudioLDM2APIObject.getResumeCheckpointDir" title="Link to this definition"></a></dt>
+<dd><p>Return the path to the checkpoint directory</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>checkpointDir (str): path to checkpoint dir</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="audioldm_train.utilities.audioldm2_api.AudioLDM2APIObject.handleDataUpload">
+<span class="sig-name descname"><span class="pre">handleDataUpload</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">zipPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_split_proportion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.6</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audioldm_train.utilities.audioldm2_api.AudioLDM2APIObject.handleDataUpload" title="Link to this definition"></a></dt>
+<dd><p>forwarding function to trigger processFromZip.process(zipPath)</p>
+<p>processFromZip.process expects a zip file containing a .csv file in the root
+with columns “audio” and “caption”. “audio” should contain the relative path
+to the source audio file within the zip file.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>zipPath (str): a path to the dataset zipfile for processing
+train_split_proportion (float): proportion of data to use for training. Must be between 0 and 1.</p>
+</dd>
+<dt>Returns:</dt><dd><p>str: “Successful Dataset Processing” upon completion</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="audioldm_train.utilities.audioldm2_api.AudioLDM2APIObject.inferFromFile">
+<span class="sig-name descname"><span class="pre">inferFromFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">promptsJsonPath</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audioldm_train.utilities.audioldm2_api.AudioLDM2APIObject.inferFromFile" title="Link to this definition"></a></dt>
+<dd><p>perform multiple inferences (generation of audio in AudioLDM2)</p>
+<p>Can be used for convenient batch testing</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>promptsJsonPath (str): path to json file containing prompts to generate</p>
+</dd>
+<dt>Returns:</dt><dd><p>str: path to folder of generated files</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="audioldm_train.utilities.audioldm2_api.AudioLDM2APIObject.inferSingle">
+<span class="sig-name descname"><span class="pre">inferSingle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audioldm_train.utilities.audioldm2_api.AudioLDM2APIObject.inferSingle" title="Link to this definition"></a></dt>
+<dd><p>perform a single inference (generation of audio in AudioLDM2)</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>prompt (str): the prompt to be generated</p>
+</dd>
+<dt>Returns:</dt><dd><p>str: path to the generated file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="audioldm_train.utilities.audioldm2_api.AudioLDM2APIObject.prepareAllValidationsDownload">
+<span class="sig-name descname"><span class="pre">prepareAllValidationsDownload</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#audioldm_train.utilities.audioldm2_api.AudioLDM2APIObject.prepareAllValidationsDownload" title="Link to this definition"></a></dt>
+<dd><p>compresses all files produced for validation steps, returns
+where it can be found for download</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>str: path to allValidations.zip</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="audioldm_train.utilities.audioldm2_api.AudioLDM2APIObject.prepareCheckpointDownload">
+<span class="sig-name descname"><span class="pre">prepareCheckpointDownload</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#audioldm_train.utilities.audioldm2_api.AudioLDM2APIObject.prepareCheckpointDownload" title="Link to this definition"></a></dt>
+<dd><p>compresses latest checkpoint, returns path where it can be
+found for download</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>str: path to compressed checkpoint</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="audioldm_train.utilities.audioldm2_api.AudioLDM2APIObject.set_parameter">
+<span class="sig-name descname"><span class="pre">set_parameter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">targetParam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#audioldm_train.utilities.audioldm2_api.AudioLDM2APIObject.set_parameter" title="Link to this definition"></a></dt>
+<dd><p>Sets parameter to val</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>targetParam (list): Full list of hierarchical keys which identify the parameter
+val (any): Value to set the parameter to</p>
+</dd>
+<dt>Returns:</dt><dd><p>bool: success or failure value</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="audioldm_train.utilities.audioldm2_api.AudioLDM2APIObject.trainFromScratch">
+<span class="sig-name descname"><span class="pre">trainFromScratch</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#audioldm_train.utilities.audioldm2_api.AudioLDM2APIObject.trainFromScratch" title="Link to this definition"></a></dt>
+<dd><p>Finetune from scratch, no checkpoint</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="usage.html" class="btn btn-neutral float-left" title="Usage" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="flaskApp.html" class="btn btn-neutral float-right" title="Flask App" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Kyler Smith.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

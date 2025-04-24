@@ -20,3 +20,5 @@ dump.rdb
 docs/*
 !docs/source
 !webapp/static/checkpoints
+!docs/*.pdf
+!docs/html

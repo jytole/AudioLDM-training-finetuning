@@ -1,0 +1,256 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Usage &mdash; AudioLDM2 Pipeline 1.8 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+    <link rel="shortcut icon" href="_static/favicon.png"/>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=d13700ae"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="AudioLDM2 API" href="audioldm2_api.html" />
+    <link rel="prev" title="Installation" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            AudioLDM2 Pipeline
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#process-overview">Process Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#fine-tuning">Fine-Tuning</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#import-files-from-cloud-storage">Import Files from Cloud Storage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dataset-formatting">Dataset Formatting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#accessing-checkpoints">Accessing checkpoints</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#manually-stop-fine-tuning">Manually Stop Fine-Tuning</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#generating-sounds">Generating sounds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#parameters">Parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#interface-images">Interface images</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="audioldm2_api.html">AudioLDM2 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="flaskApp.html">Flask App</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchServer.html">Torch Server</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">AudioLDM2 Pipeline</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Usage</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/usage.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="usage">
+<h1>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h1>
+<p>This section describes how to use the AudioLDM2 fine-tuning pipeline and interface for fine-tuning and audio generation. This section reflects the interface in version <a class="reference external" href="https://hub.docker.com/repository/docker/jytole/runpod_audioldm/tags/1.9.2.1/sha256-3d6570b303fb9f8d0cf23a367407e4c168696e5f8ee01474966c81020e92673a">1.9.2.1</a> of the Docker container as of April 18, 2025.</p>
+<p>The system is designed to be run in a container, as described in the Installation section, with an exposed web port to access the hosted flask application. When hosted on RunPod, it is possible to access the http interface from the <a class="reference external" href="https://www.runpod.io/console/pods">RunPod console</a> with the “connect” button on the pod.</p>
+<section id="process-overview">
+<h2>Process Overview<a class="headerlink" href="#process-overview" title="Link to this heading"></a></h2>
+<p>The AudioLDM2 pipeline and interface is intended to be used to either fine-tune the AudioLDM2 model, or to generate audio from a previously fine-tuned model. The process is thus divided into two main sections: fine-tuning and audio generation. In order to fine-tune, a checkpoint of AudioLDM2 and a dataset in .zip format are needed as input. A checkpoint of AudioLDM2 is included in the suggested docker container. In order to generate sounds, a checkpoint of AudioLDM2 is needed as input. A flowchart of the process is shown below.</p>
+<img alt="AudioLDM2 Pipeline Process Overview" class="align-center" src="_images/usageDiagram.png" />
+</section>
+<section id="fine-tuning">
+<h2>Fine-Tuning<a class="headerlink" href="#fine-tuning" title="Link to this heading"></a></h2>
+<p>In order to initiate the fine-tuning process, the user must upload a dataset in .zip format and select a checkpoint of AudioLDM2. The dataset must be in the format specified in the Dataset Formatting subsection below. The following steps should be followed to fine-tune the model:</p>
+<ol class="arabic simple">
+<li><p><strong>Prepare Dataset</strong>: The dataset must be in .zip format and follow the guidelines in the Dataset Formatting subsection below.</p></li>
+<li><p><strong>Upload Dataset</strong>: The dataset can be uploaded using the “Choose File” button in the interface. “Submit” once the file is uploaded.</p></li>
+<li><p><strong>Select Checkpoint</strong>: The checkpoint can be selected from the dropdown menu in the “Start Fine-Tuning” field.</p></li>
+<li><p><strong>Adjust Parameters</strong>: The parameters for the fine-tuning process can be adjusted in the “Options” tab and are discussed in the “Parameters” section below.</p></li>
+<li><p><strong>Start Fine-Tuning</strong>: Click the “Start” button in the “Start Fine-Tuning” field to begin the fine-tuning process.</p></li>
+<li><p><strong>Monitor Progress</strong>: The progress of the fine-tuning process can be monitored at the top of the page in the “AudioLDM2 Monitor” field.</p></li>
+</ol>
+<section id="import-files-from-cloud-storage">
+<h3>Import Files from Cloud Storage<a class="headerlink" href="#import-files-from-cloud-storage" title="Link to this heading"></a></h3>
+<p>In order to speed up the process of uploading large files like the dataset or the checkpoint, the interface can scan for datasets and checkpoints that have been manually transferred to the container. RunPod supports transferring files from cloud storage. If a checkpoint is placed into the /home/AudioLDM-training-finetuning/webapp/static/checkpoints/ directory, it can be detected and added to the checkpoint dropdown menu. Similarly, if a dataset is placed into the /home/AudioLDM-training-finetuning/webapp/static/datasets/ directory, it can be detected and added to the dataset dropdown menu. The interface will then allow the user to select these files from the dropdown menus instead of uploading them.</p>
+<p>In order to initiate this transfer and allow the interface to detect the files, you can refer to the <a class="reference external" href="https://docs.runpod.io/pods/configuration/export-data">RunPod documentation</a> on transferring files between the container and cloud storage. Ensure that you are transferring checkpoints with the extension .ckpt into the ./webapp/static/checkpoints/ directory, and datasets with the extension .zip into the ./webapp/static/datasets/ directory.</p>
+<p>In order to tell the interface to detect the files, there is a scan button on the Options page. This will scan the directories and add any files that are found to the dropdown menus.</p>
+</section>
+<section id="dataset-formatting">
+<h3>Dataset Formatting<a class="headerlink" href="#dataset-formatting" title="Link to this heading"></a></h3>
+<p>The dataset must be in .zip format and contain all the audio files. The audio files must be in .wav format. The audiofiles may be in a subdirectory. The dataset must also contain a .csv file with columns for “audio” and “caption”. The “audio” column must contain the relative path to an audio file from the root of the dataset. The caption should be a description of the contents of the audio file for use in training. The .csv file must be named metadata.csv and be located in the root of the dataset. An example dataset might be structured as follows:</p>
+<a class="reference internal image-reference" href="_images/datasetStructure.png"><img alt="AudioLDM2 Dataset Structure" class="align-center" src="_images/datasetStructure.png" style="width: 25%;" />
+</a>
+<p>The metadata.csv file for this dataset would look like this:</p>
+<a class="reference internal image-reference" href="_images/datasetCSV.png"><img alt="AudioLDM2 Dataset CSV" class="align-center" src="_images/datasetCSV.png" style="width: 50%;" />
+</a>
+</section>
+<section id="accessing-checkpoints">
+<h3>Accessing checkpoints<a class="headerlink" href="#accessing-checkpoints" title="Link to this heading"></a></h3>
+<p>The fine-tuning page of the interface contains a button to download the latest checkpoint, but this 8 GB download may take a significant amount of time, so it is recommended to export the checkpoint to cloud storage according to the <a class="reference external" href="https://docs.runpod.io/pods/configuration/export-data">RunPod documentation</a>.</p>
+<p>You may find checkpoints in the /home/AudioLDM-training-finetuning/log/latent-diffusion/ directory. By default within this directory, the checkpoint is located in ./2025_03_27_api_default_finetune/default_finetune/checkpoints/. The latest checkpoint should be saved with the “global step” count labeled in the filename. By default, the checkpoint is saved every 5000 global steps, but this parameter can be adjusted in the options tab.</p>
+</section>
+<section id="manually-stop-fine-tuning">
+<h3>Manually Stop Fine-Tuning<a class="headerlink" href="#manually-stop-fine-tuning" title="Link to this heading"></a></h3>
+<p>With the default configuration parameters, fine-tuning may take a long time depending on the size of the dataset and the parameters configured. If you would like to stop the fine-tuning process, it is recommended to first export the latest checkpoint according to the instructions above before stopping the process. This checkpoint can then be imported to generate sounds.</p>
+<p>Fine-tuning can be stopped by searching for the process running “python torchServer.py” in the container and killing the process with the lowest process ID. This can be done with the following commands:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(audioldm_train)</span> <span class="gp">$ </span>ps<span class="w"> </span>aux<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>torchServer.py
+<span class="gp gp-VirtualEnv">(audioldm_train)</span> <span class="gp">$ </span><span class="nb">kill</span><span class="w"> </span>&lt;process_id&gt;
+</pre></div>
+</div>
+<p>It is recommended to also kill the process running “gunicorn” int he container, as this process should be running alongside the webapp. Follow the same process as above to find the process ID and kill it. The commands should look like this:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(audioldm_train)</span> <span class="gp">$ </span>ps<span class="w"> </span>aux<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>gunicorn
+<span class="gp gp-VirtualEnv">(audioldm_train)</span> <span class="gp">$ </span><span class="nb">kill</span><span class="w"> </span>&lt;process_id&gt;
+</pre></div>
+</div>
+<p>Once this process is killed, the system may be rebooted to start it again, or the webapp script may be restarted manually without rebooting using the following commands:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(audioldm_train)</span> <span class="gp">$ </span><span class="nb">export</span><span class="w"> </span><span class="nv">FLASK_SECRET_KEY</span><span class="o">=</span><span class="k">$(</span>openssl<span class="w"> </span>rand<span class="w"> </span>-hex<span class="w"> </span><span class="m">16</span><span class="k">)</span>
+<span class="gp gp-VirtualEnv">(audioldm_train)</span> <span class="gp">$ </span>/post_start.sh
+</pre></div>
+</div>
+</section>
+</section>
+<section id="generating-sounds">
+<h2>Generating sounds<a class="headerlink" href="#generating-sounds" title="Link to this heading"></a></h2>
+<p>In order to generate sounds using the AudioLDM2 interface, the inference tab can be used. The dropdown box inside the Generate Sound section of the interface should be used to select the desired checkpoint to generate sounds from. The text box should be used to input a prompt, and “Submit” can be pressed to generate a sound.</p>
+<p>For example, “Therabot barking” could be used as a prompt for a checkpoint trained on sounds labeled with “Therabot” in order to generate a sound similar to those that were used in training.</p>
+</section>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<p>The following parameters are available in the Options tab to change the way that the model behaves. A short description of each parameter is included.</p>
+<ul>
+<li><p>Seed</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Default: 0</p></li>
+<li><p>Changes the seed for random number generation.</p></li>
+<li><p>The same seed with the same prompt and the same checkpoint will generate the same sound.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Save Checkpoint Every N Steps</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Default: 5000</p></li>
+<li><p>Number of global steps after which to save a checkpoint</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Validation Every N Epochs</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Default: 5</p></li>
+<li><p>Number of epochs after which to perform the validation loop</p></li>
+<li><p>The validation loop performs inference and adjusts the learning rate according to results</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Evaluation: Unconditional Guidance Scale</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Default: 3.5</p></li>
+<li><p>A lower value indicates more creativity</p></li>
+<li><p>A higher value indicates less creativity and more obedience to the prompt</p></li>
+<li><p>It is not recommended to go above 15</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Evaluation: DDIM Sampling Steps</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Default: 200</p></li>
+<li><p>Denoising steps</p></li>
+<li><p>More steps means a clearer sound</p></li>
+<li><p>After around 50 steps, the increase in clarity is less substantial up to 200 steps (according to the original AudioLDM paper)</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Evaluation: N Candidates Per Sample</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Default: 3</p></li>
+<li><p>Number of sounds to generate during inference before taking the top candidate</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</section>
+<section id="interface-images">
+<h2>Interface images<a class="headerlink" href="#interface-images" title="Link to this heading"></a></h2>
+<img alt="AudioLDM2 Fine-Tuning Interface" class="align-center" src="_images/finetuneInterface.png" />
+<img alt="AudioLDM2 Generation Interface" class="align-center" src="_images/inferenceInterface.png" />
+<img alt="AudioLDM2 Options Interface" class="align-center" src="_images/optionsInterface.png" />
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="audioldm2_api.html" class="btn btn-neutral float-right" title="AudioLDM2 API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Kyler Smith.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

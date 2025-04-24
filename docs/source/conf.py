@@ -26,3 +26,10 @@ exclude_patterns = []
 
 html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
+html_favicon = 'images/favicon.png'
+
+# -- Options for Latex output -------------------------------------------------
+
+latex_elements = {
+    'extraclassoptions': 'openany,oneside',
+}
