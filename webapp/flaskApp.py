@@ -440,7 +440,13 @@ def finetuningPage():
     if request.method == "POST":
         if "startFineTuningBulkForm" in request.form:
             logger.debug("/finetuning: startFineTuningForm")
+            archiveUpload() # processes dataset
+            bulkParamForm() # Handle parameters from form
+            startFineTuning() # Sets checkpoint and begins fine-tuning 
             ## Handle checkpoint, parameters, and begin finetuning
+        elif "startEvalForm" in request.form:
+            logger.debug("/finetuning: startEvalForm")
+            startEval()
     rendered_template = render_template("finetuning.html", current_state=current_state)
     response = make_response(rendered_template)
     response.headers['Content-Type'] = 'text/html; charset=utf-8'
