@@ -104,7 +104,7 @@
                 <h3>Generated Sound</h3>
                 <p id="inferencePrompt"></p>
                 <audio controls>
-                    <source src="{{current_state["inferencePath"]}}" type="audio/wav", id="inferenceAudio">
+                    <source src='{{current_state["inferencePath"]}}' type="audio/wav", id="inferenceAudio">
                 Your browser does not support the audio element.
                 </audio>
             </div>
@@ -117,7 +117,7 @@
             <form method="POST">
                 <label for="parameter">Parameter:</label>
                 <select name="parameter" id="parameter">
-                    <option value="seed">Seed</options>
+                    <option value="seed">Seed</option>
                     <option value="step,save_checkpoint_every_n_steps">Save Checkpoint Every N Steps</option>
                     <option value="step,validation_every_n_epochs">Validation Every N Epochs</option>
                     <option value="reload_from_ckpt">Reload From Checkpoint</option>
@@ -126,7 +126,7 @@
                     <option value="model,params,evaluation_params,n_candidates_per_samples">Evaluation: N Candidates Per Sample</option>
                 </select>
                 <label for="paramValue">Value:</label>
-                <input type="text" name="value" id="paramValue" title="Value of parameter" placeholder="{{ current_state["params"]["seed"] }}"/>
+                <input type="text" name="value" id="paramValue" title="Value of parameter" placeholder='{{ current_state["params"]["seed"] }}''/>
                 <input type="submit" name="setParameterForm" />
             </form>
         </div>
