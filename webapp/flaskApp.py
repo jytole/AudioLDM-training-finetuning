@@ -86,6 +86,7 @@ with app.app_context():
                         "model,params,evaluation_params,unconditional_guidance_scale": 3.5,
                         "model,params,evaluation_params,ddim_sampling_steps": 200,
                         "model,params,evaluation_params,n_candidates_per_samples": 3,
+                        "preprocessing,audio,duration": 10.24,
                      },
                      "datasets": [
                          
@@ -391,37 +392,7 @@ def index():
 
     Returns:
         response: http response containing the rendered template
-    """
-    # handle all the forms
-    if request.method == "POST":
-        if "archiveUploadForm" in request.form:
-            logger.debug("archiveUploadForm")
-            archiveUpload()
-        elif "setParameterForm" in request.form:
-            logger.debug("setParameterForm")
-            setParameter()
-        elif "startFineTuningForm" in request.form:
-            logger.debug("startFineTuningForm")
-            startFineTuning()
-        elif "inferSingleForm" in request.form:
-            logger.debug("inferSingleForm")
-            inferSingle()
-        elif "downloadCheckpointLatestForm" in request.form:
-            logger.debug("downloadCheckpointLatestForm")
-            downloadCheckpointLatest()
-        elif "scanFileSystemForm" in request.form:
-            logger.debug("scanFileSystemForm")
-            scanFileSystem()
-        elif "processImportedDatasetForm" in request.form:
-            logger.debug("processImportedDatasetForm")
-            processImportedDataset()
-        elif "startEvalForm" in request.form:
-            logger.debug("startEvalForm")
-            startEval()
-        elif "debugForm" in request.form:
-            logger.debug("debugForm")
-            debugFunc()
-            
+    """     
     rendered_template = render_template("index.html", current_state=current_state)
     response = make_response(rendered_template)
     response.headers['Content-Type'] = 'text/html; charset=utf-8'
@@ -438,15 +409,20 @@ def finetuningPage():
         response: http response containing the rendered template
     """
     if request.method == "POST":
-        if "startFineTuningBulkForm" in request.form:
-            logger.debug("/finetuning: startFineTuningForm")
-            archiveUpload() # processes dataset
+        if "archiveUploadForm" in request.form:
+            logger.debug("/finetuning: archiveUploadForm")
+            archiveUpload() # process dataset
+        elif "startFineTuningBulkForm" in request.form:
+            logger.debug("/finetuning: startFineTuningBulkForm")
             bulkParamForm() # Handle parameters from form
             startFineTuning() # Sets checkpoint and begins fine-tuning 
             ## Handle checkpoint, parameters, and begin finetuning
         elif "startEvalForm" in request.form:
             logger.debug("/finetuning: startEvalForm")
             startEval()
+        elif "downloadCheckpointLatestForm" in request.form:
+            logger.debug("/finetuning: downloadCheckpointLatestForm")
+            downloadCheckpointLatest()
     rendered_template = render_template("finetuning.html", current_state=current_state)
     response = make_response(rendered_template)
     response.headers['Content-Type'] = 'text/html; charset=utf-8'
@@ -465,6 +441,10 @@ def inferencePage():
     if request.method == "POST":
         if "startFineTuningForm" in request.form:
             logger.debug("/inference: startFineTuningForm")
+        elif "beginInferenceBulkForm" in request.form:
+            logger.debug("/inference: beginInferenceBulkForm")
+            bulkParamForm()
+            inferSingle()
     rendered_template = render_template("inference.html", current_state=current_state)
     response = make_response(rendered_template)
     response.headers['Content-Type'] = 'text/html; charset=utf-8'
@@ -609,6 +589,29 @@ def setParameter():
     else:
         flash("Failed to set parameter")
     return False
+
+def bulkParamForm():
+    """Handle all parameters in one form.
+    
+    Returns:
+        success: boolean flag
+    """
+    # Dictionary of label: arrayKey
+    parameters = {
+        "seed": "seed",
+        "validation_every_n_epochs": "step,validation_every_n_epochs",
+        "save_checkpoint_every_n_steps": "step,save_checkpoint_every_n_steps",
+        "unconditional_guidance_scale": "model,params,evaluation_params,unconditional_guidance_scale",
+        "ddim_sampling_steps": "model,params,evaluation_params,ddim_sampling_steps",
+        "n_candidates_per_samples": "model,params,evaluation_params,n_candidates_per_samples",        
+        "audio_duration": "preprocessing,audio,duration",
+    }
+    
+    for key, val in parameters:
+        valInput = request.form[key]
+        message = "set_parameter;" + val + ";" + valInput
+        if sendToServer(message):
+            current_state["params"][val] = valInput
 
 def startFineTuning():
     """Start the finetuning process on torchServer.

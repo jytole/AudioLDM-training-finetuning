@@ -60,7 +60,7 @@ body {
     text-align: center;
 }
 
-input[type="submit"], input[type="file"], .fileUploadLabel {
+input[type="submit"], input[type="file"], .fileUploadLabel, .themedButton {
     background-color: #5D1725;
     color: white;
     border: none;
@@ -84,7 +84,7 @@ body {
 }
 
 div.formContainer {
-    width: 50%;
+    width: 75%;
     margin: 0 auto;
     padding: 1%;
     border: 2px #eee solid;
@@ -145,4 +145,49 @@ input[type="text"] {
 
 .quickView > p {
     margin: 0;
+}
+
+.form-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.form-group label {
+    width: 50%;
+    margin-right: 10px;
+    text-align: right;
+}
+
+.form-group input {
+    width: 50%;
+}
+
+.splashButtonContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.splashButtonContainer button {
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+    width: 10em;
+    height: 5em;
+}
+
+.splashButtonContainer button p {
+    margin: 0px;
+}
+
+.splashScreen {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
 }

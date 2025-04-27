@@ -4,8 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="static/favicon.png">
 
-    <title>AudioLDM2 Fine-Tuning</title>
+    <title>Home | AudioLDM2</title>
 
     <!--Get filesheet from webapp/static/css/style.css-->
     <link rel="stylesheet" href="{{ url_for('static', filename= 'css/style.css') }}">
@@ -13,6 +14,7 @@
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
 </head>
 <body>
+    <div class="splashScreen">
     {% block content %}
     <div class="container">
         {% for message in get_flashed_messages() %}
@@ -25,13 +27,14 @@
     {% endblock %}
     <h1>AudioLDM2 Fine-Tuning and Inference Pipeline</h1>
     <h3>What would you like to do?</h3>
-    <div>
-        <button id="finetuningButton" onclick="window.location.href='/finetuning'">
-                <p>Fine-Tune<p>
-            </button>
-        <button id="inferenceButton" onclick="window.location.href='/inference'">
-            <p>Generate a Sound<p>
+    <div class="splashButtonContainer">
+        <button class="themedButton" id="finetuningButton" onclick="window.location.href='/finetuning'">
+            <p>Fine-Tune</p>
         </button>
+        <button class="themedButton" id="inferenceButton" onclick="window.location.href='/inference'">
+            <p>Generate a Sound</p>
+        </button>
+    </div>
     </div>
 
 </body>

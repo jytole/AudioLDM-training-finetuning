@@ -4,8 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="static/favicon.png">
 
-    <title>AudioLDM2 Fine-Tuning</title>
+    <title>Inference | AudioLDM2</title>
 
     <!--Get filesheet from webapp/static/css/style.css-->
     <link rel="stylesheet" href="{{ url_for('static', filename= 'css/style.css') }}">
@@ -23,8 +24,78 @@
         {% endfor %}
     </div>
     {% endblock %}
-    <h1>AudioLDM2 Fine-Tuning and Inference Pipeline</h1>
-    <h3>Generate a Sound</h3>
+    <div class="titleBar" id="titleBar">
+        <img src="static/icons/house-solid.svg" class="icon navButton" alt="house" onclick="window.location.href='/'" style="color: white" />
+        <div class="titleAndSubtitle">
+            <h1>AudioLDM2 Fine-Tuning and Inference Pipeline</h1>
+            <h3>Inference</h3>
+        </div>
+    </div>
+    <div class="finetuneContainer">
+        <form method="POST">
+            <div class="formContainer">
+                <h3 class="processStep"><div class="circledNumber">1</div>Select a Checkpoint</h3>
+                    <label for="checkpointSelect">Select Checkpoint:</label>
+                    <select name="checkpointSelect" id="checkpointSelect">
+                    </select>
+            </div>
+
+            <div class="formContainer">
+                <h3 class="processStep"><div class="circledNumber">2</div>Adjust Parameters</h3>
+                    <div class="form-group">
+                        <label for="seed">Seed:</label>
+                        <input type="text" name="seed" id="seed" title="Value of parameter" placeholder='{{ current_state["params"]["seed"] }}' />
+                    </div>
+                    <div class="form-group">
+                        <label for="validation_every_n_epochs">Validation Every N Epochs:</label>
+                        <input type="text" name="validation_every_n_epochs" id="validation_every_n_epochs" title="Value of parameter" placeholder='{{ current_state["params"]["step,validation_every_n_epochs"] }}' />
+                    </div>
+                    <div class="form-group">
+                        <label for="save_checkpoint_every_n_steps">Save Checkpoint Every N Steps:</label>
+                        <input type="text" name="save_checkpoint_every_n_steps" id="save_checkpoint_every_n_steps" title="Value of parameter" placeholder='{{ current_state["params"]["step,save_checkpoint_every_n_steps"] }}' />
+                    </div>
+                    <div class="form-group">
+                        <label for="unconditional_guidance_scale">Unconditional Guidance Scale:</label>
+                        <input type="text" name="unconditional_guidance_scale" id="unconditional_guidance_scale" title="Value of parameter" placeholder='{{ current_state["params"]["model,params,evaluation_params,unconditional_guidance_scale"] }}' />
+                    </div>
+                    <div class="form-group">
+                        <label for="ddim_sampling_steps">DDIM Sampling Steps:</label>
+                        <input type="text" name="ddim_sampling_steps" id="ddim_sampling_steps" title="Value of parameter" placeholder='{{ current_state["params"]["model,params,evaluation_params,ddim_sampling_steps"] }}' />
+                    </div>
+                    <div class="form-group">
+                        <label for="n_candidates_per_samples">N Candidates Per Sample:</label>
+                        <input type="text" name="n_candidates_per_samples" id="n_candidates_per_samples" title="Value of parameter" placeholder='{{ current_state["params"]["model,params,evaluation_params,n_candidates_per_samples"] }}' />
+                    </div>
+                    <div class="form-group">
+                        <label for="audio_duration">Audio Duration:</label>
+                        <input type="text" name="audio_duration" id="audio_duration" title="Value of parameter" placeholder='{{ current_state["params"]["preprocessing,audio,duration"] }}' />
+                    </div>
+            </div>
+
+            <div class="formContainer">
+                <h3 class="processStep"><div class="circledNumber">3</div>Input Text Prompt</h3>
+                <p>Input a text prompt to guide the inference process.</p>
+                <label for="prompt">Prompt:</label>
+                <input type="text" name="prompt" id="prompt" title="Prompt for generation" placeholder="A dog barking on a quiet night"/>
+            </div>
+
+            <div class="formContainer">
+                <h3 class="processStep"><div class="circledNumber">4</div>Begin Inference</h3>
+                <input type="submit" name="beginInferenceBulkForm" value="Start"/>
+            </div>
+
+        </form>
+
+        <div class="audioContainer" id="inferenceAudioContainer">
+                <h3>Generated Sound</h3>
+                <p id="inferencePrompt"></p>
+                <audio controls>
+                    <source src='{{current_state["inferencePath"]}}' type="audio/wav", id="inferenceAudio">
+                Your browser does not support the audio element.
+                </audio>
+        </div>
+
+    </div>
 </body>
 <script>
     var socket = io();
@@ -61,11 +132,11 @@
     updateCurrentState();
 
     function updateCurrentState() {
-        if (current_state["displayInferenceAudio"]) {
-            $('#inferenceAudioContainer').show();
-        } else {
-            $('#inferenceAudioContainer').hide();
-        }
+        //if (current_state["displayInferenceAudio"]) {
+        //    $('#inferenceAudioContainer').show();
+        //} else {
+        //    $('#inferenceAudioContainer').hide();
+        //}
         $('#inferencePrompt').text(current_state["inferencePrompt"]);
         $('#inferenceAudio').attr("src", current_state["inferencePath"]);
 
@@ -132,7 +203,7 @@
         current_state = data;
         if($('#inferenceAudio').attr("src") != current_state["inferencePath"]){
             // Reload if audio is new, to fetch the new file
-            location.href = "/";
+            location.href = "/finetuning";
         };
         updateCurrentState();
     });
@@ -154,4 +225,10 @@
     socket.on("monitor", function(data) {
         $('#monitorContent').append(data + "<br>");
     });
+
+    const fileUploadField = document.getElementById('datasetZip');
+    const fileName = document.getElementById('datasetZipName');
+    fileUploadField.addEventListener('change', function() {
+        fileName.textContent = this.files[0].name;
+    })
 </script>
