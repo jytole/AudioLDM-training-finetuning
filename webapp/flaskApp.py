@@ -612,7 +612,7 @@ def bulkParamForm():
         "audio_duration": "preprocessing,audio,duration",
     }
     
-    for key, val in parameters:
+    for key, val in parameters.items():
         valInput = request.form[key]
         message = "set_parameter;" + val + ";" + valInput
         if sendToServer(message):
