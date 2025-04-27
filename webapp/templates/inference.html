@@ -166,18 +166,11 @@
             $('#importedDatasetForm').parent().hide();
         }
 
-        if (Object.keys(current_state["checkpoints"]).length != 0) {
+        if (Object.keys(current_state["inferenceCheckpoints"]).length != 0) {
             $('#checkpointSelectForm').parent().show();
             $('#checkpointSelect').empty();
-            current_state["checkpoints"].forEach(function(checkpoint) {
-                $('#checkpointSelect').append($('<option>', {
-                    value: checkpoint,
-                    text: checkpoint.replace(/^.*[\\/]/, '')
-                }));
-            });
-            $('#inferenceCheckpointSelect').empty();
             current_state["inferenceCheckpoints"].forEach(function(checkpoint) {
-                $('#inferenceCheckpointSelect').append($('<option>', {
+                $('#checkpointSelect').append($('<option>', {
                     value: checkpoint,
                     text: checkpoint.replace(/^.*[\\/]/, '')
                 }));
