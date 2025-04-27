@@ -209,7 +209,7 @@
         current_state = data;
         if($('#inferenceAudio').attr("src") != current_state["inferencePath"]){
             // Reload if audio is new, to fetch the new file
-            location.href = "/finetuning";
+            location.href = "/inference";
         };
         updateCurrentState();
     });
