@@ -614,9 +614,10 @@ def bulkParamForm():
     
     for key, val in parameters.items():
         valInput = request.form[key]
-        message = "set_parameter;" + val + ";" + valInput
-        if sendToServer(message):
-            current_state["params"][val] = valInput
+        if(valInput != ''):
+            message = "set_parameter;" + val + ";" + valInput
+            if sendToServer(message):
+                current_state["params"][val] = valInput
 
 def startFineTuning():
     """Start the finetuning process on torchServer.
