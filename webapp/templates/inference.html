@@ -85,14 +85,15 @@
             </div>
 
         </form>
-
-        <div class="audioContainer" id="inferenceAudioContainer">
-                <h3>Generated Sound</h3>
-                <p id="inferencePrompt"></p>
-                <audio controls>
-                    <source src='{{current_state["inferencePath"]}}' type="audio/wav", id="inferenceAudio">
-                Your browser does not support the audio element.
-                </audio>
+        <div class="formContainer">
+            <div class="audioContainer" id="inferenceAudioContainer">
+                    <h3>Generated Sound</h3>
+                    <p id="inferencePrompt"></p>
+                    <audio controls>
+                        <source src='{{current_state["inferencePath"]}}' type="audio/wav", id="inferenceAudio">
+                    Your browser does not support the audio element.
+                    </audio>
+            </div>
         </div>
 
     </div>

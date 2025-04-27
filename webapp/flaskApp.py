@@ -77,7 +77,7 @@ with app.app_context():
 
     current_state = {"inferencePath": "fake.mp3", 
                      "displayInferenceAudio": False,
-                     "inferencePrompt": "fake prompt",
+                     "inferencePrompt": "<no sound generated>",
                      "params": {
                         "seed": 0,
                         "step,validation_every_n_epochs": 5,
