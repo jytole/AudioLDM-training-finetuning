@@ -87,8 +87,8 @@
         </form>
         <div class="formContainer">
             <div class="audioContainer" id="inferenceAudioContainer">
-                    <h3>Generated Sound</h3>
-                    <p id="inferencePrompt"></p>
+                    <h3 class="processStep"><div class="circledNumber">5</div>Listen to Generated Sound</h3>
+                    <p id="inferencePrompt" style="text-align: center;"></p>
                     <audio controls>
                         <source src='{{current_state["inferencePath"]}}' type="audio/wav", id="inferenceAudio">
                     Your browser does not support the audio element.
