@@ -133,6 +133,12 @@
     // on render of template, set current_state
     let current_state = {{ current_state | tojson }};
 
+    window.onload = function() {
+        if(current_state["monitor"]["torchServerStatus"] == "idle") {
+            socket.emit("scanSystem");
+        }
+    }
+
     // add event listeners to tab tab buttons
     $('#tabButtonFineTune').click(function() {
         $('.tabSection').hide();

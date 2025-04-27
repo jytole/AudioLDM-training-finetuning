@@ -126,6 +126,11 @@ def tab_change(data):
 def disconnect(sid):
     logger.info('disconnect ' + str(sid))
 
+@socket.on("scanSystem")
+def scanSystem():
+    logger.debug("Socket scanSystem")
+    scanFileSystem()
+
 # https://stackoverflow.com/questions/5419888/reading-from-a-frequently-updated-file
 def follow(logFile):
     """Helper function to monitor a constantly growing file.
