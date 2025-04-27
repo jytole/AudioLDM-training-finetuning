@@ -126,7 +126,7 @@ def tab_change(data):
 def disconnect(sid):
     logger.info('disconnect ' + str(sid))
 
-@socket.on("scanSystem")
+@socketio.on("scanSystem")
 def scanSystem():
     logger.debug("Socket scanSystem")
     scanFileSystem()
