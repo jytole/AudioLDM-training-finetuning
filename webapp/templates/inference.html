@@ -104,8 +104,15 @@
     let current_state = {{ current_state | tojson }};
 
     window.onload = function() {
-        if(current_state["monitor"]["torchServerStatus"] == "idle") {
-            socket.emit("scanSystem");
+        if (typeof sessionStorage !== "undefined") {
+            // Check if the scan has already been triggered
+            if (!sessionStorage.getItem("scanSystemTriggered")) {
+                socket.emit("scanSystem");
+                // Set a flag in sessionStorage to prevent re-triggering
+                sessionStorage.setItem("scanSystemTriggered", "true");
+            }
+        } else {
+            console.warn("sessionStorage is not supported by this browser.");
         }
     }
 
