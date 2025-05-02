@@ -57,31 +57,31 @@
                 <h3 class="processStep"><div class="circledNumber">3</div>Adjust Parameters</h3>
                     <div class="form-group">
                         <label for="seed">Seed:</label>
-                        <input type="text" name="seed" id="seed" title="Value of parameter" placeholder='{{ current_state["params"]["seed"] }}' />
+                        <input type="number" name="seed" id="seed" title="Value of parameter" placeholder='{{ current_state["params"]["seed"] }}' />
                     </div>
                     <div class="form-group">
                         <label for="validation_every_n_epochs">Validation Every N Epochs:</label>
-                        <input type="text" name="validation_every_n_epochs" id="validation_every_n_epochs" title="Value of parameter" placeholder='{{ current_state["params"]["step,validation_every_n_epochs"] }}' />
+                        <input type="number" name="validation_every_n_epochs" id="validation_every_n_epochs" title="Value of parameter" placeholder='{{ current_state["params"]["step,validation_every_n_epochs"] }}' />
                     </div>
                     <div class="form-group">
                         <label for="save_checkpoint_every_n_steps">Save Checkpoint Every N Steps:</label>
-                        <input type="text" name="save_checkpoint_every_n_steps" id="save_checkpoint_every_n_steps" title="Value of parameter" placeholder='{{ current_state["params"]["step,save_checkpoint_every_n_steps"] }}' />
+                        <input type="number" name="save_checkpoint_every_n_steps" id="save_checkpoint_every_n_steps" title="Value of parameter" placeholder='{{ current_state["params"]["step,save_checkpoint_every_n_steps"] }}' />
                     </div>
                     <div class="form-group">
                         <label for="unconditional_guidance_scale">Unconditional Guidance Scale:</label>
-                        <input type="text" name="unconditional_guidance_scale" id="unconditional_guidance_scale" title="Value of parameter" placeholder='{{ current_state["params"]["model,params,evaluation_params,unconditional_guidance_scale"] }}' />
+                        <input type="number" name="unconditional_guidance_scale" id="unconditional_guidance_scale" title="Value of parameter" placeholder='{{ current_state["params"]["model,params,evaluation_params,unconditional_guidance_scale"] }}' />
                     </div>
                     <div class="form-group">
                         <label for="ddim_sampling_steps">DDIM Sampling Steps:</label>
-                        <input type="text" name="ddim_sampling_steps" id="ddim_sampling_steps" title="Value of parameter" placeholder='{{ current_state["params"]["model,params,evaluation_params,ddim_sampling_steps"] }}' />
+                        <input type="number" name="ddim_sampling_steps" id="ddim_sampling_steps" title="Value of parameter" placeholder='{{ current_state["params"]["model,params,evaluation_params,ddim_sampling_steps"] }}' />
                     </div>
                     <div class="form-group">
                         <label for="n_candidates_per_samples">N Candidates Per Sample:</label>
-                        <input type="text" name="n_candidates_per_samples" id="n_candidates_per_samples" title="Value of parameter" placeholder='{{ current_state["params"]["model,params,evaluation_params,n_candidates_per_samples"] }}' />
+                        <input type="number" name="n_candidates_per_samples" id="n_candidates_per_samples" title="Value of parameter" placeholder='{{ current_state["params"]["model,params,evaluation_params,n_candidates_per_samples"] }}' />
                     </div>
                     <div class="form-group">
                         <label for="audio_duration">Audio Duration:</label>
-                        <input type="text" name="audio_duration" id="audio_duration" title="Value of parameter" placeholder='{{ current_state["params"]["preprocessing,audio,duration"] }}' />
+                        <input type="number" name="audio_duration" id="audio_duration" title="Value of parameter" placeholder='{{ current_state["params"]["preprocessing,audio,duration"] }}' />
                     </div>
             </div>
 
