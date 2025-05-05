@@ -252,10 +252,6 @@
     // when received from socket, update current_state
     socket.on("current_state_update", function(data) {
         current_state = data;
-        if($('#inferenceAudio').attr("src") != current_state["inferencePath"]){
-            // Reload if audio is new, to fetch the new file
-            location.href = "/finetuning";
-        };
         updateCurrentState();
     });
 
