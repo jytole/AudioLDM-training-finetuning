@@ -101,6 +101,8 @@ with app.app_context():
                      "monitor": {
                         "torchServerStatus": "idle",
                         "epoch": -1,
+                        "epochStep": 0,
+                        "epochStepMax": 100,
                         "ddimStep": -1,
                         "globalStep": -1,
                      },
@@ -199,6 +201,18 @@ def torchServer_monitor(timeout=100):
             epochNew = int(line[numStart:numEnd])
             if epochNew != current_state["monitor"]["epoch"]:
                 current_state["monitor"]["epoch"] = epochNew
+                postEmit = True
+            epochStepEnd = line.find("/", numEnd)
+            epochStepMaxStart = epochStepEnd + 1
+            epochStepMaxEnd = line.find(" ", epochStepMaxStart)
+            epochStepStart = line.rfind(" ", numEnd, epochStepEnd)
+            epochStepMaxNew = int(line[epochStepMaxStart:epochStepMaxEnd])
+            epochStepNew = int(line[epochStepStart:epochStepEnd])
+            if epochStepMaxNew != current_state["monitor"]["epochStepMax"]:
+                current_state["monitor"]["epochStepMax"] = epochStepMaxNew
+                postEmit = True
+            if epochStepNew != current_state["monitor"]["epochStep"]:
+                current_state["monitor"]["epochStep"] = epochStepNew
                 postEmit = True
             if "global_step=" in line:
                 numStart = line.find("global_step=") + 12

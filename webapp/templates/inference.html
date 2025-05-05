@@ -89,6 +89,10 @@
             <div class="audioContainer" id="inferenceAudioContainer">
                     <h3 class="processStep"><div class="circledNumber">5</div>Listen to Generated Sound</h3>
                     <p id="inferencePrompt" style="text-align: center;"></p>
+                    <div style="display: flex; flex-direction: row;">
+                        <label for="ddimStep">Audio Generation Progress:</label>
+                        <progress id="ddimStep" value='{{ current_state["monitor"]["ddimStep"] }}' max='{{ current_state["params"]["model,params,evaluation_params,ddim_sampling_steps"] }}'> </progress>
+                    </div>
                     <audio controls>
                         <source src='{{current_state["inferencePath"]}}' type="audio/wav", id="inferenceAudio">
                     Your browser does not support the audio element.
@@ -203,6 +207,9 @@
         $('#epochVal').text(current_state["monitor"]["epoch"]);
         $('#globalStepVal').text(current_state["monitor"]["globalStep"]);
         $('#ddimStepVal').text(current_state["monitor"]["ddimStep"]);
+        $('#ddimStep').attr("value", current_state["monitor"]["ddimStep"]);
+        $('#ddimStep').attr("max", current_state["params"]["model,params,evaluation_params,ddim_sampling_steps"]);
+        $('#ddimStep').text(current_state["monitor"]["ddimStep"] / current_state["params"]["model,params,evaluation_params,ddim_sampling_steps"]);
     }
     
     // when received from socket, update current_state

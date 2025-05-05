@@ -109,6 +109,10 @@
                     <p>DDIM Step:<span id="ddimStepVal"></span></p>
                 </div>
             </div>
+            <div style="display: flex; flex-direction: row;">
+                <label for="epochStep">Current Epoch Progress:</label>
+                <progress id="epochStep" value='{{ current_state["monitor"]["epochStep"] }}' max='{{ current_state["monitor"]["epochStepMax"] }}'> </progress>
+            </div>
             <p id="monitorContent"></p>
         </div>
 
@@ -239,6 +243,10 @@
         $('#epochVal').text(current_state["monitor"]["epoch"]);
         $('#globalStepVal').text(current_state["monitor"]["globalStep"]);
         $('#ddimStepVal').text(current_state["monitor"]["ddimStep"]);
+        $('#epochStep').attr("value", current_state["monitor"]["epochStep"]);
+        $('#epochStep').attr("max", current_state["monitor"]["epochStepMax"]);
+        $('#epochStep').text(current_state["monitor"]["epochStep"] / current_state["monitor"]["epochStep"]);
+
     }
     
     // when received from socket, update current_state
